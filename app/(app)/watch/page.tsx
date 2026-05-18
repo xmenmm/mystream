@@ -217,7 +217,7 @@ export default function WatchPage() {
     seekFlashTimerRef.current = setTimeout(() => setSeekFlash(null), 650);
   }
   // 1x klik = play/pause (ditunda 250ms nunggu klik ke-2).
-  // 2x klik kanan = +5 dtk, 2x klik kiri = -2 dtk.
+  // 2x klik kanan = +10 dtk, 2x klik kiri = -10 dtk.
   function onPlayerClick(e: React.MouseEvent<HTMLElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
     const isRight = e.clientX - rect.left > rect.width / 2;
@@ -227,11 +227,11 @@ export default function WatchPage() {
       const el = videoRef.current;
       if (!el) return;
       if (isRight) {
-        seekTo((el.currentTime || 0) + 5);
-        flashSeek('R', 5);
+        seekTo((el.currentTime || 0) + 10);
+        flashSeek('R', 10);
       } else {
-        seekTo((el.currentTime || 0) - 2);
-        flashSeek('L', 2);
+        seekTo((el.currentTime || 0) - 10);
+        flashSeek('L', 10);
       }
       showControlsNow();
     } else {
