@@ -34,12 +34,24 @@ export async function putFile(
 }
 
 /**
+ * Base URL Supabase yang sudah DIBERSIHKAN dari spasi/newline/enter.
+ * (Env var sering kebawa newline pas paste di dashboard Vercel → bikin
+ *  header Location ilegal. URL tidak pernah punya whitespace sah, jadi
+ *  buang SEMUA \s aman.)
+ */
+function sbBase(): string {
+  return (process.env.SUPABASE_URL || '')
+    .replace(/\s+/g, '')
+    .replace(/\/+$/, '');
+}
+
+/**
  * URL publik file (bucket public) — DIBANGUN LANGSUNG dari env, TANPA SDK.
  * Tidak ada network/SDK call saat serving → tidak bisa throw/gagal.
  * Format Supabase: {url}/storage/v1/object/public/{bucket}/{prefix}/{name}
  */
 export function publicUrl(prefix: string, name: string): string {
-  const base = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+  const base = sbBase();
   const path = String(name)
     .split('/')
     .filter(Boolean)
@@ -55,8 +67,7 @@ export function publicUrl(prefix: string, name: string): string {
  */
 export function storageRedirect(prefix: string, name: string): Response {
   try {
-    const base = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
-    if (!base) {
+    if (!sbBase()) {
       return new Response('SUPABASE_URL belum di-set di environment', { status: 500 });
     }
     const url = publicUrl(prefix, name);

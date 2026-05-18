@@ -15,8 +15,9 @@ let _client: SupabaseClient | null = null;
 
 export function supa(): SupabaseClient {
   if (_client) return _client;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Bersihkan spasi/newline (sering kebawa pas paste env di dashboard Vercel).
+  const url = (process.env.SUPABASE_URL || '').replace(/\s+/g, '').replace(/\/+$/, '');
+  const key = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').replace(/\s+/g, '');
   if (!url || !key) {
     throw new Error(
       'Supabase belum dikonfigurasi: set SUPABASE_URL & SUPABASE_SERVICE_ROLE_KEY di environment.',
