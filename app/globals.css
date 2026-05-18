@@ -1,0 +1,675 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root, .dark {
+  color-scheme: dark;
+  /* Dark nyaman — bukan pure black (lembut di mata), surface ada elevasi jelas */
+  --bg: #0e0e12;
+  --bg-card: #18181f;
+  --bg-card-rgb: 24 24 31;
+  --bg-elev: #21212b;
+  --text: #e9e9ee;
+  --muted: #9a9aa8;
+  --border: #2e2e3a;
+  --scroll-track: #18181f;
+  --scroll-thumb: #3a3a48;
+  --scroll-thumb-hover: #50505f;
+  /* Accent — biru adem (bukan ungu), kontras enak, kasih "hidup" */
+  --accent-rgb: 96 165 250;
+  --accent-2-rgb: 56 189 248;
+  --grad-accent: linear-gradient(135deg, #3b82f6, #2563eb);
+  --accent-fg: #ffffff;
+  --glow: 0 6px 22px rgba(59, 130, 246, 0.28);
+}
+
+.light {
+  color-scheme: light;
+  /* Light lembut — off-white (bukan putih nyetrong), abu netral */
+  --bg: #fbfbfd;
+  --bg-card: #ffffff;
+  --bg-card-rgb: 255 255 255;
+  --bg-elev: #f3f4f7;
+  --text: #1c1c24;
+  --muted: #6b6b78;
+  --border: #e7e7ed;
+  --scroll-track: #f3f4f7;
+  --scroll-thumb: #d5d5dd;
+  --scroll-thumb-hover: #b3b3be;
+  /* Accent — biru sama (konsisten dgn dark), kontras enak di putih */
+  --accent-rgb: 37 99 235;
+  --accent-2-rgb: 14 165 233;
+  --grad-accent: linear-gradient(135deg, #3b82f6, #2563eb);
+  --accent-fg: #ffffff;
+  --glow: 0 6px 20px rgba(37, 99, 235, 0.16);
+}
+
+html {
+  /* Fluid root font: 12px @ 320px viewport → 16px @ 1600px+ viewport.
+     Saat user Ctrl+- (zoom out) viewport jadi lebih lebar → font tetap proporsional,
+     saat user Ctrl++ (zoom in) viewport jadi lebih sempit → font ikut mengecil
+     supaya layout tetap fit tanpa horizontal scroll atau ruang kosong. */
+  font-size: clamp(12px, 0.5rem + 0.6vw, 16px);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s, color 0.2s;
+}
+
+* { box-sizing: border-box; }
+
+a { color: inherit; }
+
+/* Elemen ber-background accent (tombol, logo, badge, header) pakai accent-fg
+   biar teks selalu kontras di atas accent. Berlaku dark & light (kedua mode
+   accent-nya gelap charcoal). Specificity > .text-white & muncul setelah
+   @tailwind utilities → menang. */
+.dark .bg-grad-accent,
+.dark .bg-accent,
+.light .bg-grad-accent,
+.light .bg-accent {
+  color: var(--accent-fg);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+@layer components {
+  .card {
+    /* Semi-transparent + backdrop-blur supaya space bg keliatan di belakang */
+    @apply rounded-2xl border border-border p-3 shadow-md backdrop-blur-md sm:p-4 md:p-5;
+    background-color: color-mix(in srgb, var(--bg-card) 80%, transparent);
+  }
+  .card-glass {
+    @apply rounded-2xl border border-border p-3 shadow-md backdrop-blur-md sm:p-4 md:p-5;
+    background-color: color-mix(in srgb, var(--bg-card) 65%, transparent);
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium transition active:scale-95;
+  }
+  .btn-primary {
+    @apply btn bg-grad-accent shadow-glow hover:opacity-90;
+    color: var(--accent-fg);
+  }
+  .btn-ghost {
+    @apply btn border border-border bg-transparent hover:bg-bg-elev;
+  }
+  .btn-danger {
+    @apply btn bg-danger text-white hover:opacity-90;
+  }
+  .input {
+    @apply w-full rounded-xl border border-border bg-bg-elev px-3 py-2 text-sm outline-none focus:border-accent;
+  }
+  .label {
+    @apply mb-1 block text-xs font-medium text-muted;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-border bg-bg-elev px-3 py-1 text-xs;
+  }
+}
+
+/* Sidebar admin flyout animation — drop down */
+@keyframes fade-in-down {
+  0%   { opacity: 0; transform: translateY(-8px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-fade-in-down {
+  animation: fade-in-down 0.18s ease-out;
+}
+
+/* Running text marquee */
+@keyframes marquee-x {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+.banner-marquee {
+  display: inline-flex;
+  animation: marquee-x 22s linear infinite;
+}
+.banner-strip:hover .banner-marquee { animation-play-state: paused; }
+
+/* ===== Category tile animations — biar lebih hidup ===== */
+@keyframes tile-pan-anim {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+.tile-pan {
+  background-size: 200% 200%;
+  animation: tile-pan-anim 8s ease-in-out infinite;
+}
+
+@keyframes tile-bounce-anim {
+  0%, 100% { transform: translateY(0) rotate(-2deg) scale(1); }
+  50%      { transform: translateY(-10px) rotate(2deg) scale(1.06); }
+}
+.tile-bounce { animation: tile-bounce-anim 3.5s ease-in-out infinite; }
+
+@keyframes tile-float-anim {
+  0%, 100% { transform: translateY(0) rotate(-6deg); opacity: 0.45; }
+  50%      { transform: translateY(-14px) rotate(8deg); opacity: 0.7; }
+}
+.tile-float { animation: tile-float-anim 4.2s ease-in-out infinite; }
+
+@keyframes tile-sparkle-anim {
+  0%, 100% { opacity: 0.15; transform: scale(0.6); }
+  50%      { opacity: 1; transform: scale(1.4); }
+}
+.tile-sparkle { animation: tile-sparkle-anim 2.4s ease-in-out infinite; }
+
+/* ========== Welcome / loading splash ========== */
+.welcome-bg {
+  background: radial-gradient(ellipse at top, #2a1f5c 0%, #0d0b1e 55%, #050410 100%);
+}
+.welcome-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.welcome-orb-1 {
+  width: 380px; height: 380px;
+  background: #8b5cf6;
+  top: -80px; left: -80px;
+  animation: orb-float 8s ease-in-out infinite;
+}
+.welcome-orb-2 {
+  width: 320px; height: 320px;
+  background: #d946ef;
+  bottom: -60px; right: -40px;
+  animation: orb-float 10s ease-in-out infinite reverse;
+}
+.welcome-orb-3 {
+  width: 260px; height: 260px;
+  background: #06b6d4;
+  bottom: 30%; left: 30%;
+  opacity: 0.35;
+  animation: orb-float 12s ease-in-out infinite;
+}
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(40px, -30px) scale(1.08); }
+}
+
+.welcome-logo {
+  animation: welcome-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), welcome-pulse 2.4s ease-in-out 0.6s infinite;
+  box-shadow: 0 0 60px rgba(139, 92, 246, 0.55), 0 0 120px rgba(217, 70, 239, 0.35);
+}
+@keyframes welcome-pop {
+  0%   { transform: scale(0.4) rotate(-12deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes welcome-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+.welcome-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #d946ef);
+  animation: welcome-bounce 1.1s ease-in-out infinite;
+}
+@keyframes welcome-bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%           { transform: scale(1.2); opacity: 1; }
+}
+
+/* ========== Page entry animations (fade-up dengan stagger) ========== */
+@keyframes enter-fade-up {
+  0%   { opacity: 0; transform: translateY(16px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.enter {
+  opacity: 0;
+  animation: enter-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+/* Stagger delays — tiap element dapat delay berbeda */
+.enter-1  { animation-delay: 0.05s; }
+.enter-2  { animation-delay: 0.10s; }
+.enter-3  { animation-delay: 0.18s; }
+.enter-4  { animation-delay: 0.26s; }
+.enter-5  { animation-delay: 0.34s; }
+.enter-6  { animation-delay: 0.42s; }
+.enter-7  { animation-delay: 0.50s; }
+.enter-8  { animation-delay: 0.58s; }
+.enter-9  { animation-delay: 0.66s; }
+.enter-10 { animation-delay: 0.74s; }
+
+@keyframes enter-pop {
+  0%   { opacity: 0; transform: scale(0.7); }
+  60%  { transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.enter-pop {
+  opacity: 0;
+  animation: enter-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes enter-slide-right {
+  0%   { opacity: 0; transform: translateX(-12px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.enter-slide {
+  opacity: 0;
+  animation: enter-slide-right 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter, .enter-pop, .enter-slide { animation: none; opacity: 1; }
+}
+
+/* ========== HERO 3D BACKGROUND ========== */
+
+/* Container — perspective biar children punya kedalaman 3D */
+.hero3d, .hero3d-fixed {
+  overflow: hidden;
+  perspective: 1000px;
+  pointer-events: none;
+}
+.hero3d {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+/* Fixed full-page version — covers entire viewport, scrolls dengan parallax */
+.hero3d-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Vignette gelap di pinggiran biar fokus content */
+.hero3d-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(13, 11, 30, 0.5) 100%);
+  pointer-events: none;
+}
+
+/* Extra scroll-parallax orbs — different colors, scattered di tinggi yang beda */
+.hero3d-orb-extra {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+}
+.hero3d-orb-x1 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #d946ef, transparent 70%);
+  top: 60vh; left: -100px;
+  animation: orb-drift-1 16s ease-in-out infinite;
+}
+.hero3d-orb-x2 {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, #06b6d4, transparent 70%);
+  top: 130vh; right: -80px;
+  animation: orb-drift-2 18s ease-in-out infinite;
+}
+.hero3d-orb-x3 {
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, #f59e0b, transparent 70%);
+  top: 210vh; left: 40%;
+  opacity: 0.35;
+  animation: orb-drift-3 20s ease-in-out infinite;
+}
+.hero3d-orb-x4 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, #8b5cf6, transparent 70%);
+  top: 290vh; right: 10%;
+  animation: orb-drift-4 14s ease-in-out infinite;
+}
+
+/* Floating glowing orbs — pakai blur + animasi multi-axis */
+.hero3d-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.6;
+  will-change: transform;
+}
+.hero3d-orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle at 30% 30%, #8b5cf6, transparent 70%);
+  top: -100px; left: -80px;
+  animation: orb-drift-1 14s ease-in-out infinite;
+}
+.hero3d-orb-2 {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle at 70% 30%, #d946ef, transparent 70%);
+  top: 100px; right: -100px;
+  animation: orb-drift-2 18s ease-in-out infinite;
+}
+.hero3d-orb-3 {
+  width: 360px; height: 360px;
+  background: radial-gradient(circle at 50% 50%, #06b6d4, transparent 70%);
+  bottom: -80px; left: 30%;
+  opacity: 0.45;
+  animation: orb-drift-3 22s ease-in-out infinite;
+}
+.hero3d-orb-4 {
+  width: 280px; height: 280px;
+  background: radial-gradient(circle at 50% 50%, #f59e0b, transparent 70%);
+  top: 40%; left: 50%;
+  opacity: 0.35;
+  animation: orb-drift-4 16s ease-in-out infinite;
+}
+.hero3d-orb-5 {
+  width: 220px; height: 220px;
+  background: radial-gradient(circle at 50% 50%, #ec4899, transparent 70%);
+  top: 20%; right: 25%;
+  opacity: 0.4;
+  animation: orb-drift-5 20s ease-in-out infinite;
+}
+
+@keyframes orb-drift-1 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33%      { transform: translate3d(60px, 40px, 0) scale(1.15); }
+  66%      { transform: translate3d(-30px, 80px, 0) scale(0.92); }
+}
+@keyframes orb-drift-2 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(-80px, 60px, 0) scale(1.1); }
+}
+@keyframes orb-drift-3 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  40%      { transform: translate3d(50px, -40px, 0) scale(1.2); }
+  70%      { transform: translate3d(-60px, -20px, 0) scale(0.88); }
+}
+@keyframes orb-drift-4 {
+  0%, 100% { transform: translate3d(-50%, -50%, 0) scale(1); }
+  50%      { transform: translate3d(-30%, -70%, 0) scale(1.3); }
+}
+@keyframes orb-drift-5 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(40px, 60px, 0) scale(0.9); }
+}
+
+/* 3D perspective grid — kayak floor going to horizon */
+.hero3d-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(139, 92, 246, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.18) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: perspective(800px) rotateX(60deg) translateZ(-40px) scale(2);
+  transform-origin: center top;
+  mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+  opacity: 0.6;
+  animation: grid-drift 20s linear infinite;
+}
+@keyframes grid-drift {
+  from { background-position: 0 0; }
+  to   { background-position: 0 60px; }
+}
+
+/* Star particles — random sparkles */
+.hero3d-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20px 30px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 40px 70px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 130px 80px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 160px 30px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 200px 50px, rgba(255,255,255,0.5), transparent);
+  background-size: 220px 100px;
+  animation: stars-twinkle 4s ease-in-out infinite;
+  opacity: 0.6;
+}
+@keyframes stars-twinkle {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.85; }
+}
+
+/* Mouse parallax — diisi via inline style dari JS */
+.hero3d-parallax {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* 3D tilt card untuk hero content */
+.hero3d-tilt {
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.hero3d-tilt > * {
+  transform: translateZ(40px);
+}
+
+/* Aurora gradient di background — flowing color waves */
+.hero3d-aurora {
+  position: absolute;
+  inset: -50% -20%;
+  background:
+    conic-gradient(from 0deg at 50% 50%, #7c3aed00 0deg, #7c3aed30 60deg, #d946ef30 120deg, #06b6d430 180deg, #f59e0b30 240deg, #7c3aed00 360deg);
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: aurora-rotate 30s linear infinite;
+}
+@keyframes aurora-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero3d-orb, .hero3d-grid, .hero3d-stars, .hero3d-aurora,
+  .hero3d-parallax, .hero3d-tilt { animation: none !important; transition: none !important; }
+}
+
+/* ========== LIVE FEED TICKER ========== */
+@keyframes livefeed-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.333%); }
+}
+.livefeed-track {
+  animation: livefeed-scroll 60s linear infinite;
+  will-change: transform;
+}
+.livefeed-track:hover { animation-play-state: paused; }
+
+/* ========== HERO FLOATING MINI CARDS ========== */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+.float-card { animation: float-y 4s ease-in-out infinite; }
+.float-card-delay-1 { animation-delay: 0.5s; }
+.float-card-delay-2 { animation-delay: 1s; }
+.float-card-delay-3 { animation-delay: 1.5s; }
+
+/* ==========================================
+   SPACE BACKGROUND (login page) — Earth + shooting stars
+   ========================================== */
+
+.space-bg {
+  background: radial-gradient(ellipse at 30% 50%, #1a0d4a 0%, #0a0420 40%, #02010a 100%);
+  pointer-events: none;
+}
+
+/* Deep space layer */
+.space-deep {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+}
+
+/* Nebula clouds — colored blurs deep in background */
+.space-nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+}
+.space-nebula-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, #4c1d95, transparent 60%);
+  top: -200px; left: -200px;
+  opacity: 0.5;
+  animation: nebula-drift 30s ease-in-out infinite;
+}
+.space-nebula-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #6d28d9, transparent 60%);
+  bottom: -100px; right: -100px;
+  opacity: 0.4;
+  animation: nebula-drift 35s ease-in-out infinite reverse;
+}
+.space-nebula-3 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #1e3a8a, transparent 60%);
+  top: 60%; left: 70%;
+  opacity: 0.3;
+  animation: nebula-drift 25s ease-in-out infinite;
+}
+@keyframes nebula-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(50px, -30px) scale(1.1); }
+}
+
+/* Star field — distant twinkling stars */
+.space-scene { position: absolute; inset: 0; }
+.space-star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.space-star-twinkle { animation: star-twinkle 3s ease-in-out infinite; }
+@keyframes star-twinkle {
+  0%, 100% { opacity: var(--star-min, 0.3); }
+  50%      { opacity: 1; }
+}
+
+/* EARTH planet — pure CSS sphere */
+.space-earth-wrap {
+  position: absolute;
+  /* Position di kiri-bawah viewport, sebagian terlihat */
+  bottom: -22vw;
+  right: -10vw;
+  width: 60vw;
+  height: 60vw;
+  max-width: 800px;
+  max-height: 800px;
+  pointer-events: none;
+}
+.space-earth {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, #4c9eeb 0%, #2563eb 25%, #1e40af 60%, #1e3a8a 100%);
+  box-shadow:
+    inset -40px -40px 60px rgba(0,0,0,0.6),
+    inset -10px -10px 30px rgba(0,0,0,0.4),
+    inset 30px 30px 50px rgba(135, 206, 250, 0.3),
+    0 0 80px rgba(59, 130, 246, 0.4);
+  overflow: hidden;
+  transform-style: preserve-3d;
+  animation: earth-rotate 120s linear infinite;
+}
+/* Continents — abstract green-brown shapes */
+.space-earth-continents {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 35% 25% at 25% 35%, #16a34a 30%, transparent 60%),
+    radial-gradient(ellipse 25% 30% at 65% 50%, #15803d 30%, transparent 60%),
+    radial-gradient(ellipse 20% 15% at 45% 70%, #166534 30%, transparent 60%),
+    radial-gradient(ellipse 18% 28% at 80% 30%, #15803d 30%, transparent 60%),
+    radial-gradient(ellipse 15% 18% at 20% 75%, #166534 30%, transparent 60%);
+  border-radius: 50%;
+  opacity: 0.85;
+  mix-blend-mode: overlay;
+}
+/* Cloud layer */
+.space-earth-clouds {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 40% 8% at 30% 25%, rgba(255,255,255,0.6) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 6% at 70% 45%, rgba(255,255,255,0.5) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 7% at 20% 60%, rgba(255,255,255,0.55) 0%, transparent 60%),
+    radial-gradient(ellipse 25% 5% at 75% 75%, rgba(255,255,255,0.4) 0%, transparent 60%);
+  border-radius: 50%;
+  animation: clouds-drift 200s linear infinite;
+}
+/* Day/night shadow — half of Earth in darkness */
+.space-earth-shadow {
+  position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(0,0,0,0.65) 80%);
+  border-radius: 50%;
+}
+/* Atmospheric glow on edge */
+.space-earth-atmosphere {
+  position: absolute; inset: -2px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 30px rgba(135, 206, 250, 0.5);
+}
+.space-earth-halo {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 50%, rgba(59, 130, 246, 0.25) 55%, transparent 70%);
+  filter: blur(20px);
+}
+@keyframes earth-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes clouds-drift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-20%); }
+}
+
+/* BIG SPARKLE STARS — 4-pointed cross effect */
+.space-sparkle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  animation: sparkle-pulse 3s ease-in-out infinite;
+}
+.space-sparkle::before, .space-sparkle::after {
+  content: '';
+  position: absolute;
+  background: linear-gradient(transparent, white, transparent);
+  filter: blur(0.5px);
+}
+.space-sparkle::before {
+  /* Vertical line */
+  left: -1px; top: -10px;
+  width: 2px; height: 20px;
+}
+.space-sparkle::after {
+  /* Horizontal line */
+  left: -10px; top: -1px;
+  width: 20px; height: 2px;
+}
+@keyframes sparkle-pulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.5); }
+  50%      { opacity: 1; transform: scale(1.4); }
+}
+
+/* Vignette */
+.space-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .space-earth, .space-earth-clouds, .space-nebula,
+  .space-star-twinkle {
+    animation: none !important;
+  }
+}

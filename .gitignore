@@ -1,0 +1,55 @@
+# Dependencies & build
+node_modules
+.next
+out
+*.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env vars
+.env*.local
+.env
+
+# === DATA SENSITIF — JANGAN DI-PUSH ===
+# db.json berisi password user, email, IP, 2FA secret
+data/db.json
+data/db.json.*
+data/*.bak
+
+# User uploads
+data/files
+data/thumbs
+data/avatars
+data/banners
+data/msg-files
+data/generated
+
+# === Test artifacts ===
+test-*.mjs
+test-*.png
+*.test-backup
+*.geo-backup
+*.fp-backup
+*.lan-backup
+*.premium-backup
+.playwright-mcp/
+
+# Editor
+.vscode
+.idea
+*.swp
+
+# Deploy: data sudah di Supabase, jangan push
+data/
+*.zip
+cloudflared.exe
+START-TUNNEL.bat
+CARA-PUBLIC-URL.txt
