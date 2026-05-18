@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loadDB, ADS_DIR } from '@/lib/db';
-import { publicUrl } from '@/lib/storage';
+import { storageRedirect } from '@/lib/storage';
 
 export const runtime = 'nodejs';
 
@@ -10,5 +10,5 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   const ads = db.adsConfig?.ads || [];
   const ad = ads.find((x: any) => x.id === params.id && x.enabled);
   if (!ad) return new NextResponse(null, { status: 404 });
-  return NextResponse.redirect(publicUrl(ADS_DIR, params.id), 302);
+  return storageRedirect(ADS_DIR, params.id);
 }

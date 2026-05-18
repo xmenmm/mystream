@@ -33,11 +33,42 @@ export async function putFile(
   if (error) throw new Error('upload gagal: ' + error.message);
 }
 
-/** URL publik (bucket harus public). Dipakai untuk redirect saat serving. */
+/**
+ * URL publik file (bucket public) — DIBANGUN LANGSUNG dari env, TANPA SDK.
+ * Tidak ada network/SDK call saat serving → tidak bisa throw/gagal.
+ * Format Supabase: {url}/storage/v1/object/public/{bucket}/{prefix}/{name}
+ */
 export function publicUrl(prefix: string, name: string): string {
-  const sb = supa();
-  const { data } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(keyOf(prefix, name));
-  return data.publicUrl;
+  const base = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+  const path = String(name)
+    .split('/')
+    .filter(Boolean)
+    .map(encodeURIComponent)
+    .join('/');
+  return `${base}/storage/v1/object/public/${STORAGE_BUCKET}/${prefix}/${path}`;
+}
+
+/**
+ * Redirect 302 ke file di Storage — MANUAL (tanpa NextResponse.redirect /
+ * validateURL yang bisa throw). Dibungkus try/catch supaya TIDAK PERNAH
+ * jadi 500 opak: kalau ada masalah, pesannya jelas di body.
+ */
+export function storageRedirect(prefix: string, name: string): Response {
+  try {
+    const base = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+    if (!base) {
+      return new Response('SUPABASE_URL belum di-set di environment', { status: 500 });
+    }
+    const url = publicUrl(prefix, name);
+    return new Response(null, {
+      status: 302,
+      headers: { Location: url, 'Cache-Control': 'public, max-age=300' },
+    });
+  } catch (e: any) {
+    return new Response('storage redirect error: ' + (e?.message || String(e)), {
+      status: 500,
+    });
+  }
 }
 
 /** Ambil bytes file (server-side) — dipakai kalau perlu proses isi file. */

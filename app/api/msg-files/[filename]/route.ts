@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest } from '@/lib/auth';
 import { loadDB, MSG_FILES_DIR } from '@/lib/db';
-import { publicUrl } from '@/lib/storage';
+import { storageRedirect } from '@/lib/storage';
 
 export const runtime = 'nodejs';
 
@@ -21,5 +21,5 @@ export async function GET(req: NextRequest, { params }: { params: { filename: st
   if (msg.from !== a.user.username && msg.to !== a.user.username && !a.user.isAdmin) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   }
-  return NextResponse.redirect(publicUrl(MSG_FILES_DIR, filename), 302);
+  return storageRedirect(MSG_FILES_DIR, filename);
 }

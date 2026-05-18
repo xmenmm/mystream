@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest, getUserPlan } from '@/lib/auth';
 import { loadDB, saveDB, publicVideo, FILES_DIR } from '@/lib/db';
-import { putFile, publicUrl } from '@/lib/storage';
+import { putFile, storageRedirect } from '@/lib/storage';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -17,7 +17,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   const db = await loadDB();
   const v = db.videos.find((x) => x.id === params.id);
   if (!v) return new NextResponse(null, { status: 404 });
-  return NextResponse.redirect(publicUrl(FILES_DIR, params.id), 302);
+  return storageRedirect(FILES_DIR, params.id);
 }
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {

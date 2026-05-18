@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BANNERS_DIR } from '@/lib/db';
-import { publicUrl } from '@/lib/storage';
+import { storageRedirect } from '@/lib/storage';
 
 export const runtime = 'nodejs';
 
@@ -10,5 +10,5 @@ export async function GET(_req: NextRequest, { params }: { params: { filename: s
   if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
     return NextResponse.json({ error: 'invalid filename' }, { status: 400 });
   }
-  return NextResponse.redirect(publicUrl(BANNERS_DIR, filename), 302);
+  return storageRedirect(BANNERS_DIR, filename);
 }
