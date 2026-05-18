@@ -5,7 +5,7 @@ import { putFile } from '@/lib/storage';
 import crypto from 'node:crypto';
 
 export const runtime = 'nodejs';
-export const maxDuration = 600;
+export const maxDuration = 300;
 
 const MAX_BYTES = 500 * 1024 * 1024; // 500 MB per ad
 
