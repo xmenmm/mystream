@@ -42,6 +42,10 @@ export default function WatchPage() {
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resCanvasRef = useRef<HTMLCanvasElement>(null);
   const resRafRef = useRef<number | null>(null);
+  // Double-click seek: kanan 2x = +5s, kiri 2x = -2s
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const seekFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [seekFlash, setSeekFlash] = useState<{ side: 'L' | 'R'; sec: number } | null>(null);
   const [speed, setSpeed] = useState(1);
   const [size, setSize] = useState(100);   // default Full — fill kolom penuh kayak banner
   const [resolution, setResolution] = useState<string>('Auto');  // pilihan user
@@ -206,6 +210,36 @@ export default function WatchPage() {
     const el = videoRef.current;
     if (!el || !isFinite(t)) return;
     el.currentTime = Math.max(0, Math.min(t, el.duration || 0));
+  }
+  function flashSeek(side: 'L' | 'R', sec: number) {
+    setSeekFlash({ side, sec });
+    if (seekFlashTimerRef.current) clearTimeout(seekFlashTimerRef.current);
+    seekFlashTimerRef.current = setTimeout(() => setSeekFlash(null), 650);
+  }
+  // 1x klik = play/pause (ditunda 250ms nunggu klik ke-2).
+  // 2x klik kanan = +5 dtk, 2x klik kiri = -2 dtk.
+  function onPlayerClick(e: React.MouseEvent<HTMLElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const isRight = e.clientX - rect.left > rect.width / 2;
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+      const el = videoRef.current;
+      if (!el) return;
+      if (isRight) {
+        seekTo((el.currentTime || 0) + 5);
+        flashSeek('R', 5);
+      } else {
+        seekTo((el.currentTime || 0) - 2);
+        flashSeek('L', 2);
+      }
+      showControlsNow();
+    } else {
+      clickTimerRef.current = setTimeout(() => {
+        clickTimerRef.current = null;
+        togglePlay();
+      }, 250);
+    }
   }
   function toggleMute() {
     const el = videoRef.current;
@@ -382,7 +416,7 @@ export default function WatchPage() {
                 src={fileUrl(v.id)}
                 poster={v.hasThumb ? thumbUrl(v.id) : undefined}
                 controls={false}
-                onClick={togglePlay}
+                onClick={onPlayerClick}
                 onPlay={() => { setIsPlaying(true); showControlsNow(); }}
                 onPause={() => { setIsPlaying(false); setControlsVisible(true); }}
                 onTimeUpdate={(e) => {
@@ -415,10 +449,21 @@ export default function WatchPage() {
             {v.type !== 'image' && resCapPx && (
               <canvas
                 ref={resCanvasRef}
-                onClick={togglePlay}
+                onClick={onPlayerClick}
                 className="absolute inset-0 z-[5] h-full w-full cursor-pointer"
                 style={{ objectFit: 'contain', background: '#000', imageRendering: resCapPx <= 480 ? 'pixelated' : 'auto' }}
               />
+            )}
+
+            {/* SEEK FLASH — indikator double-click maju/mundur */}
+            {seekFlash && (
+              <div
+                className={`pointer-events-none absolute inset-y-0 z-[15] flex w-2/5 items-center justify-center ${seekFlash.side === 'R' ? 'right-0' : 'left-0'}`}
+              >
+                <div className="rounded-2xl bg-black/55 px-5 py-3 text-base font-semibold text-white backdrop-blur-sm">
+                  {seekFlash.side === 'R' ? `⏩ +${seekFlash.sec} dtk` : `⏪ −${seekFlash.sec} dtk`}
+                </div>
+              </div>
             )}
 
             {/* LAYER GATE — tutup video sampai user click sebanyak N kali */}
