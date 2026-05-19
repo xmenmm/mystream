@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { api, apiGetMyQuota, makeImageThumb, makeVideoThumb, uploadBytes } from '@/lib/api-client';
+import { api, apiGetMyQuota, makeImageThumb, makeVideoThumb, uploadToSignedUrl } from '@/lib/api-client';
 import { fmtBytes, fmtDuration } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
@@ -124,7 +124,14 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
           thumbDataURL: thumb,
         },
       });
-      await uploadBytes(`/api/videos/${encodeURIComponent(video.id)}/file`, file, setProgress);
+      // Upload LANGSUNG ke Supabase (lewati Vercel → tidak kena batas 4.5MB)
+      const { uploadUrl } = await api<{ uploadUrl: string }>(
+        `/api/videos/${encodeURIComponent(video.id)}/upload-url`,
+        { method: 'POST' },
+      );
+      await uploadToSignedUrl(uploadUrl, file, setProgress);
+      // Tandai file siap diputar
+      await api(`/api/videos/${encodeURIComponent(video.id)}/upload-url`, { method: 'PUT' });
       router.push('/history');
       router.refresh();
       onClose();
@@ -140,7 +147,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
       className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-lg animate-slide-up rounded-2xl border border-border bg-bg-card p-6 shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-lg animate-slide-up overflow-y-auto rounded-2xl border border-border bg-bg-card p-6 shadow-xl">
         <div className="mb-1 flex items-start justify-between">
           <h3 className="text-xl font-bold">Upload Video or Image</h3>
           <button className="text-2xl text-muted hover:text-white" onClick={onClose} aria-label="Close">

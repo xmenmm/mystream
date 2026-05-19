@@ -34,6 +34,23 @@ export async function putFile(
 }
 
 /**
+ * Buat URL upload BERTANDA-TANGAN (signed) — supaya browser bisa upload
+ * file LANGSUNG ke Supabase Storage, MELEWATI Vercel (Vercel serverless
+ * batas body request ~4.5 MB; video besar pasti gagal kalau lewat Vercel).
+ * Return: URL absolut (sudah termasuk token). Browser tinggal PUT file ke sini.
+ */
+export async function signedUploadUrl(prefix: string, name: string): Promise<string> {
+  const sb = supa();
+  const { data, error } = await sb.storage
+    .from(STORAGE_BUCKET)
+    .createSignedUploadUrl(keyOf(prefix, name), { upsert: true } as any);
+  if (error || !data) {
+    throw new Error('gagal buat signed upload URL: ' + (error?.message || 'unknown'));
+  }
+  return data.signedUrl;
+}
+
+/**
  * Base URL Supabase yang sudah DIBERSIHKAN dari spasi/newline/enter.
  * (Env var sering kebawa newline pas paste di dashboard Vercel → bikin
  *  header Location ilegal. URL tidak pernah punya whitespace sah, jadi

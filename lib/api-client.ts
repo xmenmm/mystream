@@ -43,6 +43,32 @@ export function uploadBytes(url: string, file: File | Blob, onProgress?: (p: num
   });
 }
 
+/**
+ * Upload file LANGSUNG ke Supabase Storage via signed URL — lewati Vercel
+ * (Vercel batas body ~4.5MB; ini bisa file besar sampai limit plan).
+ * TANPA credentials (cross-origin ke Supabase; token sudah di URL).
+ */
+export function uploadToSignedUrl(
+  uploadUrl: string,
+  file: File | Blob,
+  onProgress?: (p: number) => void,
+) {
+  return new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', uploadUrl);
+    xhr.setRequestHeader('content-type', (file as File).type || 'application/octet-stream');
+    xhr.setRequestHeader('cache-control', 'max-age=3600');
+    xhr.setRequestHeader('x-upsert', 'true');
+    if (onProgress) xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
+    xhr.onload = () =>
+      xhr.status >= 200 && xhr.status < 300
+        ? resolve()
+        : reject(new Error('upload ke storage gagal (' + xhr.status + ') ' + xhr.responseText));
+    xhr.onerror = () => reject(new Error('network error saat upload ke storage'));
+    xhr.send(file);
+  });
+}
+
 export function makeVideoThumb(file: File): Promise<{ thumb: string; duration: number }> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
