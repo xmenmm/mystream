@@ -54,10 +54,14 @@ export function uploadToSignedUrl(
   onProgress?: (p: number) => void,
 ) {
   return new Promise<void>((resolve, reject) => {
+    // Format PERSIS seperti Supabase storage-js uploadToSignedUrl untuk Blob:
+    // multipart/form-data — field "cacheControl" + file (nama field kosong "").
+    // JANGAN set Content-Type manual (browser yang set boundary multipart).
+    const form = new FormData();
+    form.append('cacheControl', '3600');
+    form.append('', file);
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', uploadUrl);
-    xhr.setRequestHeader('content-type', (file as File).type || 'application/octet-stream');
-    xhr.setRequestHeader('cache-control', 'max-age=3600');
     xhr.setRequestHeader('x-upsert', 'true');
     if (onProgress) xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
     xhr.onload = () =>
@@ -65,7 +69,7 @@ export function uploadToSignedUrl(
         ? resolve()
         : reject(new Error('upload ke storage gagal (' + xhr.status + ') ' + xhr.responseText));
     xhr.onerror = () => reject(new Error('network error saat upload ke storage'));
-    xhr.send(file);
+    xhr.send(form);
   });
 }
 
