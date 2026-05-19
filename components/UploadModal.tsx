@@ -109,8 +109,9 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
     if (!file || !title.trim()) return;
     setBusy(true);
     setErr('');
+    const isVideo = file.type.startsWith('video/');
+    let videoId = '';
     try {
-      const isVideo = file.type.startsWith('video/');
       const { video } = await api<any>('/api/videos', {
         method: 'POST',
         body: {
@@ -124,6 +125,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
           thumbDataURL: thumb,
         },
       });
+      videoId = video.id;
       // Upload LANGSUNG ke Supabase (lewati Vercel → tidak kena batas 4.5MB)
       const { uploadUrl } = await api<{ uploadUrl: string }>(
         `/api/videos/${encodeURIComponent(video.id)}/upload-url`,
@@ -136,7 +138,18 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
       router.refresh();
       onClose();
     } catch (e: any) {
-      setErr(e.message || 'Upload gagal');
+      // Upload gagal SETELAH entri dibuat → hapus entri biar tidak jadi
+      // "video hantu" di History yang tidak bisa diputar.
+      if (videoId) {
+        await api(`/api/videos/${encodeURIComponent(videoId)}`, { method: 'DELETE' }).catch(() => {});
+      }
+      const raw = String(e?.message || 'Upload gagal');
+      const tooBig = /\(413\)|payload too large|exceeded.*size|maximum allowed/i.test(raw);
+      setErr(
+        tooBig
+          ? 'File terlalu besar untuk Supabase (paket gratis Supabase batas ±50 MB per file). Pakai video lebih kecil, atau upgrade paket Supabase.'
+          : raw,
+      );
     } finally {
       setBusy(false);
     }
