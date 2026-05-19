@@ -228,15 +228,15 @@ export default async function LandingPage() {
             Dari vlog harian sampai tutorial mendalam — MyStream nampung semua jenis cerita kamu.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <CategoryTile emoji="🎥" label="Vlog & Daily" desc="Bagikan momen hari-harimu" gradient="from-rose-900/70 via-slate-900 to-slate-950" decoratives={['📷','🌅','✈️','🍜']} views="2.4K" videos="48" hot />
-          <CategoryTile emoji="🎮" label="Gaming" desc="Highlight, gameplay, tutorial" gradient="from-fuchsia-900/70 via-slate-900 to-slate-950" decoratives={['🕹️','💥','🏆','🎯']} views="5.1K" videos="92" hot />
-          <CategoryTile emoji="🎵" label="Musik & Cover" desc="Bikin musik kamu didengar" gradient="from-indigo-900/70 via-slate-900 to-slate-950" decoratives={['🎸','🎤','🎧','🎹']} views="1.8K" videos="36" />
-          <CategoryTile emoji="📚" label="Tutorial" desc="Skill kamu = ilmu berharga" gradient="from-emerald-900/70 via-slate-900 to-slate-950" decoratives={['💡','📝','🔧','🧠']} views="980" videos="24" />
-          <CategoryTile emoji="😂" label="Komedi" desc="Bikin orang senyum hari ini" gradient="from-amber-900/70 via-slate-900 to-slate-950" decoratives={['🤣','🎭','🎪','🃏']} views="3.2K" videos="61" hot />
-          <CategoryTile emoji="🎨" label="Seni & Kreatif" desc="DIY, drawing, animasi" gradient="from-pink-900/70 via-slate-900 to-slate-950" decoratives={['🖌️','✏️','🌈','🖼️']} views="1.1K" videos="29" />
-          <CategoryTile emoji="💻" label="Tech & Review" desc="Gadget, software, koding" gradient="from-blue-900/70 via-slate-900 to-slate-950" decoratives={['📱','⌨️','🤖','🚀']} views="1.5K" videos="33" />
-          <CategoryTile emoji="✨" label="Lifestyle" desc="Fashion, makanan, travel" gradient="from-violet-900/70 via-slate-900 to-slate-950" decoratives={['👗','🍔','🌴','💄']} views="2.0K" videos="44" />
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <CategoryTile icon="video" label="Vlog & Daily" desc="Bagikan momen hari-harimu" tint="text-rose-400" chip="bg-rose-500/10" views="2.4K" videos="48" hot />
+          <CategoryTile icon="gamepad" label="Gaming" desc="Highlight, gameplay, tutorial" tint="text-fuchsia-400" chip="bg-fuchsia-500/10" views="5.1K" videos="92" hot />
+          <CategoryTile icon="music" label="Musik & Cover" desc="Bikin musik kamu didengar" tint="text-indigo-400" chip="bg-indigo-500/10" views="1.8K" videos="36" />
+          <CategoryTile icon="book" label="Tutorial" desc="Skill kamu = ilmu berharga" tint="text-emerald-400" chip="bg-emerald-500/10" views="980" videos="24" />
+          <CategoryTile icon="smile" label="Komedi" desc="Bikin orang senyum hari ini" tint="text-amber-400" chip="bg-amber-500/10" views="3.2K" videos="61" hot />
+          <CategoryTile icon="palette" label="Seni & Kreatif" desc="DIY, drawing, animasi" tint="text-pink-400" chip="bg-pink-500/10" views="1.1K" videos="29" />
+          <CategoryTile icon="laptop" label="Tech & Review" desc="Gadget, software, koding" tint="text-sky-400" chip="bg-sky-500/10" views="1.5K" videos="33" />
+          <CategoryTile icon="sparkles" label="Lifestyle" desc="Fashion, makanan, travel" tint="text-violet-400" chip="bg-violet-500/10" views="2.0K" videos="44" />
         </div>
       </section>
 
@@ -571,78 +571,47 @@ export default async function LandingPage() {
   );
 }
 
-function CategoryTile({ emoji, label, desc, gradient, decoratives, views, videos, hot }: {
-  emoji: string; label: string; desc: string; gradient: string;
-  decoratives?: string[]; views?: string; videos?: string; hot?: boolean;
+// Ikon garis (SVG, gaya Lucide) — bukan emoji 3D. Bersih & konsisten.
+const CAT_ICONS: Record<string, JSX.Element> = {
+  video: (<><path d="m22 8-6 4 6 4V8Z" /><rect width="14" height="12" x="2" y="6" rx="2" /></>),
+  gamepad: (<><line x1="6" x2="10" y1="12" y2="12" /><line x1="8" x2="8" y1="10" y2="14" /><line x1="15" x2="15.01" y1="13" y2="13" /><line x1="18" x2="18.01" y1="11" y2="11" /><rect width="20" height="12" x="2" y="6" rx="2" /></>),
+  music: (<><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></>),
+  book: (<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />),
+  smile: (<><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" x2="9.01" y1="9" y2="9" /><line x1="15" x2="15.01" y1="9" y2="9" /></>),
+  palette: (<><circle cx="13.5" cy="6.5" r=".5" fill="currentColor" /><circle cx="17.5" cy="10.5" r=".5" fill="currentColor" /><circle cx="8.5" cy="7.5" r=".5" fill="currentColor" /><circle cx="6.5" cy="12.5" r=".5" fill="currentColor" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2Z" /></>),
+  laptop: (<path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16" />),
+  sparkles: (<path d="m12 3-1.9 5.8a2 2 0 0 1-1.287 1.288L3 12l5.8 1.9a2 2 0 0 1 1.288 1.287L12 21l1.9-5.8a2 2 0 0 1 1.287-1.288L21 12l-5.8-1.9a2 2 0 0 1-1.288-1.287Z" />),
+};
+
+function CategoryTile({ icon, label, desc, tint, chip, views, videos, hot }: {
+  icon: string; label: string; desc: string; tint: string; chip: string;
+  views?: string; videos?: string; hot?: boolean;
 }) {
   return (
-    <div className={`group relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-gradient-to-br ${gradient} shadow-lg transition duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-2xl cursor-pointer tile-pan`}>
-      {/* Mesh light/shadow overlay */}
-      <div
-        className="absolute inset-0 opacity-25 mix-blend-overlay"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.55) 0%, transparent 45%), radial-gradient(circle at 80% 75%, rgba(0,0,0,0.55) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 70%)',
-        }}
-      />
-
-      {/* Floating decorative emojis (background, soft) */}
-      {decoratives?.map((e, i) => {
-        const positions = [
-          { top: '12%', left: '14%', size: 'text-2xl', delay: '0s' },
-          { top: '20%', right: '18%', size: 'text-xl', delay: '0.7s' },
-          { bottom: '38%', left: '20%', size: 'text-2xl', delay: '1.4s' },
-          { bottom: '32%', right: '15%', size: 'text-xl', delay: '2.1s' },
-        ];
-        const p = positions[i] || positions[0];
-        return (
-          <span
-            key={i}
-            className={`absolute ${p.size} opacity-50 tile-float drop-shadow-md`}
-            style={{ top: p.top, left: p.left, right: p.right, bottom: p.bottom, animationDelay: p.delay }}
-          >
-            {e}
-          </span>
-        );
-      })}
-
-      {/* Sparkles berkedip */}
-      <span className="absolute left-[20%] top-[35%] text-yellow-100 drop-shadow tile-sparkle" style={{ animationDelay: '0s' }}>✦</span>
-      <span className="absolute right-[25%] top-[28%] text-white drop-shadow tile-sparkle" style={{ animationDelay: '1.1s' }}>·</span>
-      <span className="absolute left-[55%] top-[50%] text-yellow-100 drop-shadow tile-sparkle" style={{ animationDelay: '2.3s' }}>✦</span>
-      <span className="absolute right-[40%] bottom-[40%] text-white drop-shadow tile-sparkle" style={{ animationDelay: '0.6s' }}>·</span>
-
-      {/* Big main emoji center — bouncing */}
-      <div className="absolute inset-0 grid place-items-center">
-        <span className="text-7xl drop-shadow-2xl tile-bounce">{emoji}</span>
-      </div>
-
-      {/* Shine sweep on hover */}
-      <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-
-      {/* Top-left: HOT / TRENDING badge */}
-      {hot && (
-        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/40 px-2 py-1 backdrop-blur-md">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-white">Hot</span>
+    <div className="group relative flex flex-col rounded-2xl border border-border bg-bg-card p-5 transition duration-300 hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg cursor-pointer">
+      <div className="flex items-start justify-between">
+        <div className={`grid h-12 w-12 place-items-center rounded-xl ${chip} ${tint}`}>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+            {CAT_ICONS[icon] || CAT_ICONS.video}
+          </svg>
         </div>
-      )}
-
-      {/* Top-right: play button with hover pulse */}
-      <div className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/25 text-sm text-white backdrop-blur-md transition duration-300 group-hover:scale-110 group-hover:bg-white/50 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.6)]">
-        ▶
-      </div>
-
-      {/* Bottom panel — title + desc + mock metadata */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent p-4">
-        <div className="text-base font-extrabold text-white drop-shadow">{label}</div>
-        <div className="mt-0.5 line-clamp-1 text-[11px] text-white/85 drop-shadow">{desc}</div>
-        {(views || videos) && (
-          <div className="mt-2 flex items-center gap-2 text-[10px] font-medium text-white/90">
-            {views && <span className="flex items-center gap-1 rounded-md bg-white/15 px-1.5 py-0.5 backdrop-blur-sm">👁 {views}</span>}
-            {videos && <span className="flex items-center gap-1 rounded-md bg-white/15 px-1.5 py-0.5 backdrop-blur-sm">🎬 {videos}</span>}
-          </div>
+        {hot && (
+          <span className="flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-red-400">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /> Hot
+          </span>
         )}
       </div>
+
+      <h3 className="mt-4 text-base font-bold text-text">{label}</h3>
+      <p className="mt-1 line-clamp-1 text-[13px] text-muted">{desc}</p>
+
+      {(views || videos) && (
+        <div className="mt-4 flex items-center gap-2 border-t border-border pt-3 text-[11px] font-medium text-muted">
+          {videos && <span className={tint}>{videos} video</span>}
+          {videos && views && <span className="text-border">·</span>}
+          {views && <span>{views} views</span>}
+        </div>
+      )}
     </div>
   );
 }
