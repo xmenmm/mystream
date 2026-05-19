@@ -1,13 +1,30 @@
-import { randomBytes } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
 const CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // skip O,0,I,1
 const TTL_MS = 5 * 60 * 1000;
 
-export const captchas = new Map<string, { code: string; expiresAt: number }>();
-setInterval(() => {
-  const now = Date.now();
-  for (const [k, v] of captchas) if (v.expiresAt < now) captchas.delete(k);
-}, 60 * 1000);
+/**
+ * Captcha STATELESS (tidak simpan apa-apa di memori server).
+ * Wajib stateless di Vercel serverless: tiap request bisa instance beda,
+ * jadi Map di memori HILANG saat verifikasi → captcha selalu "salah".
+ *
+ * Cara: id = "<expiry>.<HMAC(code+expiry, SECRET)>". Verifikasi = hitung
+ * ulang HMAC dari input user; cocok + belum kadaluarsa → valid. Nol storage.
+ */
+function secret(): string {
+  // Pakai secret yang sudah ADA di env Vercel (nggak perlu tambah env baru).
+  const s =
+    process.env.CAPTCHA_SECRET ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    'mystream-captcha-fallback-secret';
+  return s.replace(/\s+/g, '');
+}
+
+function sign(code: string, exp: number): string {
+  return createHmac('sha256', secret())
+    .update(`${code.toUpperCase()}.${exp}`)
+    .digest('hex');
+}
 
 function generateCode(len = 5): string {
   let s = '';
@@ -62,19 +79,28 @@ export function generateCaptchaSvg(code: string): string {
 }
 
 export function newCaptcha(): { id: string; code: string } {
-  const id = 'cap_' + randomBytes(8).toString('hex');
   const code = generateCode();
-  captchas.set(id, { code, expiresAt: Date.now() + TTL_MS });
+  const exp = Date.now() + TTL_MS;
+  // id membawa expiry + tanda tangan kode (tanpa membocorkan kode-nya).
+  const id = `${exp}.${sign(code, exp)}`;
   return { id, code };
 }
 
-export function verifyCaptcha(id: string | null | undefined, input: string | null | undefined): boolean {
+export function verifyCaptcha(
+  id: string | null | undefined,
+  input: string | null | undefined,
+): boolean {
   if (!id || !input) return false;
-  const entry = captchas.get(id);
-  if (!entry || entry.expiresAt < Date.now()) {
-    captchas.delete(id);
+  const dot = id.indexOf('.');
+  if (dot < 1) return false;
+  const exp = Number(id.slice(0, dot));
+  const sig = id.slice(dot + 1);
+  if (!Number.isFinite(exp) || exp < Date.now()) return false; // kadaluarsa
+  const expected = sign(String(input).trim(), exp);
+  if (sig.length !== expected.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+  } catch {
     return false;
   }
-  captchas.delete(id); // one-time use
-  return entry.code.toUpperCase() === String(input).toUpperCase().trim();
 }
