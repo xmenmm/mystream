@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api, apiGetRunningText, apiGetGlobalLayers, fileUrl, thumbUrl, GlobalLayers } from '@/lib/api-client';
 import { useMe } from '@/components/UserContext';
@@ -29,8 +29,17 @@ const VIDEO_MAX_HEIGHT = '85vh';
 
 export default function WatchPage() {
   const params = useSearchParams();
+  const router = useRouter();
   const id = params.get('id');
-  const { me } = useMe();
+  const { me, loading: meLoading } = useMe();
+
+  // User 2 (belum login) yang buka link ini → arahkan ke /view (mode fokus,
+  // tanpa sidebar/menu) supaya pengalaman share bersih, bukan "gabung menu".
+  useEffect(() => {
+    if (!meLoading && !me && id) {
+      router.replace('/view?id=' + encodeURIComponent(id));
+    }
+  }, [meLoading, me, id, router]);
   const [v, setV] = useState<V | null>(null);
   const [liked, setLiked] = useState(false);
   const [downloadProg, setDownloadProg] = useState<number | null>(null);
