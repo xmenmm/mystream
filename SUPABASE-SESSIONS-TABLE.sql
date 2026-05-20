@@ -17,5 +17,14 @@ create table if not exists public.sessions (
 -- Index untuk filter by username (dipakai saat suspend user, hapus all sessions, dll)
 create index if not exists idx_sessions_username on public.sessions(username);
 
--- Selesai. Cek: Table Editor → sessions (table baru, kosong dulu — terisi
--- otomatis saat user login).
+-- ============================================================
+--  Tabel app_config — admin config (globalLayers, banner, dll) per-key
+--  per-row, anti race dengan tulisan user (lastActiveAt, notif, dll).
+-- ============================================================
+create table if not exists public.app_config (
+  key         text primary key,
+  value       jsonb not null default '{}'::jsonb,
+  updated_at  timestamptz not null default now()
+);
+
+-- Selesai. Cek: Table Editor → sessions + app_config (dua tabel baru).
