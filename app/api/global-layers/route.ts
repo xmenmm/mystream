@@ -15,8 +15,8 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   const a = await getAuthFromRequest(req);
-  if (!a) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-  if (!a.user.isAdmin) return NextResponse.json({ error: 'admin only' }, { status: 403 });
+  if (!a) return NextResponse.json({ error: 'Belum login atau sesi habis — login ulang sebagai admin' }, { status: 401 });
+  if (!a.user.isAdmin) return NextResponse.json({ error: 'Akun ini bukan admin — login dengan akun admin' }, { status: 403 });
   const body = await req.json().catch(() => ({}));
   const layers = Array.isArray(body.layers)
     ? body.layers
