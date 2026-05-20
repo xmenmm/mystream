@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest } from '@/lib/auth';
 import { getConfig, setConfig } from '@/lib/config';
-import { supa } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 // Anti edge-cache: PUT balas 405 kalau GET ke-cache statis.
@@ -12,20 +11,8 @@ const KEY = 'globalLayers';
 const def: GlobalLayers = { enabled: false, layers: [] };
 
 export async function GET() {
-  // DEBUG sementara: ekspos error/data dari query supabase
-  const sb = supa();
-  const raw = await sb.from('app_config').select('value').eq('key', KEY).maybeSingle();
-  const all = await sb.from('app_config').select('key, value').limit(5);
   const cfg = await getConfig<GlobalLayers>(KEY, def);
-  return NextResponse.json({
-    globalLayers: { ...def, ...cfg },
-    _debug: {
-      raw_data: raw.data,
-      raw_error: raw.error ? { message: raw.error.message, code: (raw.error as any).code, details: (raw.error as any).details } : null,
-      all_rows: all.data,
-      all_error: all.error ? { message: all.error.message } : null,
-    },
-  });
+  return NextResponse.json({ globalLayers: { ...def, ...cfg } });
 }
 
 export async function PUT(req: NextRequest) {

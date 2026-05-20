@@ -20,13 +20,13 @@ const T = 'app_config';
 
 export async function getConfig<T = any>(key: string, def: T): Promise<T> {
   const sb = supa();
-  const { data, error } = await sb
-    .from(T)
-    .select('value')
-    .eq('key', key)
-    .maybeSingle();
+  // Catatan: kombinasi .eq('key', key).maybeSingle() bisa balas null padahal
+  // baris ada (bug di versi storage-js / PostgREST tertentu).
+  // Workaround: ambil array lalu filter di JS.
+  const { data, error } = await sb.from(T).select('key, value');
   if (error || !data) return def;
-  return (data.value as T) ?? def;
+  const row = (data as any[]).find((r) => r.key === key);
+  return (row?.value as T) ?? def;
 }
 
 export async function setConfig(key: string, value: any): Promise<void> {
