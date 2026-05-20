@@ -3,6 +3,8 @@ import { getAuthFromRequest } from '@/lib/auth';
 import { loadDB, saveDB } from '@/lib/db';
 
 export const runtime = 'nodejs';
+// Anti edge-cache: tanpa ini Vercel cache GET-nya & PUT balas 405.
+export const dynamic = 'force-dynamic';
 
 const def = {
   enabled: false,

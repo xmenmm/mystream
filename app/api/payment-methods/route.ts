@@ -4,6 +4,8 @@ import { loadDB, saveDB } from '@/lib/db';
 import type { PaymentMethod, PaymentSettings } from '@/lib/types';
 
 export const runtime = 'nodejs';
+// Anti edge-cache: tanpa ini Vercel cache GET-nya & POST balas 405.
+export const dynamic = 'force-dynamic';
 
 const DEFAULT_METHODS: PaymentMethod[] = [
   { id: 'DANA',      name: 'DANA',      type: 'ewallet', account: '',  accountName: 'MyStream Admin', icon: '💙', color: 'bg-blue-500',    enabled: true },
