@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest, getUserPlan } from '@/lib/auth';
 import { loadDB, saveDB, AVATARS_DIR, FILES_DIR, THUMBS_DIR } from '@/lib/db';
 import { moveFile, removeFile } from '@/lib/storage';
+import { renameUserSessions, deleteAllSessionsForUser } from '@/lib/sessions';
 
 export const runtime = 'nodejs';
 
@@ -46,9 +47,7 @@ export async function PUT(req: NextRequest) {
       if (v.username === old) v.username = username;
       if (Array.isArray(v.likedBy)) v.likedBy = v.likedBy.map((x) => (x === old ? username : x));
     });
-    for (const t of Object.keys(db.sessions)) {
-      if (db.sessions[t].username === old) db.sessions[t].username = username;
-    }
+    await renameUserSessions(old, username);
     db.users.forEach((x) => {
       if (Array.isArray(x.following)) x.following = x.following.map((n) => (n === old ? username : n));
     });
@@ -86,9 +85,7 @@ export async function DELETE(req: NextRequest) {
   db.videos = db.videos.filter((v) => v.username !== a.user.username);
   db.viewsLog = db.viewsLog.filter((l) => !myVideos.some((v) => v.id === l.videoId));
   db.users = db.users.filter((x) => x.username !== a.user.username);
-  for (const t of Object.keys(db.sessions)) {
-    if (db.sessions[t].username === a.user.username) delete db.sessions[t];
-  }
+  await deleteAllSessionsForUser(a.user.username);
   await saveDB(db);
   return NextResponse.json({ ok: true });
 }

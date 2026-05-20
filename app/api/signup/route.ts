@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hashPw, newToken, SESSION_COOKIE, getUserPlan } from '@/lib/auth';
 import { loadDB, saveDB } from '@/lib/db';
+import { createSession } from '@/lib/sessions';
 import { verifyCaptcha } from '@/lib/captcha';
 import { notifyDiscord } from '@/lib/discord';
 
@@ -33,9 +34,9 @@ export async function POST(req: NextRequest) {
     createdAt: new Date().toISOString(),
   };
   db.users.push(user);
-  const token = newToken();
-  db.sessions[token] = { username, createdAt: Date.now() };
   await saveDB(db);
+  const token = newToken();
+  await createSession(token, username);
 
   const plan = getUserPlan(user);
   const { password: _p, passwordPlain: _pp, ...pub } = user;

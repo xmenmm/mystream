@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthFromRequest, SESSION_COOKIE } from '@/lib/auth';
+import { getAuthFromRequest } from '@/lib/auth';
 import { loadDB, saveDB } from '@/lib/db';
 
 export const runtime = 'nodejs';
@@ -15,21 +15,7 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   const a = await getAuthFromRequest(req);
-  if (!a) {
-    // DEBUG: kasih tahu kenapa auth gagal (sementara, biar bisa lacak)
-    const cookieNames = req.cookies.getAll().map((c) => c.name);
-    const token = req.cookies.get(SESSION_COOKIE)?.value;
-    let why = 'tidak ada cookie session (cookies yg ada: ' + (cookieNames.join(',') || 'KOSONG') + ')';
-    if (token) {
-      const dbg = await loadDB();
-      if (!dbg.sessions[token]) {
-        why = `token ada (${token.slice(0, 8)}…) tapi tidak ada di sessions DB (total ${Object.keys(dbg.sessions || {}).length} sessions)`;
-      } else {
-        why = `session ada tapi user "${dbg.sessions[token].username}" tidak ditemukan`;
-      }
-    }
-    return NextResponse.json({ error: 'AUTH GAGAL: ' + why }, { status: 401 });
-  }
+  if (!a) return NextResponse.json({ error: 'Belum login atau sesi habis — login ulang sebagai admin' }, { status: 401 });
   if (!a.user.isAdmin) return NextResponse.json({ error: 'Akun ini bukan admin — login dengan akun admin' }, { status: 403 });
   const body = await req.json().catch(() => ({}));
   const layers = Array.isArray(body.layers)

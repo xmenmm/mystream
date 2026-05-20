@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest } from '@/lib/auth';
 import { loadDB, saveDB } from '@/lib/db';
+import { deleteAllSessionsForUser } from '@/lib/sessions';
 
 export const runtime = 'nodejs';
 
@@ -19,9 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: { username: s
   u.suspendedReason = (reason || '').slice(0, 200);
   u.suspendedAt = new Date().toISOString();
   u.suspendedBy = a.user.username;
-  for (const t of Object.keys(db.sessions)) {
-    if (db.sessions[t].username === target) delete db.sessions[t];
-  }
+  await deleteAllSessionsForUser(target);
   await saveDB(db);
   return NextResponse.json({ ok: true, username: target, suspended: true });
 }

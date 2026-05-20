@@ -5,6 +5,7 @@ import {
   pending2FA, PENDING_2FA_MS, getUserPlan,
 } from '@/lib/auth';
 import { loadDB, saveDB, AVATARS_DIR } from '@/lib/db';
+import { createSession } from '@/lib/sessions';
 import { notifyDiscord } from '@/lib/discord';
 
 export const runtime = 'nodejs';
@@ -65,8 +66,7 @@ export async function POST(req: NextRequest) {
   }
 
   const token = newToken();
-  db.sessions[token] = { username: user.username, createdAt: Date.now() };
-  await saveDB(db);
+  await createSession(token, user.username);
 
   const plan = getUserPlan(user);
   const { password: _, passwordPlain: ___, totpSecret: __, ...pub } = user;

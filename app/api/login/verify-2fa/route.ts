@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { newToken, SESSION_COOKIE, pending2FA, verifyTotpCode, getUserPlan } from '@/lib/auth';
 import { loadDB, saveDB, AVATARS_DIR } from '@/lib/db';
+import { createSession } from '@/lib/sessions';
 
 export const runtime = 'nodejs';
 
@@ -19,8 +20,7 @@ export async function POST(req: NextRequest) {
   }
   pending2FA.delete(tempToken);
   const token = newToken();
-  db.sessions[token] = { username: user.username, createdAt: Date.now() };
-  await saveDB(db);
+  await createSession(token, user.username);
   const plan = getUserPlan(user);
   const { password: _, passwordPlain: ___, totpSecret: __, ...pub } = user;
   const res = NextResponse.json({

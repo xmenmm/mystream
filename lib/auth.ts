@@ -2,6 +2,7 @@ import { createHash, randomBytes, createHmac } from 'node:crypto';
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import { loadDB, saveDB } from './db';
+import { getSession, deleteSession } from './sessions';
 import { User } from './types';
 
 export const SESSION_COOKIE = 'mystream_session';
@@ -20,15 +21,14 @@ export async function getAuthFromRequest(req: NextRequest): Promise<AuthCtx | nu
     req.cookies.get(SESSION_COOKIE)?.value ||
     (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
   if (!token) return null;
-  const db = await loadDB();
-  const sess = db.sessions[token];
+  const sess = await getSession(token);
   if (!sess) return null;
+  const db = await loadDB();
   const user = db.users.find((u) => u.username === sess.username);
   if (!user) return null;
   // Suspended user → invalidate session
   if (user.suspended) {
-    delete db.sessions[token];
-    await saveDB(db);
+    await deleteSession(token);
     return null;
   }
   // Track last active (debounce 30s untuk hindari write storm)
@@ -43,9 +43,9 @@ export async function getAuthFromRequest(req: NextRequest): Promise<AuthCtx | nu
 export async function getAuthFromCookies(): Promise<AuthCtx | null> {
   const token = cookies().get(SESSION_COOKIE)?.value;
   if (!token) return null;
-  const db = await loadDB();
-  const sess = db.sessions[token];
+  const sess = await getSession(token);
   if (!sess) return null;
+  const db = await loadDB();
   const user = db.users.find((u) => u.username === sess.username);
   if (!user || user.suspended) return null;
   return { token, user };

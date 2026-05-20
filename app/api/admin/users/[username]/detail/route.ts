@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest, getUserPlan } from '@/lib/auth';
 import { loadDB, AVATARS_DIR } from '@/lib/db';
+import { listSessionsForUser } from '@/lib/sessions';
 
 export const runtime = 'nodejs';
 
@@ -21,13 +22,11 @@ export async function GET(req: NextRequest, { params }: { params: { username: st
   const following = u.following || [];
   const plan = getUserPlan(u);
 
-  const activeSessions = Object.entries(db.sessions || {})
-    .filter(([, s]) => s.username === u.username)
-    .map(([token, s]) => ({
-      tokenPreview: token.slice(0, 8) + '…' + token.slice(-4),
-      tokenFull: token,
-      createdAt: s.createdAt,
-    }));
+  const activeSessions = (await listSessionsForUser(u.username)).map((s) => ({
+    tokenPreview: s.token.slice(0, 8) + '…' + s.token.slice(-4),
+    tokenFull: s.token,
+    createdAt: s.createdAt,
+  }));
 
   const messagesSent = (db.messages || []).filter((m) => m.from === u.username).length;
   const messagesReceived = (db.messages || []).filter((m) => m.to === u.username).length;
