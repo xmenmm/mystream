@@ -395,7 +395,7 @@ export default async function LandingPage() {
           <div>
             <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs uppercase tracking-wider text-accent">Cerita Kamu, Mulai Hari Ini</span>
             <h2 className="mt-4 text-3xl md:text-5xl font-extrabold leading-tight">
-              Setiap video adalah <span className="bg-grad-accent bg-clip-text text-transparent">cerita</span> yang menunggu dilihat seseorang.
+              Setiap video adalah <span className="text-accent">cerita</span> yang menunggu dilihat seseorang.
             </h2>
             <p className="mt-6 text-lg text-muted leading-relaxed">
               Kamu nggak perlu kamera mahal. Nggak perlu studio. Cukup hp di tangan,

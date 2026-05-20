@@ -66,7 +66,7 @@ function SearchInner() {
     <div className="space-y-4">
       <header>
         <h1 className="text-2xl font-extrabold">
-          Hasil untuk <span className="bg-grad-accent bg-clip-text text-transparent">"{q}"</span>
+          Hasil untuk <span className="text-accent">"{q}"</span>
         </h1>
         <p className="mt-1 text-sm text-muted">
           {loading ? '⏳ Mencari...' : `${videos.length + users.length} hasil ditemukan`}

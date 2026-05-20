@@ -429,7 +429,7 @@ export function LandingPricing() {
           </div>
           <div className="text-center">
             <h3 className="text-2xl font-bold">Premium</h3>
-            <div className="mt-3 bg-grad-accent bg-clip-text text-4xl font-extrabold text-transparent">
+            <div className="mt-3 text-4xl font-extrabold text-accent">
               Mulai Rp 15K
             </div>
             <div className="text-xs text-muted">5 pilihan durasi · 7 hari sampai setahun</div>
