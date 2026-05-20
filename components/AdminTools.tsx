@@ -257,11 +257,28 @@ function GlobalLayersModal({ onClose }: { onClose: () => void }) {
   async function save() {
     setSaving(true); setErr(''); setMsg('');
     try {
-      const cleaned = layers.filter((l) => /^https?:\/\//i.test(l.url || ''));
-      await apiSetGlobalLayers({ enabled, layers: cleaned });
-      setLayers(cleaned);
-      setMsg('✓ Tersimpan — berlaku untuk semua video sekarang');
-      setTimeout(() => setMsg(''), 2500);
+      // Auto-tambah https:// kalau user lupa, biar nggak ke-drop silent.
+      const normalized = layers
+        .map((l) => {
+          const url = (l.url || '').trim();
+          if (!url) return { ...l, url: '' };
+          if (/^https?:\/\//i.test(url)) return { ...l, url };
+          return { ...l, url: 'https://' + url };
+        })
+        .filter((l) => l.url.length > 0);
+      // Cek mana yang tetap nggak valid (mis. cuma "asdf")
+      const invalid = normalized.filter((l) => {
+        try { new URL(l.url); return false; } catch { return true; }
+      });
+      if (invalid.length > 0) {
+        setErr(`URL tidak valid: ${invalid.map((l) => l.url).join(', ')} — pakai contoh https://tiktok.com/@user`);
+        setSaving(false);
+        return;
+      }
+      await apiSetGlobalLayers({ enabled, layers: normalized });
+      setLayers(normalized);
+      setMsg(`✓ Tersimpan ${normalized.length} layer — berlaku untuk semua video sekarang`);
+      setTimeout(() => setMsg(''), 3500);
     } catch (e: any) { setErr(e.message); }
     finally { setSaving(false); }
   }
