@@ -388,7 +388,7 @@ export default function ProfilePage() {
               </select>
             </div>
             <div className="mt-3">
-              <label className="label">Avatar color</label>
+              <label className="label">{t('profile.avatar_color')}</label>
               <div className="flex gap-2">
                 <input
                   className="h-10 w-12 cursor-pointer rounded-md border border-border bg-bg"
@@ -412,7 +412,7 @@ export default function ProfilePage() {
             </div>
             {msg && <div className="mt-3 text-sm text-success">{msg}</div>}
             <button className="btn-primary mt-4 w-full" onClick={save} disabled={busy}>
-              {busy ? 'Menyimpan…' : '💾 Simpan Perubahan'}
+              {busy ? '⏳ ' + t('profile.save') + '…' : '💾 ' + t('profile.save')}
             </button>
           </section>
 
