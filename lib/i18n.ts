@@ -232,6 +232,25 @@ const ID: Dict = {
   'admin_tools.discord_title': 'Kirim ke Discord', 'admin_tools.discord_desc': 'Notifikasi manual ke channel #hasil-claude',
   'admin_tools.daily_title': 'Daily Report', 'admin_tools.daily_desc': 'Trigger laporan harian ke Discord',
   'admin_tools.rt_title': 'Running Text & Banner', 'admin_tools.rt_desc': 'Set di Admin Control Panel → tab Banner (scroll bawah). Muncul di semua watch page.',
+
+  'admin_panel.announce_active': '📢 Pengumuman Aktif',
+  'admin_panel.create_update': '✏ Buat / Update',
+  'admin_panel.grant_premium': '⭐ Berikan Premium',
+  'admin_panel.new_users': '🆕 User Baru (24 jam)',
+  'admin_panel.online_now': '🟢 Online Sekarang',
+  'admin_panel.main_banner': '🎬 Banner Utama / Running Text',
+  'admin_panel.side_banner': '📌 Banner Samping',
+  'admin_panel.running_text': '📢 Running Text (Watch Page)',
+  'admin_panel.quick_approve': '⚡ Approve Cepat — paste kode dari user',
+  'admin_panel.payment_accounts': '🏦 Atur Nomor Rekening Pembayaran',
+  'admin_panel.ewallet': 'E-Wallet',
+  'admin_panel.bank_transfer': 'Transfer Bank',
+  'admin_panel.full_detail': 'Detail Lengkap:',
+  'admin_panel.pending': '⏳ Menunggu',
+  'admin_panel.approved': '✅ Diterima',
+  'admin_panel.rejected': '❌ Ditolak',
+  'admin_panel.approve': 'Terima',
+  'admin_panel.reject': 'Tolak',
 };
 
 const EN: Dict = {
@@ -454,6 +473,25 @@ const EN: Dict = {
   'admin_tools.discord_title': 'Send to Discord', 'admin_tools.discord_desc': 'Manual notification to #hasil-claude channel',
   'admin_tools.daily_title': 'Daily Report', 'admin_tools.daily_desc': 'Trigger daily report to Discord',
   'admin_tools.rt_title': 'Running Text & Banner', 'admin_tools.rt_desc': 'Set in Admin Control Panel → Banner tab (scroll down). Appears on all watch pages.',
+
+  'admin_panel.announce_active': '📢 Active Announcement',
+  'admin_panel.create_update': '✏ Create / Update',
+  'admin_panel.grant_premium': '⭐ Grant Premium',
+  'admin_panel.new_users': '🆕 New Users (24h)',
+  'admin_panel.online_now': '🟢 Online Now',
+  'admin_panel.main_banner': '🎬 Main Banner / Running Text',
+  'admin_panel.side_banner': '📌 Side Banner',
+  'admin_panel.running_text': '📢 Running Text (Watch Page)',
+  'admin_panel.quick_approve': '⚡ Quick Approve — paste code from user',
+  'admin_panel.payment_accounts': '🏦 Set Payment Account Numbers',
+  'admin_panel.ewallet': 'E-Wallet',
+  'admin_panel.bank_transfer': 'Bank Transfer',
+  'admin_panel.full_detail': 'Full Detail:',
+  'admin_panel.pending': '⏳ Pending',
+  'admin_panel.approved': '✅ Approved',
+  'admin_panel.rejected': '❌ Rejected',
+  'admin_panel.approve': 'Approve',
+  'admin_panel.reject': 'Reject',
 };
 
 const JP: Dict = {
@@ -676,6 +714,25 @@ const JP: Dict = {
   'admin_tools.discord_title': 'Discord に送信', 'admin_tools.discord_desc': '#hasil-claude チャンネルへ手動通知',
   'admin_tools.daily_title': 'デイリーレポート', 'admin_tools.daily_desc': '毎日のレポートを Discord に送信',
   'admin_tools.rt_title': 'ランニングテキストとバナー', 'admin_tools.rt_desc': 'Admin Control Panel → Bannerタブ（下にスクロール）で設定。全ての視聴ページに表示。',
+
+  'admin_panel.announce_active': '📢 アクティブなお知らせ',
+  'admin_panel.create_update': '✏ 作成 / 更新',
+  'admin_panel.grant_premium': '⭐ プレミアム付与',
+  'admin_panel.new_users': '🆕 新規ユーザー（24時間）',
+  'admin_panel.online_now': '🟢 オンライン中',
+  'admin_panel.main_banner': '🎬 メインバナー / ランニングテキスト',
+  'admin_panel.side_banner': '📌 サイドバナー',
+  'admin_panel.running_text': '📢 ランニングテキスト（視聴ページ）',
+  'admin_panel.quick_approve': '⚡ クイック承認 — ユーザーのコードを貼り付け',
+  'admin_panel.payment_accounts': '🏦 支払い口座番号の設定',
+  'admin_panel.ewallet': '電子マネー',
+  'admin_panel.bank_transfer': '銀行振込',
+  'admin_panel.full_detail': '詳細:',
+  'admin_panel.pending': '⏳ 保留中',
+  'admin_panel.approved': '✅ 承認済み',
+  'admin_panel.rejected': '❌ 拒否済み',
+  'admin_panel.approve': '承認',
+  'admin_panel.reject': '拒否',
 };
 
 const AR: Dict = {
@@ -898,6 +955,25 @@ const AR: Dict = {
   'admin_tools.discord_title': 'إرسال إلى Discord', 'admin_tools.discord_desc': 'إشعار يدوي إلى قناة #hasil-claude',
   'admin_tools.daily_title': 'التقرير اليومي', 'admin_tools.daily_desc': 'إطلاق التقرير اليومي إلى Discord',
   'admin_tools.rt_title': 'النص المتحرك والبانر', 'admin_tools.rt_desc': 'اضبط في Admin Control Panel → علامة Banner (مرر للأسفل). يظهر في جميع صفحات المشاهدة.',
+
+  'admin_panel.announce_active': '📢 إعلان نشط',
+  'admin_panel.create_update': '✏ إنشاء / تحديث',
+  'admin_panel.grant_premium': '⭐ منح البريميوم',
+  'admin_panel.new_users': '🆕 مستخدمون جدد (24 ساعة)',
+  'admin_panel.online_now': '🟢 متصل الآن',
+  'admin_panel.main_banner': '🎬 البانر الرئيسي / النص المتحرك',
+  'admin_panel.side_banner': '📌 البانر الجانبي',
+  'admin_panel.running_text': '📢 النص المتحرك (صفحة المشاهدة)',
+  'admin_panel.quick_approve': '⚡ موافقة سريعة — الصق الكود من المستخدم',
+  'admin_panel.payment_accounts': '🏦 ضبط أرقام حسابات الدفع',
+  'admin_panel.ewallet': 'محفظة إلكترونية',
+  'admin_panel.bank_transfer': 'تحويل بنكي',
+  'admin_panel.full_detail': 'التفاصيل الكاملة:',
+  'admin_panel.pending': '⏳ قيد الانتظار',
+  'admin_panel.approved': '✅ موافق عليه',
+  'admin_panel.rejected': '❌ مرفوض',
+  'admin_panel.approve': 'موافقة',
+  'admin_panel.reject': 'رفض',
 };
 
 const DICTS: Record<Locale, Dict> = { id: ID, en: EN, jp: JP, ar: AR };

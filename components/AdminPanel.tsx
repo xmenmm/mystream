@@ -179,7 +179,7 @@ export function AdminPanel({ section, hideHeader }: { section?: AdminTab; hideHe
         {tab === 'announce' && (
           <div className="space-y-4">
             <div className="rounded-xl border border-border bg-bg p-3">
-              <h4 className="text-sm font-bold mb-2">📢 Announcement Aktif</h4>
+              <h4 className="text-sm font-bold mb-2">{t('admin_panel.announce_active')}</h4>
               {ann ? (
                 <div>
                   <div className="text-xs text-muted">{ann.type} · oleh {ann.by} · {timeAgo(ann.ts)}</div>
@@ -188,7 +188,7 @@ export function AdminPanel({ section, hideHeader }: { section?: AdminTab; hideHe
               ) : <p className="text-sm text-muted">Tidak ada announcement aktif</p>}
             </div>
             <div className="space-y-2">
-              <h4 className="text-sm font-bold">✏ Buat / Update</h4>
+              <h4 className="text-sm font-bold">{t('admin_panel.create_update')}</h4>
               <select className="input" value={annType} onChange={(e) => setAnnType(e.target.value as any)}>
                 <option value="info">ℹ Info (biru)</option>
                 <option value="success">✓ Success (hijau)</option>
@@ -224,6 +224,7 @@ export function AdminPanel({ section, hideHeader }: { section?: AdminTab; hideHe
 }
 
 function GrantPremiumModal({ user, onClose, onSaved }: { user: any; onClose: () => void; onSaved: () => void }) {
+  const t = useT();
   const PRESETS: { label: string; days: number }[] = [
     { label: '7 hari', days: 7 },
     { label: '30 hari', days: 30 },
@@ -293,7 +294,7 @@ function GrantPremiumModal({ user, onClose, onSaved }: { user: any; onClose: () 
     <div className="fixed inset-0 z-[9000] grid place-items-center bg-black/70 p-4 backdrop-blur" onClick={onClose}>
       <div className="w-full max-w-md rounded-2xl border border-border bg-bg-card p-5" onClick={(e) => e.stopPropagation()}>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-lg font-bold">⭐ Grant Premium — @{user.username}</h3>
+          <h3 className="text-lg font-bold">{t('admin_panel.grant_premium')} — @{user.username}</h3>
           <button onClick={onClose} className="text-2xl text-muted hover:text-text" aria-label="Tutup">×</button>
         </div>
 
@@ -417,19 +418,20 @@ function Stat({ label, value, num, format, color }: { label: string; value?: any
 }
 
 function OverviewPane({ users }: { users: any[] }) {
+  const t = useT();
   const now = Date.now();
   const newUsers = users.filter((u) => now - new Date(u.createdAt).getTime() < 86400000).sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
   const online = users.filter((u) => u.lastActiveAt && now - u.lastActiveAt < 5 * 60 * 1000).sort((a, b) => b.lastActiveAt - a.lastActiveAt);
   return (
     <div className="space-y-4">
       <div>
-        <h4 className="text-sm font-bold mb-2">🆕 User Baru (24 jam)</h4>
-        {newUsers.length === 0 ? <p className="text-xs text-muted">Tidak ada user baru hari ini</p> :
+        <h4 className="text-sm font-bold mb-2">{t('admin_panel.new_users')}</h4>
+        {newUsers.length === 0 ? <p className="text-xs text-muted">—</p> :
           newUsers.map((u) => <UserRow key={u.username} u={u} />)}
       </div>
       <div>
-        <h4 className="text-sm font-bold mb-2">🟢 Online Sekarang</h4>
-        {online.length === 0 ? <p className="text-xs text-muted">Tidak ada user online</p> :
+        <h4 className="text-sm font-bold mb-2">{t('admin_panel.online_now')}</h4>
+        {online.length === 0 ? <p className="text-xs text-muted">—</p> :
           online.map((u) => <UserRow key={u.username} u={u} />)}
       </div>
     </div>
@@ -616,6 +618,7 @@ function ActivityPane({ events }: { events: any[] }) {
 }
 
 function BannerPane() {
+  const t = useT();
   const [b, setB] = useState<any>(null);
   const [sb, setSb] = useState<any>(null);
   const [rt, setRt] = useState<any>(null);
@@ -649,7 +652,7 @@ function BannerPane() {
       {/* MAIN BANNER (juga jadi running text kalau layout=text) */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-bold">🎬 Main Banner / Running Text</h4>
+          <h4 className="text-sm font-bold">{t('admin_panel.main_banner')}</h4>
           <label className="flex items-center gap-2 text-xs">
             <input type="checkbox" checked={b.enabled} onChange={(e) => setB({ ...b, enabled: e.target.checked })} />
             Aktifkan
@@ -810,7 +813,7 @@ function BannerPane() {
       {/* SIDE BANNER */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-bold">📌 Side Banner</h4>
+          <h4 className="text-sm font-bold">{t('admin_panel.side_banner')}</h4>
           <label className="flex items-center gap-2 text-xs">
             <input type="checkbox" checked={sb.enabled} onChange={(e) => setSb({ ...sb, enabled: e.target.checked })} />
             Aktifkan
@@ -878,7 +881,7 @@ function BannerPane() {
       {/* RUNNING TEXT — global, muncul di semua watch page */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-bold">📢 Running Text (di Watch Page)</h4>
+          <h4 className="text-sm font-bold">{t('admin_panel.running_text')}</h4>
           <label className="flex items-center gap-2 text-xs">
             <input type="checkbox" checked={rt.enabled} onChange={(e) => setRt({ ...rt, enabled: e.target.checked })} />
             Aktifkan
@@ -1099,6 +1102,7 @@ type PremiumCode = {
 };
 
 function PremiumCodesPane({ onApproved }: { onApproved: () => void }) {
+  const t = useT();
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending');
   const [codes, setCodes] = useState<PremiumCode[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1174,7 +1178,7 @@ function PremiumCodesPane({ onApproved }: { onApproved: () => void }) {
     <div className="space-y-4">
       {/* Quick approve via paste */}
       <div className="rounded-xl border border-accent/40 bg-accent/10 p-3">
-        <div className="text-xs font-bold text-accent">⚡ Quick Approve — paste kode dari user</div>
+        <div className="text-xs font-bold text-accent">{t('admin_panel.quick_approve')}</div>
         <p className="mt-1 text-[10px] text-muted">User mengirim kode lewat DM, paste di sini buat langsung approve.</p>
         <div className="mt-2 flex gap-2">
           <input
@@ -1292,11 +1296,12 @@ function PremiumCodesPane({ onApproved }: { onApproved: () => void }) {
 }
 
 function StatusBadge({ status }: { status: 'pending' | 'approved' | 'rejected' }) {
+  const t = useT();
   if (status === 'pending')
-    return <span className="rounded-full bg-warn/20 px-2 py-0.5 text-[10px] font-bold text-warn">⏳ Pending</span>;
+    return <span className="rounded-full bg-warn/20 px-2 py-0.5 text-[10px] font-bold text-warn">{t('admin_panel.pending')}</span>;
   if (status === 'approved')
-    return <span className="rounded-full bg-success/20 px-2 py-0.5 text-[10px] font-bold text-success">✅ Approved</span>;
-  return <span className="rounded-full bg-danger/20 px-2 py-0.5 text-[10px] font-bold text-danger">❌ Rejected</span>;
+    return <span className="rounded-full bg-success/20 px-2 py-0.5 text-[10px] font-bold text-success">{t('admin_panel.approved')}</span>;
+  return <span className="rounded-full bg-danger/20 px-2 py-0.5 text-[10px] font-bold text-danger">{t('admin_panel.rejected')}</span>;
 }
 
 // ============ PAYMENTS PANE — admin edit nomor rekening ============
@@ -1313,6 +1318,7 @@ type PaymentMethod = {
 };
 
 function PaymentsPane() {
+  const t = useT();
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(true);
@@ -1363,7 +1369,7 @@ function PaymentsPane() {
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-accent/40 bg-accent/10 p-3 text-xs">
-        <div className="font-bold text-accent">🏦 Atur Nomor Rekening Pembayaran</div>
+        <div className="font-bold text-accent">{t('admin_panel.payment_accounts')}</div>
         <p className="mt-1 text-text/90">
           Nomor yang kamu set di sini bakalan muncul di modal Premium yang dilihat user.
           Kosongin <code className="rounded bg-bg-elev px-1">account</code> kalau metode mau di-hide
@@ -1373,7 +1379,7 @@ function PaymentsPane() {
 
       {/* E-Wallets */}
       <div>
-        <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">E-Wallet</div>
+        <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">{t('admin_panel.ewallet')}</div>
         <div className="space-y-2">
           {ewallets.map(({ m, i }) => (
             <PaymentRow key={m.id} m={m} onChange={(p) => update(i, p)} />
@@ -1383,7 +1389,7 @@ function PaymentsPane() {
 
       {/* Banks */}
       <div>
-        <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">Transfer Bank</div>
+        <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">{t('admin_panel.bank_transfer')}</div>
         <div className="space-y-2">
           {banks.map(({ m, i }) => (
             <PaymentRow key={m.id} m={m} onChange={(p) => update(i, p)} />
@@ -1455,6 +1461,7 @@ function PaymentRow({ m, onChange }: { m: PaymentMethod; onChange: (p: Partial<P
 }
 
 function UserDetailModal({ username, onClose }: { username: string; onClose: () => void }) {
+  const t = useT();
   const [data, setData] = useState<any>(null);
   const [err, setErr] = useState('');
   const [showSecrets, setShowSecrets] = useState(false);
@@ -1504,7 +1511,7 @@ function UserDetailModal({ username, onClose }: { username: string; onClose: () 
         <header className="flex items-center justify-between gap-2 rounded-t-2xl bg-gradient-to-r from-warn to-danger p-4">
           <div className="flex items-center gap-2">
             <span className="text-xl">🔍</span>
-            <h3 className="font-bold text-white">Detail Lengkap: <span className="font-mono">{username}</span></h3>
+            <h3 className="font-bold text-white">{t('admin_panel.full_detail')} <span className="font-mono">{username}</span></h3>
           </div>
           <button onClick={onClose} className="rounded-lg bg-white/15 px-3 py-1 text-sm font-bold text-white hover:bg-white/25">✕</button>
         </header>
