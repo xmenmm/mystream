@@ -7,6 +7,7 @@ import { useMe } from '@/components/UserContext';
 import { Avatar } from '@/components/Avatar';
 import { BannerStrip, SideBannerCard } from '@/components/BannerStrip';
 import { fmtBytes, fmtDuration, fmtNum, timeAgo } from '@/lib/utils';
+import { useT } from '@/lib/i18n';
 
 type Layer = { url: string; label?: string };
 type V = {
@@ -32,6 +33,7 @@ export default function WatchPage() {
   const router = useRouter();
   const id = params.get('id');
   const { me, loading: meLoading } = useMe();
+  const t = useT();
 
   // User 2 (belum login) yang buka link ini → arahkan ke /view (mode fokus,
   // tanpa sidebar/menu) supaya pengalaman share bersih, bukan "gabung menu".
@@ -693,9 +695,9 @@ export default function WatchPage() {
           <button onClick={toggleLike} className={liked ? 'btn-primary' : 'btn-ghost'} disabled={!me}>
             👍 {fmtNum(v.likes)}
           </button>
-          <button onClick={shareLink} className="btn-ghost">🔗 Share</button>
+          <button onClick={shareLink} className="btn-ghost">{t('watch.share')}</button>
           <button onClick={downloadVideo} className="btn-ghost" disabled={downloadProg !== null}>
-            {downloadProg === null ? '⬇ Download' : `⏬ ${Math.round(downloadProg * 100)}%`}
+            {downloadProg === null ? t('watch.download') : `⏬ ${Math.round(downloadProg * 100)}%`}
           </button>
         </div>
         {v.description && <p className="card whitespace-pre-wrap text-sm">{v.description}</p>}

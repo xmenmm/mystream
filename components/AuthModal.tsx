@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, apiVerify2FA, apiGetCaptcha } from '@/lib/api-client';
+import { useT } from '@/lib/i18n';
 
 type Mode = 'login' | 'signup';
 
@@ -9,6 +10,7 @@ type Mode = 'login' | 'signup';
  *  window.dispatchEvent(new CustomEvent('open-auth', { detail: { mode } })) */
 export function AuthModal() {
   const router = useRouter();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>('login');
 
@@ -140,14 +142,14 @@ export function AuthModal() {
               onClick={() => switchMode('login')}
               className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${mode === 'login' ? 'bg-grad-accent text-white shadow' : 'text-muted hover:text-white'}`}
             >
-              Login
+              {t('auth.btn_login')}
             </button>
             <button
               type="button"
               onClick={() => switchMode('signup')}
               className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${mode === 'signup' ? 'bg-grad-accent text-white shadow' : 'text-muted hover:text-white'}`}
             >
-              Daftar
+              {t('auth.signup_title')}
             </button>
           </div>
         )}
@@ -156,14 +158,14 @@ export function AuthModal() {
           <form onSubmit={submitLogin}>
             {!tempToken ? (
               <>
-                <h2 className="text-xl font-bold">Masuk ke MyStream</h2>
-                <p className="mt-1 text-sm text-muted">Username atau email + password.</p>
+                <h2 className="text-xl font-bold">{t('auth.login_title')} MyStream</h2>
+                <p className="mt-1 text-sm text-muted">Username / email + password.</p>
                 <div className="mt-4">
-                  <label className="label">Username / Email</label>
+                  <label className="label">{t('auth.username')} / {t('auth.email')}</label>
                   <input className="input" value={id} onChange={(e) => setId(e.target.value)} autoFocus />
                 </div>
                 <div className="mt-3">
-                  <label className="label">Password</label>
+                  <label className="label">{t('auth.password')}</label>
                   <input className="input" type="password" value={loginPw} onChange={(e) => setLoginPw(e.target.value)} />
                 </div>
               </>
@@ -197,27 +199,27 @@ export function AuthModal() {
             )}
             {err && <div className="mt-3 rounded-lg bg-danger/20 p-2 text-sm text-danger">{err}</div>}
             <button className="btn-primary mt-5 w-full" disabled={busy}>
-              {busy ? 'Loading…' : (tempToken ? '✓ Verifikasi' : 'Login')}
+              {busy ? t('auth.btn_loading') : (tempToken ? '✓ ' + t('auth.verify_2fa') : t('auth.btn_login'))}
             </button>
           </form>
         ) : (
           <form onSubmit={submitSignup}>
-            <h2 className="text-xl font-bold">Daftar MyStream</h2>
-            <p className="mt-1 text-sm text-muted">Gratis selamanya. Mulai upload dalam hitungan detik.</p>
+            <h2 className="text-xl font-bold">{t('auth.signup_title')}</h2>
+            <p className="mt-1 text-sm text-muted">Gratis. Mulai upload dalam hitungan detik.</p>
             <div className="mt-4">
-              <label className="label">Username</label>
+              <label className="label">{t('auth.username')}</label>
               <input className="input" value={username} onChange={(e) => setU(e.target.value)} minLength={3} required />
             </div>
             <div className="mt-3">
-              <label className="label">Email</label>
+              <label className="label">{t('auth.email')}</label>
               <input className="input" type="email" value={email} onChange={(e) => setE(e.target.value)} required />
             </div>
             <div className="mt-3">
-              <label className="label">Password</label>
+              <label className="label">{t('auth.password')}</label>
               <input className="input" type="password" value={signupPw} onChange={(e) => setSignupPw(e.target.value)} minLength={6} required />
             </div>
             <div className="mt-3">
-              <label className="label">Captcha — ketik kode di gambar</label>
+              <label className="label">{t('auth.captcha_label')}</label>
               <div className="flex items-stretch gap-2">
                 <div className="grid min-h-[64px] min-w-0 flex-1 place-items-center rounded-xl border border-border bg-bg-elev p-1">
                   {captcha
@@ -238,7 +240,7 @@ export function AuthModal() {
             </div>
             {err && <div className="mt-3 rounded-lg bg-danger/20 p-2 text-sm text-danger">{err}</div>}
             <button className="btn-primary mt-5 w-full" disabled={busy}>
-              {busy ? 'Loading…' : '✨ Daftar Sekarang'}
+              {busy ? t('auth.btn_loading') : t('auth.btn_signup')}
             </button>
           </form>
         )}

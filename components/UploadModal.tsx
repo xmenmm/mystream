@@ -3,9 +3,11 @@ import { useState, useRef, useEffect } from 'react';
 import { api, apiGetMyQuota, makeImageThumb, makeVideoThumb, uploadToSignedUrl } from '@/lib/api-client';
 import { fmtBytes, fmtDuration } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { useT } from '@/lib/i18n';
 
 export function UploadModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
+  const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [thumb, setThumb] = useState<string>('');
@@ -162,7 +164,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
     >
       <div className="max-h-[90vh] w-full max-w-lg animate-slide-up overflow-y-auto rounded-2xl border border-border bg-bg-card p-6 shadow-xl">
         <div className="mb-1 flex items-start justify-between">
-          <h3 className="text-xl font-bold">Upload Video or Image</h3>
+          <h3 className="text-xl font-bold">{t('upload.title')}</h3>
           <button className="text-2xl text-muted hover:text-white" onClick={onClose} aria-label="Close">
             ×
           </button>
@@ -189,8 +191,8 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
             onChange={(e) => e.target.files?.[0] && pick(e.target.files[0])}
           />
           <div className="text-3xl">📤</div>
-          <div className="mt-1 font-semibold">Klik atau pilih file</div>
-          <div className="text-xs text-muted">Video atau gambar</div>
+          <div className="mt-1 font-semibold">{t('upload.file_label')}</div>
+          <div className="text-xs text-muted">{t('upload.file_sub')}</div>
         </label>
 
         {file && (
@@ -208,12 +210,12 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
         )}
 
         <div className="mt-4">
-          <label className="label">Title</label>
+          <label className="label">{t('upload.title_field')}</label>
           <input
             className="input"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Judul video..."
+            placeholder={t('upload.title_ph')}
             maxLength={100}
           />
         </div>
@@ -221,7 +223,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
         {/* Thumbnail (Upload + AI) */}
         {file && (
           <div className="mt-3">
-            <label className="label">🖼 Thumbnail</label>
+            <label className="label">{t('upload.thumb')}</label>
 
             {/* Preview */}
             {thumb && (
@@ -245,14 +247,14 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
                 onClick={() => thumbInputRef.current?.click()}
                 className="flex-1 rounded-xl border border-border bg-bg-elev px-3 py-2 text-xs font-semibold hover:border-accent/50"
               >
-                📁 Upload Thumbnail Sendiri
+                {t('upload.thumb_own')}
               </button>
               <button
                 type="button"
                 onClick={() => setShowAiThumb((v) => !v)}
                 className="flex-1 rounded-xl border border-warn/30 bg-warn/10 px-3 py-2 text-xs font-semibold text-warn hover:border-warn/60"
               >
-                ✨ AI Thumbnail
+                {t('upload.thumb_ai')}
                 <span className="ml-1 text-[9px]">⭐</span>
               </button>
             </div>
@@ -286,7 +288,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
 
         <div className="mt-3">
           <div className="flex items-center justify-between">
-            <label className="label">Description (opsional)</label>
+            <label className="label">{t('upload.desc_field')}</label>
             <button
               type="button"
               onClick={generateAiDesc}
@@ -294,7 +296,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
               className="text-xs text-accent hover:underline disabled:opacity-40"
               title="AI auto-generate description (Premium)"
             >
-              {aiDescBusy ? '✨ Generating…' : '✨ AI Generate'}
+              {aiDescBusy ? '✨ Generating…' : t('upload.ai_generate')}
               <span className="ml-1 rounded bg-warn/15 px-1 py-0.5 text-[9px] font-bold text-warn">PREMIUM</span>
             </button>
           </div>
@@ -303,7 +305,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
             maxLength={1500}
-            placeholder="Tambahkan deskripsi... (atau klik ✨ AI Generate untuk auto-generate dari judul)"
+            placeholder={t('upload.desc_ph')}
           />
         </div>
 
@@ -319,14 +321,14 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
 
         <div className="mt-5 flex items-center justify-between gap-3">
           <button className="btn-ghost" onClick={onClose} disabled={busy}>
-            Cancel
+            {t('upload.cancel')}
           </button>
           <button
             className="btn-primary"
             disabled={!file || !title.trim() || busy}
             onClick={submit}
           >
-            {busy ? 'Uploading…' : 'Upload'}
+            {busy ? t('upload.uploading') : t('upload.upload')}
           </button>
         </div>
       </div>
