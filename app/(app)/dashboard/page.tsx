@@ -288,17 +288,6 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {/* QUICK STATS */}
-        <section className="card enter enter-3">
-          <h2 className="mb-3 font-bold">📊 Stats Singkat</h2>
-          <div className="grid grid-cols-2 gap-2 text-center">
-            <MiniStat label="Videos" valueNode={<CountUp to={videos.length} delay={200} />} icon="🎬" />
-            <MiniStat label="Storage" valueNode={<CountUp to={summary?.storageBytes ?? 0} format={fmtBytes} delay={250} />} icon="💾" />
-            <MiniStat label="Total Views" valueNode={<CountUp to={summary?.totalViews ?? 0} format={fmtNum} delay={300} />} icon="👁" color="text-warn" />
-            <MiniStat label="Total Likes" valueNode={<CountUp to={summary?.totalLikes ?? 0} format={fmtNum} delay={350} />} icon="👍" color="text-accent-2" />
-          </div>
-        </section>
-
         {/* NETWORK */}
         <section className="card enter enter-4">
           <h2 className="mb-3 font-bold">🌐 Network</h2>
