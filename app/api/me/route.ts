@@ -3,14 +3,18 @@ import { getAuthFromRequest, getUserPlan } from '@/lib/auth';
 import { loadDB, saveDB, AVATARS_DIR, FILES_DIR, THUMBS_DIR } from '@/lib/db';
 import { moveFile, removeFile } from '@/lib/storage';
 import { renameUserSessions, deleteAllSessionsForUser } from '@/lib/sessions';
+import { getConfig } from '@/lib/config';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   const a = await getAuthFromRequest(req);
   if (!a) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const { password: _p, passwordPlain: _pp, totpSecret: __, ...pub } = a.user;
   const plan = getUserPlan(a.user);
+  // Locale dibaca dari app_config (race-proof), bukan dari db.users JSONB.
+  const localeCfg = await getConfig<{ locale?: string }>(`locale:${a.user.username}`, {});
   return NextResponse.json({
     user: {
       ...pub,
@@ -21,6 +25,7 @@ export async function GET(req: NextRequest) {
       planLabel: plan.label,
       isPremium: plan.isPremium,
       premiumUntil: plan.expiresAt,
+      locale: localeCfg.locale || (a.user as any).locale || 'id',
     },
   });
 }

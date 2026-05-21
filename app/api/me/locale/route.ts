@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest, getUserPlan } from '@/lib/auth';
-import { loadDB, saveDB } from '@/lib/db';
+import { setConfig } from '@/lib/config';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 const VALID = ['id', 'en', 'jp', 'ar'] as const;
 
@@ -24,11 +25,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `locale invalid (boleh: ${VALID.join(', ')})` }, { status: 400 });
   }
 
-  const db = await loadDB();
-  const u = db.users.find((x) => x.username === a.user.username);
-  if (!u) return NextResponse.json({ error: 'user not found' }, { status: 404 });
-  u.locale = locale;
-  await saveDB(db);
+  // Simpan ke app_config (race-proof) bukan ke db.users di JSONB (race).
+  await setConfig(`locale:${a.user.username}`, { locale });
 
   return NextResponse.json({ ok: true, locale });
 }
