@@ -216,11 +216,11 @@ export default function SettingsPage() {
             <h2 className="mb-3 text-lg font-bold">🔑 {t('settings.change_password')}</h2>
             <div className="space-y-3">
               <div>
-                <label className="label">Password lama</label>
+                <label className="label">{t('settings.old_password')}</label>
                 <input className="input" type="password" value={oldPw} onChange={(e) => setOldPw(e.target.value)} />
               </div>
               <div>
-                <label className="label">Password baru <span className="text-[10px] text-muted">(min 6 karakter)</span></label>
+                <label className="label">{t('settings.new_password')} <span className="text-[10px] text-muted">{t('settings.new_password_hint')}</span></label>
                 <input className="input" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} />
                 {newPw && (
                   <div className="mt-1.5 flex items-center gap-2">
@@ -238,17 +238,17 @@ export default function SettingsPage() {
                 </div>
               </div>
               <div>
-                <label className="label">Konfirmasi password baru</label>
+                <label className="label">{t('settings.confirm_new_password')}</label>
                 <input className="input" type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} />
                 {confirmPw && (
                   <div className={`mt-1 text-[10px] ${newPw === confirmPw ? 'text-success' : 'text-danger'}`}>
-                    {newPw === confirmPw ? '✓ Cocok' : '✕ Tidak cocok'}
+                    {newPw === confirmPw ? t('settings.match') : t('settings.not_match')}
                   </div>
                 )}
               </div>
               {pwMsg && <div className={`text-sm ${pwMsg.startsWith('✓') ? 'text-success' : 'text-danger'}`}>{pwMsg}</div>}
               <button className="btn-primary" onClick={changePw} disabled={!oldPw || newPw.length < 6 || newPw !== confirmPw}>
-                💾 Ubah Password
+                {t('settings.btn_change_pw')}
               </button>
             </div>
           </section>
@@ -260,17 +260,17 @@ export default function SettingsPage() {
               ? (
                 <>
                   <p className="rounded-lg bg-success/15 border border-success/30 p-3 text-sm text-success">
-                    ✅ 2FA aktif — login butuh kode 6-digit dari authenticator app.
+                    {t('settings.tfa_on')}
                   </p>
                   <button className="btn-ghost mt-3" onClick={() => { setTfaDisableOpen(true); setTfaMsg(''); }}>
-                    🔓 Matikan 2FA
+                    {t('settings.btn_disable_2fa')}
                   </button>
                 </>
               )
               : (
                 <>
                   <p className="rounded-lg bg-warn/15 border border-warn/30 p-3 text-sm text-warn">
-                    ⚠ 2FA belum aktif — proteksi password saja.
+                    {t('settings.tfa_off')}
                   </p>
                   <ul className="mt-3 space-y-1 text-xs text-muted">
                     <li>✓ Lapisan kedua keamanan setelah password</li>
