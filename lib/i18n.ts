@@ -55,6 +55,23 @@ const ID: Dict = {
   'common.followers': 'pengikut',
   'common.following': 'diikuti',
   'common.videos': 'video',
+
+  'topbar.greeting': 'Hi',
+  'topbar.upload_video': '+ Upload Video',
+  'topbar.my_profile': '👤 Profil Saya',
+  'topbar.my_uploads': '🖼 Upload Saya',
+  'topbar.settings': '⚙ Pengaturan',
+  'topbar.logout': '⎋ Keluar',
+  'topbar.login': 'Masuk',
+
+  'landing.hero_title_1': 'Bagikan momen,',
+  'landing.hero_title_2': 'watch creator,',
+  'landing.hero_title_3': 'follow teman.',
+  'landing.hero_subtitle': 'Platform berbagi video sederhana — upload, like, follow, dan ngobrol langsung dengan creator lain via DM. 100% gratis untuk mulai.',
+  'landing.cta_start': '🚀 Mulai Gratis Sekarang →',
+  'landing.cta_demo': 'Lihat Dashboard Demo',
+  'landing.cat_eyebrow': 'Categories',
+  'landing.cat_title': 'Apa pun konten kamu, ada tempatnya di sini',
 };
 
 const EN: Dict = {
@@ -100,6 +117,23 @@ const EN: Dict = {
   'common.followers': 'followers',
   'common.following': 'following',
   'common.videos': 'videos',
+
+  'topbar.greeting': 'Hi',
+  'topbar.upload_video': '+ Upload Video',
+  'topbar.my_profile': '👤 My Profile',
+  'topbar.my_uploads': '🖼 My Uploads',
+  'topbar.settings': '⚙ Settings',
+  'topbar.logout': '⎋ Logout',
+  'topbar.login': 'Sign in',
+
+  'landing.hero_title_1': 'Share moments,',
+  'landing.hero_title_2': 'watch creators,',
+  'landing.hero_title_3': 'follow friends.',
+  'landing.hero_subtitle': 'Simple video sharing — upload, like, follow, and chat directly with other creators via DM. 100% free to start.',
+  'landing.cta_start': '🚀 Start Free Now →',
+  'landing.cta_demo': 'View Dashboard Demo',
+  'landing.cat_eyebrow': 'Categories',
+  'landing.cat_title': 'Whatever your content is, there’s a place for it here',
 };
 
 const JP: Dict = {
@@ -145,6 +179,23 @@ const JP: Dict = {
   'common.followers': 'フォロワー',
   'common.following': 'フォロー中',
   'common.videos': '動画',
+
+  'topbar.greeting': 'こんにちは',
+  'topbar.upload_video': '+ 動画アップロード',
+  'topbar.my_profile': '👤 マイプロフィール',
+  'topbar.my_uploads': '🖼 アップロード履歴',
+  'topbar.settings': '⚙ 設定',
+  'topbar.logout': '⎋ ログアウト',
+  'topbar.login': 'ログイン',
+
+  'landing.hero_title_1': '瞬間を共有、',
+  'landing.hero_title_2': 'クリエイターを視聴、',
+  'landing.hero_title_3': '友達をフォロー。',
+  'landing.hero_subtitle': 'シンプルな動画共有 — アップロード、いいね、フォロー、DMで他のクリエイターと直接チャット。100% 無料で始められます。',
+  'landing.cta_start': '🚀 今すぐ無料で始める →',
+  'landing.cta_demo': 'ダッシュボードを見る',
+  'landing.cat_eyebrow': 'カテゴリ',
+  'landing.cat_title': 'どんなコンテンツでも、ここに居場所があります',
 };
 
 const AR: Dict = {
@@ -190,6 +241,23 @@ const AR: Dict = {
   'common.followers': 'متابعون',
   'common.following': 'يتابع',
   'common.videos': 'فيديوهات',
+
+  'topbar.greeting': 'مرحبا',
+  'topbar.upload_video': '+ رفع فيديو',
+  'topbar.my_profile': '👤 ملفي الشخصي',
+  'topbar.my_uploads': '🖼 تحميلاتي',
+  'topbar.settings': '⚙ الإعدادات',
+  'topbar.logout': '⎋ تسجيل الخروج',
+  'topbar.login': 'تسجيل الدخول',
+
+  'landing.hero_title_1': 'شارك اللحظات،',
+  'landing.hero_title_2': 'شاهد المبدعين،',
+  'landing.hero_title_3': 'تابع الأصدقاء.',
+  'landing.hero_subtitle': 'مشاركة فيديو بسيطة — ارفع، أعجب، تابع، وتحدث مباشرة مع المبدعين عبر الرسائل الخاصة. مجاني 100٪ للبدء.',
+  'landing.cta_start': '🚀 ابدأ مجانا الآن ←',
+  'landing.cta_demo': 'عرض لوحة التحكم التجريبية',
+  'landing.cat_eyebrow': 'الفئات',
+  'landing.cat_title': 'أيا كان محتواك، هناك مكان له هنا',
 };
 
 const DICTS: Record<Locale, Dict> = { id: ID, en: EN, jp: JP, ar: AR };
