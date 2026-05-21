@@ -135,6 +135,12 @@ const ID: Dict = {
   'watch.share': '🔗 Bagikan',
   'watch.download': '⬇ Unduh',
   'watch.report': '🚩 Laporkan',
+  'watch.speed': '⚡ Kecepatan',
+  'watch.resolution': '📺 Resolusi',
+  'watch.size': '📐 Ukuran',
+  'watch.pip': '🖼 Popup Video',
+  'watch.pip_open': 'Buka',
+  'watch.pip_close': 'Tutup',
 
   'history.title': 'Riwayat Upload',
   'history.empty': 'Belum ada upload.',
@@ -218,6 +224,14 @@ const ID: Dict = {
   'admin_page.tools_title': 'Tools', 'admin_page.tools_desc': 'Tools admin lainnya (Global Layers, Running Text, dll).',
   'admin_page.top_title': 'Top Performer', 'admin_page.top_desc': 'Video & creator dengan performa tertinggi.',
   'admin_page.users_title': 'Users', 'admin_page.users_desc': 'Kelola user — view, suspend, premium, dll.',
+
+  'admin_tools.header': '🛠 Admin Tools',
+  'admin_tools.quick_actions': 'Aksi cepat',
+  'admin_tools.gen_title': 'Generate Image', 'admin_tools.gen_desc': 'AI banner / logo / thumbnail (Pollinations.ai)',
+  'admin_tools.layers_title': 'Player Layers (Global)', 'admin_tools.layers_desc': 'Sponsor link berlaku untuk SEMUA video — set sekali, otomatis kena semua',
+  'admin_tools.discord_title': 'Kirim ke Discord', 'admin_tools.discord_desc': 'Notifikasi manual ke channel #hasil-claude',
+  'admin_tools.daily_title': 'Daily Report', 'admin_tools.daily_desc': 'Trigger laporan harian ke Discord',
+  'admin_tools.rt_title': 'Running Text & Banner', 'admin_tools.rt_desc': 'Set di Admin Control Panel → tab Banner (scroll bawah). Muncul di semua watch page.',
 };
 
 const EN: Dict = {
@@ -343,6 +357,12 @@ const EN: Dict = {
   'watch.share': '🔗 Share',
   'watch.download': '⬇ Download',
   'watch.report': '🚩 Report',
+  'watch.speed': '⚡ Speed',
+  'watch.resolution': '📺 Resolution',
+  'watch.size': '📐 Size',
+  'watch.pip': '🖼 Picture-in-Picture',
+  'watch.pip_open': 'Open',
+  'watch.pip_close': 'Close',
 
   'history.title': 'Upload History',
   'history.empty': 'No uploads yet.',
@@ -426,6 +446,14 @@ const EN: Dict = {
   'admin_page.tools_title': 'Tools', 'admin_page.tools_desc': 'Other admin tools (Global Layers, Running Text, etc).',
   'admin_page.top_title': 'Top Performer', 'admin_page.top_desc': 'Highest performing videos & creators.',
   'admin_page.users_title': 'Users', 'admin_page.users_desc': 'Manage users — view, suspend, premium, etc.',
+
+  'admin_tools.header': '🛠 Admin Tools',
+  'admin_tools.quick_actions': 'Quick actions',
+  'admin_tools.gen_title': 'Generate Image', 'admin_tools.gen_desc': 'AI banner / logo / thumbnail (Pollinations.ai)',
+  'admin_tools.layers_title': 'Player Layers (Global)', 'admin_tools.layers_desc': 'Sponsor links apply to ALL videos — set once, automatically applied everywhere',
+  'admin_tools.discord_title': 'Send to Discord', 'admin_tools.discord_desc': 'Manual notification to #hasil-claude channel',
+  'admin_tools.daily_title': 'Daily Report', 'admin_tools.daily_desc': 'Trigger daily report to Discord',
+  'admin_tools.rt_title': 'Running Text & Banner', 'admin_tools.rt_desc': 'Set in Admin Control Panel → Banner tab (scroll down). Appears on all watch pages.',
 };
 
 const JP: Dict = {
@@ -551,6 +579,12 @@ const JP: Dict = {
   'watch.share': '🔗 共有',
   'watch.download': '⬇ ダウンロード',
   'watch.report': '🚩 通報',
+  'watch.speed': '⚡ 速度',
+  'watch.resolution': '📺 解像度',
+  'watch.size': '📐 サイズ',
+  'watch.pip': '🖼 ピクチャインピクチャ',
+  'watch.pip_open': '開く',
+  'watch.pip_close': '閉じる',
 
   'history.title': 'アップロード履歴',
   'history.empty': 'まだアップロードがありません。',
@@ -634,6 +668,14 @@ const JP: Dict = {
   'admin_page.tools_title': 'ツール', 'admin_page.tools_desc': 'その他の管理ツール（Global Layers、Running Textなど）。',
   'admin_page.top_title': 'トップパフォーマー', 'admin_page.top_desc': '最も成績の良い動画とクリエイター。',
   'admin_page.users_title': 'ユーザー', 'admin_page.users_desc': 'ユーザー管理 — 閲覧、停止、プレミアムなど。',
+
+  'admin_tools.header': '🛠 管理ツール',
+  'admin_tools.quick_actions': 'クイックアクション',
+  'admin_tools.gen_title': '画像生成', 'admin_tools.gen_desc': 'AI バナー / ロゴ / サムネ (Pollinations.ai)',
+  'admin_tools.layers_title': 'プレイヤーレイヤー（グローバル）', 'admin_tools.layers_desc': 'スポンサーリンクは全動画に適用 — 一度設定すれば自動で全部に反映',
+  'admin_tools.discord_title': 'Discord に送信', 'admin_tools.discord_desc': '#hasil-claude チャンネルへ手動通知',
+  'admin_tools.daily_title': 'デイリーレポート', 'admin_tools.daily_desc': '毎日のレポートを Discord に送信',
+  'admin_tools.rt_title': 'ランニングテキストとバナー', 'admin_tools.rt_desc': 'Admin Control Panel → Bannerタブ（下にスクロール）で設定。全ての視聴ページに表示。',
 };
 
 const AR: Dict = {
@@ -759,6 +801,12 @@ const AR: Dict = {
   'watch.share': '🔗 مشاركة',
   'watch.download': '⬇ تحميل',
   'watch.report': '🚩 إبلاغ',
+  'watch.speed': '⚡ السرعة',
+  'watch.resolution': '📺 الدقة',
+  'watch.size': '📐 الحجم',
+  'watch.pip': '🖼 صورة داخل صورة',
+  'watch.pip_open': 'فتح',
+  'watch.pip_close': 'إغلاق',
 
   'history.title': 'سجل التحميلات',
   'history.empty': 'لا توجد تحميلات بعد.',
@@ -842,6 +890,14 @@ const AR: Dict = {
   'admin_page.tools_title': 'الأدوات', 'admin_page.tools_desc': 'أدوات إدارية أخرى (Global Layers، Running Text، إلخ).',
   'admin_page.top_title': 'الأفضل أداء', 'admin_page.top_desc': 'أفضل الفيديوهات والمبدعين أداء.',
   'admin_page.users_title': 'المستخدمون', 'admin_page.users_desc': 'إدارة المستخدمين — عرض، إيقاف، بريميوم، إلخ.',
+
+  'admin_tools.header': '🛠 أدوات المشرف',
+  'admin_tools.quick_actions': 'إجراءات سريعة',
+  'admin_tools.gen_title': 'إنشاء صورة', 'admin_tools.gen_desc': 'بانر / شعار / صورة مصغرة بالذكاء الاصطناعي (Pollinations.ai)',
+  'admin_tools.layers_title': 'طبقات المشغل (عامة)', 'admin_tools.layers_desc': 'روابط الرعاة تنطبق على جميع الفيديوهات — اضبط مرة، تطبق تلقائيا في كل مكان',
+  'admin_tools.discord_title': 'إرسال إلى Discord', 'admin_tools.discord_desc': 'إشعار يدوي إلى قناة #hasil-claude',
+  'admin_tools.daily_title': 'التقرير اليومي', 'admin_tools.daily_desc': 'إطلاق التقرير اليومي إلى Discord',
+  'admin_tools.rt_title': 'النص المتحرك والبانر', 'admin_tools.rt_desc': 'اضبط في Admin Control Panel → علامة Banner (مرر للأسفل). يظهر في جميع صفحات المشاهدة.',
 };
 
 const DICTS: Record<Locale, Dict> = { id: ID, en: EN, jp: JP, ar: AR };

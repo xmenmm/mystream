@@ -12,11 +12,13 @@ import {
 } from '@/lib/api-client';
 import { fmtNum, timeAgo } from '@/lib/utils';
 import { CountUp } from './CountUp';
+import { useT } from '@/lib/i18n';
 
 export type AdminTab = 'overview' | 'users' | 'top' | 'activity' | 'announce' | 'banner' | 'premium' | 'payments';
 type Tab = AdminTab;
 
 export function AdminPanel({ section, hideHeader }: { section?: AdminTab; hideHeader?: boolean } = {}) {
+  const t = useT();
   const [tab, setTab] = useState<Tab>(section || 'overview');
   // Keep tab synced with prop when navigating between routes
   useEffect(() => { if (section) setTab(section); }, [section]);
@@ -117,7 +119,7 @@ export function AdminPanel({ section, hideHeader }: { section?: AdminTab; hideHe
     <section className="card overflow-hidden p-0 border-warn/30">
       {!hideHeader && (
         <header className="flex items-center justify-between gap-2 bg-gradient-to-r from-warn to-danger p-4">
-          <h2 className="font-bold text-white">🛡 Admin Control Panel</h2>
+          <h2 className="font-bold text-white">🛡 {t('admin_page.home_title')}</h2>
           <span className="text-xs text-white/85">⚪ Live · auto-refresh 10s</span>
         </header>
       )}

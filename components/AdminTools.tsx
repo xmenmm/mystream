@@ -2,31 +2,33 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { apiDiscordSend, apiDailyReport, apiGenerateImage, apiGetGlobalLayers, apiSetGlobalLayers } from '@/lib/api-client';
+import { useT } from '@/lib/i18n';
 
 type Layer = { url: string; label?: string };
 
 export function AdminTools() {
+  const tr = useT();
   const [tool, setTool] = useState<null | 'gen' | 'discord' | 'daily' | 'layers'>(null);
 
   const TOOLS: { key: any; icon: string; title: string; desc: string; onClick: () => void }[] = [
     {
-      key: 'gen', icon: '🎨', title: 'Generate Image',
-      desc: 'AI banner / logo / thumbnail (Pollinations.ai)',
+      key: 'gen', icon: '🎨', title: tr('admin_tools.gen_title'),
+      desc: tr('admin_tools.gen_desc'),
       onClick: () => setTool('gen'),
     },
     {
-      key: 'layers', icon: '🔗', title: 'Player Layers (Global)',
-      desc: 'Sponsor links berlaku untuk SEMUA video — set sekali, otomatis kena semua',
+      key: 'layers', icon: '🔗', title: tr('admin_tools.layers_title'),
+      desc: tr('admin_tools.layers_desc'),
       onClick: () => setTool('layers'),
     },
     {
-      key: 'discord', icon: '💬', title: 'Send to Discord',
-      desc: 'Notif manual ke #hasil-claude',
+      key: 'discord', icon: '💬', title: tr('admin_tools.discord_title'),
+      desc: tr('admin_tools.discord_desc'),
       onClick: () => setTool('discord'),
     },
     {
-      key: 'daily', icon: '📊', title: 'Daily Report',
-      desc: 'Trigger laporan harian ke Discord',
+      key: 'daily', icon: '📊', title: tr('admin_tools.daily_title'),
+      desc: tr('admin_tools.daily_desc'),
       onClick: () => setTool('daily'),
     },
   ];
@@ -34,8 +36,8 @@ export function AdminTools() {
   return (
     <section className="card overflow-hidden p-0 border-warn/30">
       <header className="flex items-center justify-between bg-grad-accent p-3">
-        <h2 className="font-bold flex items-center gap-2">🛠 Admin Tools</h2>
-        <span className="text-xs opacity-85">Quick actions</span>
+        <h2 className="font-bold flex items-center gap-2">{tr('admin_tools.header')}</h2>
+        <span className="text-xs opacity-85">{tr('admin_tools.quick_actions')}</span>
       </header>
       <div className="space-y-2 p-3">
         {TOOLS.map((t) => (
@@ -58,10 +60,8 @@ export function AdminTools() {
           <div className="flex items-start gap-2">
             <span className="text-base">📢</span>
             <div>
-              <div className="font-bold text-text">Running Text & Banner</div>
-              <div className="mt-1">
-                Set di <b>Admin Control Panel → tab 🖼 Banner</b> (scroll bawah). Muncul di semua watch page.
-              </div>
+              <div className="font-bold text-text">{tr('admin_tools.rt_title')}</div>
+              <div className="mt-1">{tr('admin_tools.rt_desc')}</div>
             </div>
           </div>
         </div>

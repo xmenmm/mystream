@@ -571,7 +571,7 @@ export default function WatchPage() {
                       {settingsOpen && (
                         <div className="absolute bottom-11 right-0 z-30 w-60 space-y-2 rounded-xl border border-white/10 bg-black/95 p-3 text-xs text-white shadow-xl backdrop-blur-md">
                           <label className="flex items-center justify-between gap-2">
-                            <span>⚡ Speed</span>
+                            <span>{t('watch.speed')}</span>
                             <select
                               value={speed}
                               onChange={(e) => setSpeed(Number(e.target.value))}
@@ -583,7 +583,7 @@ export default function WatchPage() {
                             </select>
                           </label>
                           <label className="flex items-center justify-between gap-2">
-                            <span>📺 Resolusi</span>
+                            <span>{t('watch.resolution')}</span>
                             <select
                               value={resolution}
                               onChange={(e) => setResolution(e.target.value)}
@@ -598,7 +598,7 @@ export default function WatchPage() {
                             </select>
                           </label>
                           <label className="flex items-center justify-between gap-2">
-                            <span>📐 Ukuran</span>
+                            <span>{t('watch.size')}</span>
                             <select
                               value={size}
                               onChange={(e) => setSize(Number(e.target.value))}
@@ -614,8 +614,8 @@ export default function WatchPage() {
                             onClick={() => { togglePiP(); setSettingsOpen(false); }}
                             className="flex w-full items-center justify-between gap-2 rounded-md border border-white/15 bg-white/5 px-2 py-1.5 text-left hover:bg-white/15"
                           >
-                            <span>🖼 Video Popup</span>
-                            <span className="text-[10px] text-white/70">{isPiP ? 'Tutup' : 'Buka'}</span>
+                            <span>{t('watch.pip')}</span>
+                            <span className="text-[10px] text-white/70">{isPiP ? t('watch.pip_close') : t('watch.pip_open')}</span>
                           </button>
                         </div>
                       )}
