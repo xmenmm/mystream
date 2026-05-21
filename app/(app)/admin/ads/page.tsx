@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AdminGate } from '../AdminGate';
 import { fmtBytes, fmtDuration, timeAgo } from '@/lib/utils';
+import { useT } from '@/lib/i18n';
 
 type Ad = {
   id: string;
@@ -25,8 +26,9 @@ type Cfg = {
 };
 
 export default function AdminAdsPage() {
+  const t = useT();
   return (
-    <AdminGate icon="📺" title="Iklan" desc="Iklan otomatis muncul di video user. Atur interval + skip delay + upload iklan baru.">
+    <AdminGate icon="📺" title={t('admin_page.ads_title')} desc={t('admin_page.ads_desc')}>
       <AdsPanel />
     </AdminGate>
   );

@@ -1,10 +1,12 @@
 'use client';
 import { AdminTools } from '@/components/AdminTools';
 import { AdminGate } from '../AdminGate';
+import { useT } from '@/lib/i18n';
 
 export default function AdminToolsPage() {
+  const t = useT();
   return (
-    <AdminGate icon="🛠" title="Tools" desc="Generate image AI, player layers global, send to discord, daily report, running text & banner.">
+    <AdminGate icon="🛠" title={t('admin_page.tools_title')} desc={t('admin_page.tools_desc')}>
       <AdminTools />
     </AdminGate>
   );

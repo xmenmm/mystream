@@ -1,10 +1,12 @@
 'use client';
 import { AdminPanel } from '@/components/AdminPanel';
 import { AdminGate } from '../AdminGate';
+import { useT } from '@/lib/i18n';
 
 export default function AdminActivityPage() {
+  const t = useT();
   return (
-    <AdminGate icon="⚡" title="Activity" desc="Recent activity dari semua user (auto-refresh 10s).">
+    <AdminGate icon="⚡" title={t('admin_page.activity_title')} desc={t('admin_page.activity_desc')}>
       <AdminPanel section="activity" hideHeader />
     </AdminGate>
   );

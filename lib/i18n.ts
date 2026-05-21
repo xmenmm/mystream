@@ -201,6 +201,23 @@ const ID: Dict = {
   'settings.delete_warning': 'Aksi ini permanen. Semua video, pesan, dan data kamu akan hilang.',
   'settings.save': 'Simpan',
   'settings.saved': '✓ Tersimpan',
+
+  'admin_gate.loading': 'Memuat…',
+  'admin_gate.login_first': 'Login dulu',
+  'admin_gate.access_denied': 'Akses Ditolak',
+  'admin_gate.admin_only': 'Halaman ini cuma untuk admin.',
+  'admin_gate.all_tools': '← Semua tools',
+  'admin_page.activity_title': 'Aktivitas', 'admin_page.activity_desc': 'Recent activity dari semua user (auto-refresh 10 detik).',
+  'admin_page.ads_title': 'Iklan', 'admin_page.ads_desc': 'Kelola iklan: tambah, edit, aktifkan/non-aktifkan.',
+  'admin_page.announce_title': 'Pengumuman', 'admin_page.announce_desc': 'Tulis pengumuman ke semua user.',
+  'admin_page.banner_title': 'Banner', 'admin_page.banner_desc': 'Banner promo di atas video & landing.',
+  'admin_page.overview_title': 'Overview', 'admin_page.overview_desc': 'Ringkasan stats keseluruhan platform.',
+  'admin_page.home_title': 'Admin Home', 'admin_page.home_desc': 'Halaman utama admin tools.',
+  'admin_page.premium_codes_title': 'Kode Premium', 'admin_page.premium_codes_desc': 'Generate & kelola kode Premium.',
+  'admin_page.rekening_title': 'Rekening', 'admin_page.rekening_desc': 'Kelola metode pembayaran (rekening Premium).',
+  'admin_page.tools_title': 'Tools', 'admin_page.tools_desc': 'Tools admin lainnya (Global Layers, Running Text, dll).',
+  'admin_page.top_title': 'Top Performer', 'admin_page.top_desc': 'Video & creator dengan performa tertinggi.',
+  'admin_page.users_title': 'Users', 'admin_page.users_desc': 'Kelola user — view, suspend, premium, dll.',
 };
 
 const EN: Dict = {
@@ -392,6 +409,23 @@ const EN: Dict = {
   'settings.delete_warning': 'This action is permanent. All your videos, messages, and data will be lost.',
   'settings.save': 'Save',
   'settings.saved': '✓ Saved',
+
+  'admin_gate.loading': 'Loading…',
+  'admin_gate.login_first': 'Sign in first',
+  'admin_gate.access_denied': 'Access Denied',
+  'admin_gate.admin_only': 'This page is for admins only.',
+  'admin_gate.all_tools': '← All tools',
+  'admin_page.activity_title': 'Activity', 'admin_page.activity_desc': 'Recent activity from all users (auto-refresh 10s).',
+  'admin_page.ads_title': 'Ads', 'admin_page.ads_desc': 'Manage ads: add, edit, enable/disable.',
+  'admin_page.announce_title': 'Announcements', 'admin_page.announce_desc': 'Write announcements to all users.',
+  'admin_page.banner_title': 'Banner', 'admin_page.banner_desc': 'Promo banner above video & landing.',
+  'admin_page.overview_title': 'Overview', 'admin_page.overview_desc': 'Overall platform stats summary.',
+  'admin_page.home_title': 'Admin Home', 'admin_page.home_desc': 'Main admin tools page.',
+  'admin_page.premium_codes_title': 'Premium Codes', 'admin_page.premium_codes_desc': 'Generate & manage Premium codes.',
+  'admin_page.rekening_title': 'Payment Accounts', 'admin_page.rekening_desc': 'Manage payment methods (Premium accounts).',
+  'admin_page.tools_title': 'Tools', 'admin_page.tools_desc': 'Other admin tools (Global Layers, Running Text, etc).',
+  'admin_page.top_title': 'Top Performer', 'admin_page.top_desc': 'Highest performing videos & creators.',
+  'admin_page.users_title': 'Users', 'admin_page.users_desc': 'Manage users — view, suspend, premium, etc.',
 };
 
 const JP: Dict = {
@@ -583,6 +617,23 @@ const JP: Dict = {
   'settings.delete_warning': 'この操作は元に戻せません。動画、メッセージ、データがすべて失われます。',
   'settings.save': '保存',
   'settings.saved': '✓ 保存しました',
+
+  'admin_gate.loading': '読み込み中…',
+  'admin_gate.login_first': 'まずログイン',
+  'admin_gate.access_denied': 'アクセス拒否',
+  'admin_gate.admin_only': 'このページは管理者専用です。',
+  'admin_gate.all_tools': '← すべてのツール',
+  'admin_page.activity_title': 'アクティビティ', 'admin_page.activity_desc': '全ユーザーの最近の活動（10秒ごとに自動更新）。',
+  'admin_page.ads_title': '広告', 'admin_page.ads_desc': '広告管理：追加・編集・有効/無効。',
+  'admin_page.announce_title': 'お知らせ', 'admin_page.announce_desc': '全ユーザーへのお知らせを投稿。',
+  'admin_page.banner_title': 'バナー', 'admin_page.banner_desc': '動画上部とランディングのプロモバナー。',
+  'admin_page.overview_title': '概要', 'admin_page.overview_desc': 'プラットフォーム全体の統計まとめ。',
+  'admin_page.home_title': '管理ホーム', 'admin_page.home_desc': '管理ツールのメインページ。',
+  'admin_page.premium_codes_title': 'プレミアムコード', 'admin_page.premium_codes_desc': 'プレミアムコードの生成と管理。',
+  'admin_page.rekening_title': '支払い口座', 'admin_page.rekening_desc': '支払い方法（プレミアム口座）の管理。',
+  'admin_page.tools_title': 'ツール', 'admin_page.tools_desc': 'その他の管理ツール（Global Layers、Running Textなど）。',
+  'admin_page.top_title': 'トップパフォーマー', 'admin_page.top_desc': '最も成績の良い動画とクリエイター。',
+  'admin_page.users_title': 'ユーザー', 'admin_page.users_desc': 'ユーザー管理 — 閲覧、停止、プレミアムなど。',
 };
 
 const AR: Dict = {
@@ -774,6 +825,23 @@ const AR: Dict = {
   'settings.delete_warning': 'هذا الإجراء دائم. جميع فيديوهاتك ورسائلك وبياناتك ستفقد.',
   'settings.save': 'حفظ',
   'settings.saved': '✓ تم الحفظ',
+
+  'admin_gate.loading': 'جار التحميل…',
+  'admin_gate.login_first': 'سجل الدخول أولا',
+  'admin_gate.access_denied': 'تم رفض الوصول',
+  'admin_gate.admin_only': 'هذه الصفحة للمشرفين فقط.',
+  'admin_gate.all_tools': '← كل الأدوات',
+  'admin_page.activity_title': 'النشاط', 'admin_page.activity_desc': 'نشاط حديث من جميع المستخدمين (تحديث تلقائي كل 10 ثوانٍ).',
+  'admin_page.ads_title': 'الإعلانات', 'admin_page.ads_desc': 'إدارة الإعلانات: إضافة، تعديل، تفعيل/إيقاف.',
+  'admin_page.announce_title': 'إعلانات', 'admin_page.announce_desc': 'كتابة إعلانات لجميع المستخدمين.',
+  'admin_page.banner_title': 'البانر', 'admin_page.banner_desc': 'بانر ترويجي فوق الفيديو والصفحة الرئيسية.',
+  'admin_page.overview_title': 'نظرة عامة', 'admin_page.overview_desc': 'ملخص إحصائيات المنصة العامة.',
+  'admin_page.home_title': 'الرئيسية الإدارية', 'admin_page.home_desc': 'الصفحة الرئيسية لأدوات المشرف.',
+  'admin_page.premium_codes_title': 'أكواد البريميوم', 'admin_page.premium_codes_desc': 'إنشاء وإدارة أكواد البريميوم.',
+  'admin_page.rekening_title': 'حسابات الدفع', 'admin_page.rekening_desc': 'إدارة طرق الدفع (حسابات البريميوم).',
+  'admin_page.tools_title': 'الأدوات', 'admin_page.tools_desc': 'أدوات إدارية أخرى (Global Layers، Running Text، إلخ).',
+  'admin_page.top_title': 'الأفضل أداء', 'admin_page.top_desc': 'أفضل الفيديوهات والمبدعين أداء.',
+  'admin_page.users_title': 'المستخدمون', 'admin_page.users_desc': 'إدارة المستخدمين — عرض، إيقاف، بريميوم، إلخ.',
 };
 
 const DICTS: Record<Locale, Dict> = { id: ID, en: EN, jp: JP, ar: AR };

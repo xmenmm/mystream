@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { useMe } from '@/components/UserContext';
+import { useT } from '@/lib/i18n';
 
 export function AdminGate({
   title,
@@ -15,14 +16,15 @@ export function AdminGate({
   children: ReactNode;
 }) {
   const { me, loading } = useMe();
-  if (loading) return <div className="grid h-64 place-items-center text-muted">Loading…</div>;
-  if (!me) return <div className="grid h-64 place-items-center text-muted">Login dulu</div>;
+  const t = useT();
+  if (loading) return <div className="grid h-64 place-items-center text-muted">{t('admin_gate.loading')}</div>;
+  if (!me) return <div className="grid h-64 place-items-center text-muted">{t('admin_gate.login_first')}</div>;
   if (!me.isAdmin) {
     return (
       <div className="card border-danger/40 text-center">
         <div className="text-3xl">🔒</div>
-        <h2 className="mt-2 text-lg font-bold">Akses Ditolak</h2>
-        <p className="mt-1 text-sm text-muted">Halaman ini cuma untuk admin.</p>
+        <h2 className="mt-2 text-lg font-bold">{t('admin_gate.access_denied')}</h2>
+        <p className="mt-1 text-sm text-muted">{t('admin_gate.admin_only')}</p>
       </div>
     );
   }
@@ -36,7 +38,7 @@ export function AdminGate({
           {desc && <p className="mt-1 text-sm text-muted">{desc}</p>}
         </div>
         <Link href="/admin" className="btn-ghost text-xs">
-          ← Semua tools
+          {t('admin_gate.all_tools')}
         </Link>
       </header>
       {children}

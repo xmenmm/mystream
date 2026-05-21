@@ -1,10 +1,12 @@
 'use client';
 import { AdminPanel } from '@/components/AdminPanel';
 import { AdminGate } from '../AdminGate';
+import { useT } from '@/lib/i18n';
 
 export default function AdminRekeningPage() {
+  const t = useT();
   return (
-    <AdminGate icon="🏦" title="Rekening" desc="Atur nomor rekening pembayaran (DANA, BCA, OVO, dll). User akan lihat ini di modal Premium.">
+    <AdminGate icon="🏦" title={t('admin_page.rekening_title')} desc={t('admin_page.rekening_desc')}>
       <AdminPanel section="payments" hideHeader />
     </AdminGate>
   );
