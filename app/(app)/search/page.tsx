@@ -6,6 +6,7 @@ import { Avatar } from '@/components/Avatar';
 import { VerifiedBadge } from '@/components/VerifiedBadge';
 import { thumbUrl } from '@/lib/api-client';
 import { fmtNum, timeAgo } from '@/lib/utils';
+import { useT } from '@/lib/i18n';
 
 type V = {
   id: string; title: string; username: string; hasThumb: boolean;
@@ -27,6 +28,7 @@ export default function SearchPage() {
 
 function SearchInner() {
   const params = useSearchParams();
+  const t = useT();
   const q = params.get('q') || '';
   const [videos, setVideos] = useState<V[]>([]);
   const [users, setUsers] = useState<U[]>([]);
@@ -53,7 +55,7 @@ function SearchInner() {
     return (
       <div className="card text-center">
         <div className="text-4xl">🔍</div>
-        <h1 className="mt-3 text-xl font-bold">Cari video & creator</h1>
+        <h1 className="mt-3 text-xl font-bold">{t('search.placeholder')}</h1>
         <p className="mt-1 text-sm text-muted">Pakai search bar di atas atau tekan <kbd className="rounded bg-bg-elev px-1.5 py-0.5">Ctrl+K</kbd></p>
       </div>
     );
@@ -66,7 +68,7 @@ function SearchInner() {
     <div className="space-y-4">
       <header>
         <h1 className="text-2xl font-extrabold">
-          Hasil untuk <span className="text-accent">"{q}"</span>
+          {t('search.results_for')} <span className="text-accent">"{q}"</span>
         </h1>
         <p className="mt-1 text-sm text-muted">
           {loading ? '⏳ Mencari...' : `${videos.length + users.length} hasil ditemukan`}
@@ -76,13 +78,13 @@ function SearchInner() {
       {/* Tabs */}
       <div className="flex gap-2 border-b border-border">
         <TabBtn active={tab === 'all'} onClick={() => setTab('all')} count={videos.length + users.length}>
-          🔎 Semua
+          🔎 {t('history.filter_all')}
         </TabBtn>
         <TabBtn active={tab === 'videos'} onClick={() => setTab('videos')} count={videos.length}>
-          🎬 Video
+          🎬 {t('search.videos')}
         </TabBtn>
         <TabBtn active={tab === 'users'} onClick={() => setTab('users')} count={users.length}>
-          👤 Creator
+          👤 {t('search.creators')}
         </TabBtn>
       </div>
 

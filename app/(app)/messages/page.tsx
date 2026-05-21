@@ -5,6 +5,7 @@ import { api } from '@/lib/api-client';
 import { useMe } from '@/components/UserContext';
 import { Avatar } from '@/components/Avatar';
 import { timeAgo } from '@/lib/utils';
+import { useT } from '@/lib/i18n';
 
 type Item = {
   username: string;
@@ -19,6 +20,7 @@ type Item = {
 
 export default function MessagesPage() {
   const { me } = useMe();
+  const t = useT();
   const [inbox, setInbox] = useState<Item[]>([]);
   const [requests, setRequests] = useState<Item[]>([]);
   const [tab, setTab] = useState<'inbox' | 'requests'>('inbox');
@@ -37,7 +39,7 @@ export default function MessagesPage() {
   return (
     <div className="space-y-4">
       <header>
-        <h1 className="text-3xl font-bold">Messages</h1>
+        <h1 className="text-3xl font-bold">{t('messages.title')}</h1>
       </header>
       <div className="flex gap-2">
         <button className={tab === 'inbox' ? 'btn-primary' : 'btn-ghost'} onClick={() => setTab('inbox')}>
@@ -49,7 +51,7 @@ export default function MessagesPage() {
       </div>
       <div className="card divide-y divide-border p-0">
         {list.length === 0 ? (
-          <div className="p-6 text-center text-muted">Tidak ada percakapan.</div>
+          <div className="p-6 text-center text-muted">{t('messages.empty')}</div>
         ) : (
           list.map((c) => (
             <Link

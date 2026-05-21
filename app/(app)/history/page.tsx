@@ -3,9 +3,11 @@ import { useEffect, useState, useMemo } from 'react';
 import { api } from '@/lib/api-client';
 import { useMe } from '@/components/UserContext';
 import { VideoCard, VideoLike } from '@/components/VideoCard';
+import { useT } from '@/lib/i18n';
 
 export default function HistoryPage() {
   const { me } = useMe();
+  const t = useT();
   const [videos, setVideos] = useState<VideoLike[]>([]);
   const [filter, setFilter] = useState<'all' | 'video' | 'image'>('all');
   const [page, setPage] = useState(1);
@@ -43,7 +45,7 @@ export default function HistoryPage() {
   }
 
   async function del(id: string) {
-    if (!confirm('Hapus video ini?')) return;
+    if (!confirm(t('history.confirm_delete'))) return;
     await api(`/api/videos/${encodeURIComponent(id)}`, { method: 'DELETE' });
     refresh();
   }
@@ -57,19 +59,19 @@ export default function HistoryPage() {
     <div className="space-y-4">
       <header className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-3xl font-bold">Upload History</h1>
-          <p className="text-sm text-muted">{videos.length} item · {totalVideos} video · {totalImages} image</p>
+          <h1 className="text-3xl font-bold">{t('history.title')}</h1>
+          <p className="text-sm text-muted">{videos.length} {t('history.unit_item')} · {totalVideos} {t('history.unit_video')} · {totalImages} {t('history.unit_image')}</p>
         </div>
         <div className="flex gap-2">
           {(['all', 'video', 'image'] as const).map((f) => (
             <button key={f} onClick={() => { setFilter(f); setPage(1); }} className={filter === f ? 'btn-primary' : 'btn-ghost'}>
-              {f === 'all' ? 'All' : f === 'video' ? 'Videos' : 'Images'}
+              {f === 'all' ? t('history.filter_all') : f === 'video' ? t('history.filter_videos') : t('history.filter_images')}
             </button>
           ))}
         </div>
       </header>
       {items.length === 0 ? (
-        <div className="card text-center text-muted">Belum ada upload.</div>
+        <div className="card text-center text-muted">{t('history.empty')}</div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((v) => <VideoCard key={v.id} v={v} onDelete={() => del(v.id)} />)}
@@ -79,7 +81,7 @@ export default function HistoryPage() {
       {total > 8 && (
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
           <div className="text-sm text-muted">
-            Menampilkan <b>{start + 1}–{start + items.length}</b> dari <b>{total}</b>
+            {t('history.showing')} <b>{start + 1}–{start + items.length}</b> {t('history.of')} <b>{total}</b>
             <select
               className="ml-3 input inline-block w-auto"
               value={pageSize}
@@ -90,7 +92,7 @@ export default function HistoryPage() {
                 setPage(1);
               }}
             >
-              {[4, 8, 12, 24, 48].map((n) => <option key={n} value={n}>{n} / halaman</option>)}
+              {[4, 8, 12, 24, 48].map((n) => <option key={n} value={n}>{n} {t('history.per_page')}</option>)}
             </select>
           </div>
           <div className="flex gap-1">

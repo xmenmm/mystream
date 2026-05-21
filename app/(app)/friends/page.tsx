@@ -4,6 +4,7 @@ import { api } from '@/lib/api-client';
 import { useMe } from '@/components/UserContext';
 import { Avatar } from '@/components/Avatar';
 import { fmtNum } from '@/lib/utils';
+import { useT } from '@/lib/i18n';
 
 type U = {
   username: string; bio: string; avatarColor: string; hasAvatar: boolean;
@@ -12,6 +13,7 @@ type U = {
 
 export default function FriendsPage() {
   const { me } = useMe();
+  const t = useT();
   const [users, setUsers] = useState<U[]>([]);
   const [q, setQ] = useState('');
   const [searched, setSearched] = useState(false);
@@ -47,7 +49,7 @@ export default function FriendsPage() {
   return (
     <div className="space-y-4">
       <header>
-        <h1 className="text-3xl font-bold">🔍 Cari Teman</h1>
+        <h1 className="text-3xl font-bold">🔍 {t('messages.find_creator')}</h1>
         <p className="text-sm text-muted">Ketik username minimal 2 karakter untuk mulai pencarian.</p>
       </header>
       <input
@@ -82,7 +84,7 @@ export default function FriendsPage() {
                 <div className="text-xs text-muted truncate">{u.bio || `${fmtNum(u.followerCount)} followers · ${u.videoCount} videos`}</div>
               </div>
               <button onClick={() => toggleFollow(u.username)} className={u.isFollowing ? 'btn-ghost' : 'btn-primary'}>
-                {u.isFollowing ? '✓ Following' : '+ Follow'}
+                {u.isFollowing ? '✓ ' + t('friends.btn_following') : '+ ' + t('friends.btn_follow')}
               </button>
             </div>
           ))}
