@@ -11,12 +11,14 @@ import { AdminPanel } from '@/components/AdminPanel';
 import { AdminTools } from '@/components/AdminTools';
 import { CountUp } from '@/components/CountUp';
 import { PremiumUpgradeModal } from '@/components/LandingPricing';
+import { useT } from '@/lib/i18n';
 
 type Summary = { totalVideos: number; totalViews: number; totalLikes: number; storageBytes: number };
 
 export default function DashboardPage() {
   const { me } = useMe();
   const router = useRouter();
+  const t = useT();
   const [videos, setVideos] = useState<VideoLike[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [stats, setStats] = useState<{ labels: string[]; data: number[]; likesData: number[] } | null>(null);
@@ -50,7 +52,7 @@ export default function DashboardPage() {
     <div className="grid gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-[2fr_1fr]">
       <div className="space-y-3 sm:space-y-4 lg:col-span-2 xl:col-span-1">
         <header className="enter enter-1 flex items-center justify-between flex-wrap gap-2">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
           <div className="flex gap-2">
             <span className="chip" data-count>VIEWS <b className="text-success"><CountUp to={summary?.totalViews ?? 0} format={fmtNum} /></b></span>
             <span className="chip" data-count>LIKES <b className="text-success"><CountUp to={summary?.totalLikes ?? 0} format={fmtNum} /></b></span>
@@ -59,7 +61,7 @@ export default function DashboardPage() {
 
         {/* Top 1·2·3 */}
         <section className="card bg-grad-card enter enter-2">
-          <h2 className="font-bold mb-3">🏆 Top 1·2·3 Views</h2>
+          <h2 className="font-bold mb-3">{t('dashboard.top_views')}</h2>
           {top3.length === 0
             ? <p className="text-sm text-muted">Belum ada video — upload pertama via tombol Upload di header.</p>
             : <ol className="space-y-2">{top3.map((v, i) => (
@@ -79,7 +81,7 @@ export default function DashboardPage() {
         {/* Statistics */}
         <section className="card enter enter-3">
           <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
-            <h2 className="font-bold">📈 Statistics (14 hari)</h2>
+            <h2 className="font-bold">{t('dashboard.statistics_14d')}</h2>
             {stats && (
               <div className="flex items-center gap-3 text-xs">
                 <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full bg-accent" />Views</span>
@@ -105,7 +107,7 @@ export default function DashboardPage() {
         {/* Video Performance — paginated */}
         <section className="card enter enter-4">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-bold">🎬 Video Performance</h2>
+            <h2 className="font-bold">{t('dashboard.video_performance')}</h2>
             {videos.length > 0 && (
               <span className="text-xs text-muted">
                 {videos.length} video · halaman {Math.min(videoPage, Math.max(1, Math.ceil(videos.length / VIDEOS_PER_PAGE)))} / {Math.max(1, Math.ceil(videos.length / VIDEOS_PER_PAGE))}
@@ -124,9 +126,9 @@ export default function DashboardPage() {
                     <table className="w-full text-sm">
                       <thead className="text-left text-muted">
                         <tr className="border-b border-border">
-                          <th className="py-2">Video</th><th className="py-2 text-center">7-Day</th>
+                          <th className="py-2">{t('dashboard.col_video')}</th><th className="py-2 text-center">{t('dashboard.col_7day')}</th>
                           <th className="py-2 text-center">👍</th>
-                          <th className="py-2 text-center">👁</th><th className="py-2 text-center">Action</th>
+                          <th className="py-2 text-center">👁</th><th className="py-2 text-center">{t('dashboard.col_action')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -146,7 +148,7 @@ export default function DashboardPage() {
                             <td className="px-2"><MiniSpark data={perVideo[v.id] || []} /></td>
                             <td className="text-center"><CountUp to={v.likes} format={fmtNum} delay={500} /></td>
                             <td className="text-center"><CountUp to={v.views} format={fmtNum} delay={500} /></td>
-                            <td className="text-center"><Link href={`/watch?id=${v.id}`} className="btn-ghost px-3 py-1 text-xs">View</Link></td>
+                            <td className="text-center"><Link href={`/watch?id=${v.id}`} className="btn-ghost px-3 py-1 text-xs">{t('dashboard.btn_view')}</Link></td>
                           </tr>
                         ))}
                       </tbody>
@@ -163,18 +165,18 @@ export default function DashboardPage() {
         {/* QUICK ACTIONS + ACHIEVEMENTS side-by-side */}
         <div className="grid gap-4 md:grid-cols-2 enter enter-5">
           <section className="card">
-            <h2 className="mb-3 font-bold">🎯 Quick Actions</h2>
+            <h2 className="mb-3 font-bold">{t('dashboard.quick_actions')}</h2>
             <div className="grid grid-cols-2 gap-2">
-              <QuickAction href="/history" icon="🖼" label="My Uploads" desc="Semua video kamu" />
-              <QuickAction href="/friends" icon="👥" label="Cari Teman" desc="Creator lain" />
-              <QuickAction href="/messages" icon="💬" label="Messages" desc="Inbox & DM" />
-              <QuickAction href="/settings" icon="⚙" label="Settings" desc="2FA, password" />
+              <QuickAction href="/history" icon="🖼" label={t('dashboard.qa_uploads')} desc={t('dashboard.qa_uploads_desc')} />
+              <QuickAction href="/friends" icon="👥" label={t('dashboard.qa_friends')} desc={t('dashboard.qa_friends_desc')} />
+              <QuickAction href="/messages" icon="💬" label={t('dashboard.qa_messages')} desc={t('dashboard.qa_messages_desc')} />
+              <QuickAction href="/settings" icon="⚙" label={t('dashboard.qa_settings')} desc={t('dashboard.qa_settings_desc')} />
             </div>
           </section>
 
           <section className="card">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold">🏅 Achievements</h2>
+              <h2 className="font-bold">{t('dashboard.achievements')}</h2>
               <span className="rounded-full bg-bg px-2 py-0.5 text-[10px] font-bold text-warn">
                 {[
                   videos.length >= 1, videos.length >= 5,
@@ -184,26 +186,26 @@ export default function DashboardPage() {
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <Badge unlocked={videos.length >= 1} icon="🎬" label="First" desc="Upload pertama" />
-              <Badge unlocked={videos.length >= 5} icon="📹" label="5 Vids" desc="Upload 5 video" />
-              <Badge unlocked={(summary?.totalViews ?? 0) >= 100} icon="👁" label="100 Views" desc="100 total views" />
-              <Badge unlocked={(summary?.totalLikes ?? 0) >= 10} icon="👍" label="Liked" desc="10 likes" />
-              <Badge unlocked={!!me.totpEnabled} icon="🔐" label="Secure" desc="2FA aktif" />
-              <Badge unlocked={!!me.isPremium} icon="⭐" label="Premium" desc="Upgrade Premium" />
+              <Badge unlocked={videos.length >= 1} icon="🎬" label={t('dashboard.ach_first')} desc={t('dashboard.ach_first_desc')} />
+              <Badge unlocked={videos.length >= 5} icon="📹" label={t('dashboard.ach_5vids')} desc={t('dashboard.ach_5vids_desc')} />
+              <Badge unlocked={(summary?.totalViews ?? 0) >= 100} icon="👁" label={t('dashboard.ach_100views')} desc={t('dashboard.ach_100views_desc')} />
+              <Badge unlocked={(summary?.totalLikes ?? 0) >= 10} icon="👍" label={t('dashboard.ach_liked')} desc={t('dashboard.ach_liked_desc')} />
+              <Badge unlocked={!!me.totpEnabled} icon="🔐" label={t('dashboard.ach_secure')} desc={t('dashboard.ach_secure_desc')} />
+              <Badge unlocked={!!me.isPremium} icon="⭐" label={t('dashboard.ach_premium')} desc={t('dashboard.ach_premium_desc')} />
             </div>
           </section>
         </div>
 
         {/* TIPS & TRICKS */}
         <section className="card bg-grad-card enter enter-6">
-          <h2 className="mb-3 font-bold">💡 Tips Naik Cepet</h2>
+          <h2 className="mb-3 font-bold">{t('dashboard.tips')}</h2>
           <div className="grid gap-2 text-sm md:grid-cols-2">
-            <Tip icon="📌" text={<><b>Thumbnail jelas</b> — frame pertama jadi cover, pilih opening terang.</>} />
-            <Tip icon="🔗" text={<>Pakai tombol <b>Share</b> di watch page — link mode fokus.</>} />
-            <Tip icon="👥" text={<><b>Follow creator</b> lain — biasanya follow back & saling support.</>} />
-            <Tip icon="🔥" text={<>Upload <b>video pendek viral</b> — durasi 15-60 detik dapat retention paling bagus.</>} />
-            <Tip icon="🔐" text={<>Aktifkan <b>2FA</b> di Settings — akun lebih aman.</>} />
-            <Tip icon="🎬" text={<>Upload <b>konsisten</b> — algoritma rank by recency.</>} />
+            <Tip icon="📌" text={t('dashboard.tip_thumbnail')} />
+            <Tip icon="🔗" text={t('dashboard.tip_share')} />
+            <Tip icon="👥" text={t('dashboard.tip_follow')} />
+            <Tip icon="🔥" text={t('dashboard.tip_short_video')} />
+            <Tip icon="🔐" text={t('dashboard.tip_2fa')} />
+            <Tip icon="🎬" text={t('dashboard.tip_consistent')} />
           </div>
         </section>
 
@@ -211,7 +213,7 @@ export default function DashboardPage() {
 
       <aside className="space-y-3 sm:space-y-4">
         <section className="card bg-grad-card enter enter-2">
-          <h2 className="mb-3 font-bold">👤 Profile</h2>
+          <h2 className="mb-3 font-bold">{t('dashboard.profile')}</h2>
           <div className="text-center">
             <Avatar username={me.username} hasAvatar={me.hasAvatar} color={me.avatarColor} size={72} />
             <div className="mt-2 text-lg font-bold">{me.username}</div>
@@ -221,7 +223,7 @@ export default function DashboardPage() {
             <div className={`mt-2 inline-block rounded-full px-3 py-0.5 text-xs font-semibold ${me.isPremium
               ? 'bg-gradient-to-r from-warn to-accent-2 text-white border-transparent'
               : 'border border-border'}`}>
-              {me.isPremium ? `⭐ Premium${me.premiumUntil ? ' s/d ' + new Date(me.premiumUntil).toLocaleDateString('id-ID') : ' (lifetime)'}` : '✨ Free Plan'}
+              {me.isPremium ? `⭐ Premium${me.premiumUntil ? ' ' + t('dashboard.until') + ' ' + new Date(me.premiumUntil).toLocaleDateString() : ' (' + t('dashboard.lifetime') + ')'}` : t('dashboard.free_plan')}
             </div>
 
             {/* Quota */}
@@ -399,6 +401,7 @@ function QuickAction({ href, icon, label, desc }: { href: string; icon: string; 
 }
 
 function Badge({ unlocked, icon, label, desc }: { unlocked: boolean; icon: string; label: string; desc: string }) {
+  const t = useT();
   return (
     <div
       className={`flex flex-col items-center gap-1 rounded-xl border p-3 text-center transition ${
@@ -411,8 +414,8 @@ function Badge({ unlocked, icon, label, desc }: { unlocked: boolean; icon: strin
       <span className="text-2xl">{icon}</span>
       <span className="text-xs font-bold">{label}</span>
       {unlocked
-        ? <span className="text-[10px] text-warn">✓ Unlocked</span>
-        : <span className="text-[10px] text-muted">🔒 Locked</span>}
+        ? <span className="text-[10px] text-warn">{t('dashboard.unlocked')}</span>
+        : <span className="text-[10px] text-muted">🔒 {t('dashboard.locked')}</span>}
     </div>
   );
 }
