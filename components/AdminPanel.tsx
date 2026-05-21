@@ -459,6 +459,7 @@ function UserRow({ u }: { u: any }) {
 }
 
 function UsersPane({ users, onSuspend, onUnsuspend, onWarn, onGrant, onRevoke, onVerify, onUnverify, onDetail }: any) {
+  const t = useT();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'online' | 'premium' | 'suspended' | 'admin'>('all');
 
@@ -489,7 +490,7 @@ function UsersPane({ users, onSuspend, onUnsuspend, onWarn, onGrant, onRevoke, o
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari username, email, country…"
+            placeholder={t('admin_panel.search_user')}
             className="w-full bg-transparent text-sm outline-none"
           />
           {search && (
@@ -689,7 +690,7 @@ function BannerPane() {
         {b.layout === 'image' && (
           <div className="grid gap-2 sm:grid-cols-2">
             <div>
-              <label className="text-[10px] uppercase text-muted">Image Fit (cara isi container)</label>
+              <label className="text-[10px] uppercase text-muted">{t('admin_panel.image_fit')}</label>
               <select className="input" value={b.objectFit || 'cover'} onChange={(e) => setB({ ...b, objectFit: e.target.value })}>
                 <option value="cover">Cover — penuhi tanpa distorsi (crop)</option>
                 <option value="contain">Contain — full image kelihatan (ada padding)</option>
@@ -725,11 +726,11 @@ function BannerPane() {
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
           <div>
-            <label className="text-[10px] uppercase text-muted">CTA Text</label>
+            <label className="text-[10px] uppercase text-muted">{t('admin_panel.cta_text')}</label>
             <input className="input" maxLength={40} value={b.ctaText} onChange={(e) => setB({ ...b, ctaText: e.target.value })} />
           </div>
           <div>
-            <label className="text-[10px] uppercase text-muted">CTA URL</label>
+            <label className="text-[10px] uppercase text-muted">{t('admin_panel.cta_url')}</label>
             <input className="input" maxLength={500} value={b.ctaUrl} onChange={(e) => setB({ ...b, ctaUrl: e.target.value })} />
           </div>
         </div>
@@ -748,7 +749,7 @@ function BannerPane() {
         {/* PREVIEW — replicate sama persis dengan render production */}
         <div className="rounded-xl border border-border p-2">
           <div className="mb-1 flex items-center justify-between text-[10px] uppercase text-muted">
-            <span>Preview (sama dengan tampilan watch page)</span>
+            <span>{t('admin_panel.preview')}</span>
             {b.layout === 'image' && (
               <span className="normal-case text-[10px]">
                 Tinggi: <b className="text-text">{b.height}</b> · Fit: <b className="text-text">{b.objectFit || 'cover'}</b>
@@ -829,11 +830,11 @@ function BannerPane() {
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
           <div>
-            <label className="text-[10px] uppercase text-muted">CTA Text</label>
+            <label className="text-[10px] uppercase text-muted">{t('admin_panel.cta_text')}</label>
             <input className="input" maxLength={40} value={sb.ctaText} onChange={(e) => setSb({ ...sb, ctaText: e.target.value })} />
           </div>
           <div>
-            <label className="text-[10px] uppercase text-muted">CTA URL</label>
+            <label className="text-[10px] uppercase text-muted">{t('admin_panel.cta_url')}</label>
             <input className="input" maxLength={500} value={sb.ctaUrl} onChange={(e) => setSb({ ...sb, ctaUrl: e.target.value })} />
           </div>
         </div>
@@ -857,7 +858,7 @@ function BannerPane() {
               </select>
             </div>
             <div>
-              <label className="text-[10px] uppercase text-muted">Image Fit</label>
+              <label className="text-[10px] uppercase text-muted">{t('admin_panel.image_fit')}</label>
               <select className="input" value={sb.objectFit || 'cover'} onChange={(e) => setSb({ ...sb, objectFit: e.target.value })}>
                 <option value="cover">Cover — penuhi (crop)</option>
                 <option value="contain">Contain — full kelihatan</option>
@@ -902,7 +903,7 @@ function BannerPane() {
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
           <div>
-            <label className="text-[10px] uppercase text-muted">Posisi</label>
+            <label className="text-[10px] uppercase text-muted">{t('admin_panel.position')}</label>
             <select className="input" value={rt.position} onChange={(e) => setRt({ ...rt, position: e.target.value })}>
               <option value="above">↑ Di atas video</option>
               <option value="below">↓ Di bawah video</option>
@@ -927,7 +928,7 @@ function BannerPane() {
 
         {/* PREVIEW */}
         <div className="rounded-xl border border-border p-2">
-          <div className="mb-1 text-[10px] uppercase text-muted">Preview</div>
+          <div className="mb-1 text-[10px] uppercase text-muted">{t('admin_panel.preview')}</div>
           <div
             className="overflow-hidden rounded-lg"
             style={{
@@ -965,6 +966,7 @@ function ColorField({ label, v, onChange }: { label: string; v: string; onChange
 }
 
 function ImageUrlField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const t = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
@@ -1064,7 +1066,7 @@ function ImageUrlField({ label, value, onChange, placeholder }: { label: string;
       {value && (
         <div>
           <div className="mb-1 flex items-center justify-between">
-            <div className="text-[10px] uppercase text-muted">Preview image</div>
+            <div className="text-[10px] uppercase text-muted">{t('admin_panel.preview_image')}</div>
             <button
               type="button"
               onClick={() => onChange('')}
