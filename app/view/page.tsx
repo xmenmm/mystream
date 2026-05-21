@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { api, apiGetGlobalLayers, apiGetRunningText, fileUrl, thumbUrl, GlobalLayers } from '@/lib/api-client';
 import { fmtBytes, fmtDuration, fmtNum, timeAgo } from '@/lib/utils';
 import { BannerStrip, SideBannerCard } from '@/components/BannerStrip';
+import { useT } from '@/lib/i18n';
 
 export default function ViewPageWrapper() {
   return (
@@ -27,6 +28,7 @@ type GlobalRT = { enabled: boolean; text: string; position: 'above' | 'below'; b
  *  Tetap nampilin banner + running text + side banner + player layers yang admin set. */
 function ViewPage() {
   const params = useSearchParams();
+  const t = useT();
   const id = params.get('id');
   const [v, setV] = useState<V | null>(null);
   const [globalLayers, setGlobalLayers] = useState<GlobalLayers | null>(null);
@@ -194,20 +196,20 @@ function ViewPage() {
                       onClick={() => window.open(currentAd!.url, '_blank', 'noopener,noreferrer')}
                       className="absolute bottom-12 left-3 rounded-lg bg-grad-accent px-4 py-2 text-sm font-bold text-[color:var(--accent-fg)] shadow-lg transition hover:opacity-90"
                     >
-                      🚀 Daftar Sekarang →
+                      {t('watch.ad_cta')}
                     </button>
                   )}
                   <div className="absolute bottom-12 right-3">
                     {adWatched < (adsConfig?.skipAfterSec ?? 5) ? (
                       <div className="rounded-md bg-black/80 px-3 py-2 text-sm text-white">
-                        Skip dalam {Math.max(0, Math.ceil((adsConfig?.skipAfterSec ?? 5) - adWatched))}s
+                        {t('watch.ad_skip_in')} {Math.max(0, Math.ceil((adsConfig?.skipAfterSec ?? 5) - adWatched))}s
                       </div>
                     ) : (
                       <button
                         onClick={closeAd}
                         className="rounded-md bg-white px-3 py-2 text-sm font-bold text-black shadow-lg hover:bg-gray-200"
                       >
-                        ▶ Skip Iklan
+                        {t('watch.ad_skip_btn')}
                       </button>
                     )}
                   </div>

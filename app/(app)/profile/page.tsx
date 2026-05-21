@@ -249,7 +249,7 @@ export default function ProfilePage() {
         <div className="space-y-4 lg:col-span-2">
           {/* STATS GRID */}
           <section className="card enter enter-2">
-            <h2 className="mb-3 font-bold">📊 Stats Kamu</h2>
+            <h2 className="mb-3 font-bold">{t('profile.stats')}</h2>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <Stat icon="🎬" k="Videos" v={<CountUp to={summary?.totalVideos ?? 0} delay={150} />} />
               <Stat icon="👁" k="Views" v={<CountUp to={summary?.totalViews ?? 0} format={fmtNum} delay={200} />} color="text-warn" />
@@ -278,7 +278,7 @@ export default function ProfilePage() {
           {/* TOP VIDEOS */}
           <section className="card enter enter-3">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold">🏆 Top Performing</h2>
+              <h2 className="font-bold">{t('profile.top_performing')}</h2>
               <Link href="/history" className="text-xs text-accent hover:underline">Semua video →</Link>
             </div>
             {top3.length === 0 ? (
@@ -309,7 +309,7 @@ export default function ProfilePage() {
           {/* RECENT UPLOADS GRID */}
           <section className="card enter enter-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold">🆕 Recent Uploads</h2>
+              <h2 className="font-bold">{t('profile.recent_uploads')}</h2>
               <Link href="/history" className="text-xs text-accent hover:underline">Lihat semua →</Link>
             </div>
             {recent.length === 0 ? (
@@ -418,7 +418,7 @@ export default function ProfilePage() {
 
           {/* ACCOUNT INFO */}
           <section className="card enter enter-3">
-            <h2 className="mb-3 font-bold">ℹ️ Account Info</h2>
+            <h2 className="mb-3 font-bold">{t('profile.account_info')}</h2>
             <dl className="space-y-1.5 text-sm">
               <Row k="Username" v={me.username} />
               <Row k="Email" v={me.email} />
@@ -435,7 +435,7 @@ export default function ProfilePage() {
           {/* RECENT ACTIVITY */}
           <section className="card enter enter-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold">🔔 Recent Activity</h2>
+              <h2 className="font-bold">{t('profile.recent_activity')}</h2>
               <Link href="/notifications" className="text-[10px] text-accent hover:underline">Lihat →</Link>
             </div>
             {notifs.length === 0 ? (

@@ -145,7 +145,7 @@ export default function SettingsPage() {
           {/* SECURITY SCORE */}
           <section className="card enter enter-2">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold">🛡 Security Score</h2>
+              <h2 className="font-bold">{t('settings.security_score')}</h2>
               <span className={`rounded-full px-3 py-0.5 text-sm font-extrabold ${secPct >= 80 ? 'bg-success/20 text-success' : secPct >= 50 ? 'bg-warn/20 text-warn' : 'bg-danger/20 text-danger'}`}>
                 <CountUp to={secPct} delay={150} />%
               </span>
@@ -255,7 +255,7 @@ export default function SettingsPage() {
 
           {/* 2FA */}
           <section className="card enter enter-5">
-            <h2 className="mb-3 text-lg font-bold">🔐 Two-Factor Authentication</h2>
+            <h2 className="mb-3 text-lg font-bold">{t('settings.two_factor_auth')}</h2>
             {!tfaWizardOpen && !tfaDisableOpen && (me.totpEnabled
               ? (
                 <>
@@ -341,7 +341,7 @@ export default function SettingsPage() {
         <aside className="space-y-4">
           {/* APPEARANCE */}
           <section className="card enter enter-2">
-            <h2 className="mb-3 font-bold">🎨 Appearance</h2>
+            <h2 className="mb-3 font-bold">{t('settings.appearance')}</h2>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setThemeMode('dark')}
@@ -362,7 +362,7 @@ export default function SettingsPage() {
 
           {/* QUICK LINKS */}
           <section className="card enter enter-3">
-            <h2 className="mb-3 font-bold">🔗 Quick Links</h2>
+            <h2 className="mb-3 font-bold">{t('settings.quick_links')}</h2>
             <div className="space-y-1.5">
               <QuickLink href="/profile" icon="👤" label="Edit Profile" />
               <QuickLink href="/history" icon="🖼" label="My Uploads" />
@@ -378,7 +378,7 @@ export default function SettingsPage() {
 
           {/* TIPS */}
           <section className="card enter enter-4 bg-grad-card">
-            <h2 className="mb-3 font-bold">💡 Tips Keamanan</h2>
+            <h2 className="mb-3 font-bold">{t('settings.security_tips')}</h2>
             <ul className="space-y-2 text-xs">
               <li className="flex gap-2"><span>🔐</span><span>Aktifkan <b>2FA</b> — proteksi #1 dari hijack akun.</span></li>
               <li className="flex gap-2"><span>🔑</span><span>Pakai password <b>unik</b> per situs — jangan recycle.</span></li>
