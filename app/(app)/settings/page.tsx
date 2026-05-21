@@ -6,6 +6,7 @@ import { api, api2faSetup, api2faEnable, api2faDisable, apiGetMyQuota } from '@/
 import { useMe } from '@/components/UserContext';
 import { CountUp } from '@/components/CountUp';
 import { fmtBytes } from '@/lib/utils';
+import { useT } from '@/lib/i18n';
 
 const THEME_KEY = 'mystream_theme';
 const PANDUAN_KEY = 'mystream_panduan_dismissed';
@@ -13,6 +14,7 @@ const PANDUAN_KEY = 'mystream_panduan_dismissed';
 export default function SettingsPage() {
   const router = useRouter();
   const { me, refresh, logout } = useMe();
+  const t = useT();
   const [oldPw, setOldPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
@@ -132,7 +134,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-4">
       <header className="enter enter-1 flex items-center justify-between flex-wrap gap-2">
-        <h1 className="text-3xl font-bold">⚙ Settings</h1>
+        <h1 className="text-3xl font-bold">⚙ {t('settings.title')}</h1>
         <div className="text-xs text-muted">@{me.username} · {me.email}</div>
       </header>
 
@@ -211,7 +213,7 @@ export default function SettingsPage() {
 
           {/* PASSWORD */}
           <section className="card enter enter-4">
-            <h2 className="mb-3 text-lg font-bold">🔑 Ubah Password</h2>
+            <h2 className="mb-3 text-lg font-bold">🔑 {t('settings.change_password')}</h2>
             <div className="space-y-3">
               <div>
                 <label className="label">Password lama</label>
@@ -315,7 +317,7 @@ export default function SettingsPage() {
 
           {/* DANGER ZONE */}
           <section className="card enter enter-6 border-danger/30">
-            <h2 className="mb-3 text-lg font-bold text-danger">⚠ Danger Zone</h2>
+            <h2 className="mb-3 text-lg font-bold text-danger">⚠ {t('settings.danger')}</h2>
             <div className="space-y-2">
               <DangerRow
                 title="Hapus Semua Video"

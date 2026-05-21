@@ -7,9 +7,11 @@ import { Avatar } from '@/components/Avatar';
 import { VerifiedBadge } from '@/components/VerifiedBadge';
 import { CountUp } from '@/components/CountUp';
 import { COUNTRIES, fmtBytes, fmtNum, timeAgo } from '@/lib/utils';
+import { useT } from '@/lib/i18n';
 
 export default function ProfilePage() {
   const { me, refresh } = useMe();
+  const t = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
   const pickerMenuRef = useRef<HTMLDivElement>(null);
@@ -365,9 +367,9 @@ export default function ProfilePage() {
         {/* RIGHT SIDEBAR — Edit form + activity */}
         <aside className="space-y-4">
           <section className="card enter enter-2">
-            <h2 className="mb-3 text-lg font-bold">✏️ Edit Profile</h2>
+            <h2 className="mb-3 text-lg font-bold">✏️ {t('profile.edit')}</h2>
             <div>
-              <label className="label">Bio <span className="text-[10px] text-muted">({charCountBio}/300)</span></label>
+              <label className="label">{t('profile.bio')} <span className="text-[10px] text-muted">({charCountBio}/300)</span></label>
               <textarea
                 className="input min-h-[88px]"
                 value={bio}
@@ -377,7 +379,7 @@ export default function ProfilePage() {
               />
             </div>
             <div className="mt-3">
-              <label className="label">Country</label>
+              <label className="label">{t('profile.country')}</label>
               <select className="input" value={country} onChange={(e) => setCountry(e.target.value)}>
                 <option value="">— Pilih —</option>
                 {COUNTRIES.map((c) => (
