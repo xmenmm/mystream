@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { cookies, headers } from 'next/headers';
 import { getAuthFromCookies } from '@/lib/auth';
 import { loadDB } from '@/lib/db';
 import { LandingFAQ } from '@/components/LandingFAQ';
@@ -14,8 +15,24 @@ function fmtN(n: number): string {
   return String(n);
 }
 
+type L = 'id' | 'en' | 'jp' | 'ar';
+function detectLocale(): L {
+  const c = cookies().get('mystream_locale_view')?.value as L | undefined;
+  if (c && ['id', 'en', 'jp', 'ar'].includes(c)) return c;
+  const al = (headers().get('accept-language') || '').toLowerCase();
+  if (al.startsWith('en')) return 'en';
+  if (al.startsWith('ja') || al.startsWith('jp')) return 'jp';
+  if (al.startsWith('ar')) return 'ar';
+  return 'id';
+}
+function pick(locale: L, opts: Record<L, string>): string {
+  return opts[locale] || opts.id;
+}
+
 export default async function LandingPage() {
   if (await getAuthFromCookies()) redirect('/dashboard');
+  const L = detectLocale();
+  const tt = (opts: Record<L, string>) => pick(L, opts);
 
   const db = await loadDB();
   const totalUsers = db.users.length;
@@ -50,16 +67,16 @@ export default async function LandingPage() {
             MyStream
           </Link>
           <nav className="hidden gap-6 text-sm text-muted md:flex">
-            <a href="#features" className="hover:text-text">Fitur</a>
-            <a href="#showcase" className="hover:text-text">Showcase</a>
-            <a href="#how" className="hover:text-text">Cara Kerja</a>
-            <a href="#pricing" className="hover:text-text">Harga</a>
-            <a href="#testimonials" className="hover:text-text">Review</a>
+            <a href="#features" className="hover:text-text">{tt({id:'Fitur',en:'Features',jp:'機能',ar:'الميزات'})}</a>
+            <a href="#showcase" className="hover:text-text">{tt({id:'Showcase',en:'Showcase',jp:'ショーケース',ar:'عرض'})}</a>
+            <a href="#how" className="hover:text-text">{tt({id:'Cara Kerja',en:'How It Works',jp:'仕組み',ar:'كيف يعمل'})}</a>
+            <a href="#pricing" className="hover:text-text">{tt({id:'Harga',en:'Pricing',jp:'料金',ar:'الأسعار'})}</a>
+            <a href="#testimonials" className="hover:text-text">{tt({id:'Review',en:'Reviews',jp:'レビュー',ar:'مراجعات'})}</a>
             <a href="#faq" className="hover:text-text">FAQ</a>
           </nav>
           <div className="flex items-center gap-2">
-            <AuthLink mode="login" className="btn-ghost">Login</AuthLink>
-            <AuthLink mode="signup" className="btn-primary">Daftar</AuthLink>
+            <AuthLink mode="login" className="btn-ghost">{tt({id:'Masuk',en:'Sign in',jp:'ログイン',ar:'تسجيل الدخول'})}</AuthLink>
+            <AuthLink mode="signup" className="btn-primary">{tt({id:'Daftar',en:'Sign up',jp:'登録',ar:'تسجيل'})}</AuthLink>
           </div>
         </div>
       </header>
@@ -71,24 +88,33 @@ export default async function LandingPage() {
           <div className="text-center md:text-left">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-bg-card/70 px-4 py-1 text-xs backdrop-blur-md">
               <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
-              <span className="text-muted">{fmtN(totalUsers)} creator aktif sekarang</span>
+              <span className="text-muted">{fmtN(totalUsers)} {tt({id:'creator aktif sekarang',en:'creators active now',jp:'クリエイターがアクティブ',ar:'مبدعون نشطون الآن'})}</span>
             </div>
             <h1 className="text-4xl font-extrabold leading-tight text-text sm:text-5xl md:text-6xl lg:text-7xl">
-              Bagikan momen,<br />watch creator,<br />follow teman.
+              {tt({
+                id:'Bagikan momen, watch creator, follow teman.',
+                en:'Share moments, watch creators, follow friends.',
+                jp:'瞬間を共有、クリエイターを視聴、友達をフォロー。',
+                ar:'شارك اللحظات، شاهد المبدعين، تابع الأصدقاء.',
+              }).split(',').map((s, i, arr) => <span key={i}>{s.trim()}{i < arr.length - 1 ? ',' : ''}<br/></span>)}
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-base sm:text-lg text-muted md:mx-0">
-              Platform berbagi video sederhana — upload, like, follow,
-              dan ngobrol langsung dengan creator lain via DM. <b className="text-text">100% gratis</b> untuk mulai.
+              {tt({
+                id:'Platform berbagi video sederhana — upload, like, follow, dan ngobrol langsung dengan creator lain via DM. 100% gratis untuk mulai.',
+                en:'Simple video sharing — upload, like, follow, and chat directly with other creators via DM. 100% free to start.',
+                jp:'シンプルな動画共有 — アップロード、いいね、フォロー、DMで他のクリエイターと直接チャット。100% 無料で始められます。',
+                ar:'مشاركة فيديو بسيطة — ارفع، أعجب، تابع، وتحدث مباشرة مع المبدعين عبر الرسائل الخاصة. مجاني 100٪ للبدء.',
+              })}
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3 md:justify-start">
               <AuthLink mode="signup" className="btn-primary text-base shadow-glow">
-                🚀 Mulai Gratis Sekarang →
+                {tt({id:'🚀 Mulai Gratis Sekarang →',en:'🚀 Start Free Now →',jp:'🚀 今すぐ無料で始める →',ar:'🚀 ابدأ مجانا الآن ←'})}
               </AuthLink>
               <Link href="/dashboard" className="btn-ghost text-base bg-bg-card/60 backdrop-blur-md">
-                Lihat Dashboard Demo
+                {tt({id:'Lihat Dashboard Demo',en:'View Dashboard Demo',jp:'ダッシュボードを見る',ar:'عرض لوحة التحكم التجريبية'})}
               </Link>
             </div>
-            <p className="mt-4 text-xs text-muted">⏱ Daftar 30 detik · 🔒 2FA tersedia · 🆓 No credit card</p>
+            <p className="mt-4 text-xs text-muted">⏱ {tt({id:'Daftar 30 detik',en:'Sign up in 30s',jp:'30秒で登録',ar:'سجل في 30 ثانية'})} · 🔒 {tt({id:'2FA tersedia',en:'2FA available',jp:'2FA対応',ar:'2FA متوفر'})} · 🆓 {tt({id:'No credit card',en:'No credit card',jp:'クレカ不要',ar:'بدون بطاقة'})}</p>
 
             {/* Trust badges */}
             <div className="mt-6 flex flex-wrap justify-center gap-3 text-[10px] text-muted md:justify-start">
@@ -222,10 +248,10 @@ export default async function LandingPage() {
       {/* CATEGORIES — visual gallery of content types */}
       <section id="categories" className="relative z-10 w-full px-5 py-14 md:px-8">
         <div className="mb-12 text-center">
-          <span className="rounded-full border border-accent-2/30 bg-accent-2/10 px-3 py-1 text-xs uppercase tracking-wider text-accent-2">Categories</span>
-          <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">Apa pun konten kamu, ada tempatnya di sini</h2>
+          <span className="rounded-full border border-accent-2/30 bg-accent-2/10 px-3 py-1 text-xs uppercase tracking-wider text-accent-2">{tt({id:'Categories',en:'Categories',jp:'カテゴリ',ar:'الفئات'})}</span>
+          <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">{tt({id:'Apa pun konten kamu, ada tempatnya di sini',en:'Whatever your content is, there’s a place for it here',jp:'どんなコンテンツでも、ここに居場所があります',ar:'أيا كان محتواك، هناك مكان له هنا'})}</h2>
           <p className="mx-auto mt-3 max-w-xl text-muted">
-            Dari vlog harian sampai tutorial mendalam — MyStream nampung semua jenis cerita kamu.
+            {tt({id:'Dari vlog harian sampai tutorial mendalam — MyStream nampung semua jenis cerita kamu.',en:'From daily vlogs to deep tutorials — MyStream hosts every kind of your story.',jp:'毎日のVlogから本格チュートリアルまで — MyStreamはあらゆるストーリーを受け入れます。',ar:'من فلوغات يومية إلى دروس متعمقة — MyStream يستضيف كل أنواع قصصك.'})}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
