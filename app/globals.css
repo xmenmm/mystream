@@ -222,43 +222,51 @@ a { color: inherit; }
   40%           { transform: scale(1.2); opacity: 1; }
 }
 
-/* ========== Split-reveal intro (after login) ========== */
+/* ========== Split-reveal intro (after login) — all black + accent glow ========== */
 .split-overlay {
   position: fixed; inset: 0; z-index: 10010;
   pointer-events: none;
 }
 .split-panel {
-  position: absolute; top: 0; height: 100%; width: 50%;
+  position: absolute; top: 0; height: 100%; width: 50.5%;
   background: #000;
 }
-.split-panel-l { left: 0;  animation: split-l 0.85s cubic-bezier(.7,0,.3,1) 0.85s forwards; }
-.split-panel-r { right: 0; animation: split-r 0.85s cubic-bezier(.7,0,.3,1) 0.85s forwards; }
-@keyframes split-l { from { transform: translateX(0); } to { transform: translateX(-100%); } }
-@keyframes split-r { from { transform: translateX(0); } to { transform: translateX(100%); } }
+/* Tepi-dalam panel dikasih glow biru biar belahan terlihat walau bg juga hitam */
+.split-panel-l {
+  left: 0;
+  box-shadow: inset -2px 0 16px -3px rgba(59,130,246,0.55);
+  animation: split-l 0.9s cubic-bezier(.7,0,.25,1) 0.75s forwards;
+}
+.split-panel-r {
+  right: 0;
+  box-shadow: inset 2px 0 16px -3px rgba(59,130,246,0.55);
+  animation: split-r 0.9s cubic-bezier(.7,0,.25,1) 0.75s forwards;
+}
+@keyframes split-l { from { transform: translateX(0); } to { transform: translateX(-101%); } }
+@keyframes split-r { from { transform: translateX(0); } to { transform: translateX(101%); } }
 .split-text {
   position: fixed; inset: 0; z-index: 10011;
   display: grid; place-items: center;
   pointer-events: none;
-  animation: split-text-out 0.5s ease 1.7s forwards;
+  animation: split-text-out 0.45s ease 2.05s forwards;
 }
 .split-text span {
-  font-size: clamp(28px, 6vw, 56px); font-weight: 800; color: #fff;
+  font-size: clamp(28px, 6vw, 58px); font-weight: 800; color: #fff;
   letter-spacing: -0.02em;
-  animation: split-text-in 0.6s cubic-bezier(.2,.8,.2,1) both;
-  text-shadow: 0 0 30px rgba(59,130,246,0.6);
+  animation: split-text-in 0.7s cubic-bezier(.2,.8,.2,1) both;
+  text-shadow: 0 0 34px rgba(59,130,246,0.7);
 }
 @keyframes split-text-in {
-  from { opacity: 0; transform: scale(0.85); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.86); letter-spacing: 0.06em; }
+  to   { opacity: 1; transform: scale(1);    letter-spacing: -0.02em; }
 }
-@keyframes split-text-out {
-  to { opacity: 0; }
-}
+@keyframes split-text-out { to { opacity: 0; transform: scale(1.04); } }
 .split-line {
   position: fixed; top: 0; bottom: 0; left: 50%; width: 2px; z-index: 10012;
-  background: linear-gradient(180deg, transparent, #3b82f6, transparent);
+  background: linear-gradient(180deg, transparent, #3b82f6, #60a5fa, #3b82f6, transparent);
   transform: translateX(-50%);
-  animation: split-line-out 0.4s ease 0.85s forwards;
+  box-shadow: 0 0 14px 2px rgba(59,130,246,0.7);
+  animation: split-line-out 0.5s ease 0.75s forwards;
 }
 @keyframes split-line-out { to { opacity: 0; } }
 
