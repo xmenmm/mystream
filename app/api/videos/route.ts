@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       ? `${(sz / 1024 ** 3).toFixed(2)} GB`
       : `${(sz / 1024 / 1024).toFixed(0)} MB`;
     return NextResponse.json({
-      error: `File ${fmtSz} melebihi batas plan ${plan.label} (max ${fmtMaxFile} per file). ${!plan.isPremium ? 'Upgrade Premium dapat 10 GB per file.' : ''}`,
+      error: `File ${fmtSz} melebihi batas plan ${plan.label} (max ${fmtMaxFile} per file). ${!plan.isPremium ? 'Upgrade Premium dapat ukuran file unlimited.' : ''}`,
       needsUpgrade: !plan.isPremium, plan: plan.plan,
     }, { status: 403 });
   }

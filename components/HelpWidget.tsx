@@ -3,12 +3,12 @@ import { useState } from 'react';
 
 const HELP_ITEMS = [
   { q: '🚀 Cara daftar & login', a: ['Klik tombol Login/Daftar di kanan atas.', 'Daftar gratis: cuma butuh username (min 3), email, & password (min 6) + isi captcha anti-bot.', 'Sesi tersimpan otomatis di browser.'] },
-  { q: '🎬 Cara upload video', a: ['Klik tombol "+ Upload Video" di header.', 'Free: max 500 MB, durasi 10 menit, 15 video/24jam, total storage 500 MB.', 'Premium: max 10 GB per file, durasi unlimited, unlimited video.', 'Thumbnail otomatis di-generate dari frame tengah video.'] },
+  { q: '🎬 Cara upload video', a: ['Klik tombol "+ Upload Video" di header.', 'Free: max 500 MB, durasi 10 menit, 15 video/24jam, total storage 500 MB.', 'Premium: ukuran file unlimited, durasi unlimited, unlimited video.', 'Thumbnail otomatis di-generate dari frame tengah video.'] },
   { q: '👤 Edit profile', a: ['Buka halaman Profile dari sidebar.', 'Upload foto avatar (max 10 MB).', 'Edit bio, country, warna avatar default.'] },
   { q: '👥 Cari teman', a: ['Buka halaman Friends.', 'Ketik username minimal 2 karakter di search bar atas.', 'Klik Follow di hasil pencarian.'] },
   { q: '💬 Kirim pesan', a: ['Buka Messages atau klik tombol Message di profile user.', 'Kalau belum saling follow, masuk ke Requests dulu.'] },
   { q: '🔐 2FA (Two-Factor Authentication)', a: ['Buka Settings → Two-Factor Authentication.', 'Scan QR code atau salin secret ke aplikasi authenticator (Google Auth, Authy).', 'Verifikasi dengan kode 6-digit.', 'Setelah aktif, login butuh kode dari authenticator.'] },
-  { q: '⭐ Premium', a: ['Free: 500 MB per file, 10 menit, 15 video/24jam.', 'Premium: 10 GB per file, durasi unlimited, video unlimited.', 'Hubungi admin untuk upgrade.'] },
+  { q: '⭐ Premium', a: ['Free: 500 MB per file, 10 menit, 15 video/24jam.', 'Premium: ukuran file unlimited, durasi unlimited, video unlimited.', 'Hubungi admin untuk upgrade.'] },
   { q: '🌙 Tema dark / light', a: ['Toggle ada di sidebar paling atas (☀ / ☾).', 'Pilihan tersimpan di browser.'] },
 ];
 

@@ -268,10 +268,10 @@ export default function DashboardPage() {
               <div className="text-3xl">⭐</div>
               <h2 className="mt-2 text-lg font-bold">Upgrade Premium</h2>
               <p className="mt-1 text-xs text-muted">
-                Unlimited video, durasi unlimited, file <b className="text-warn">10 GB</b>. Untuk creator serius.
+                Unlimited video, durasi unlimited, ukuran file <b className="text-warn">unlimited</b>. Untuk creator serius.
               </p>
               <ul className="mt-3 space-y-1 text-xs text-muted">
-                <li>✓ Max <b className="text-text">10 GB</b> per file (vs 500 MB)</li>
+                <li>✓ Ukuran file <b className="text-text">unlimited</b> (vs 500 MB)</li>
                 <li>✓ Durasi <b className="text-text">unlimited</b> (vs 10 menit)</li>
                 <li>✓ <b className="text-text">Unlimited</b> upload / hari</li>
                 <li>✓ Storage <b className="text-text">unlimited</b></li>

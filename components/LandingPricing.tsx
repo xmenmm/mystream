@@ -17,7 +17,7 @@ const FREE_FEATURES = [
 
 const PREMIUM_FEATURES = [
   '⭐ Semua fitur Free',
-  '⭐ Max 10 GB per file',
+  '⭐ Ukuran file unlimited',
   '⭐ Durasi unlimited',
   '⭐ Unlimited video / hari',
   '⭐ Storage unlimited',

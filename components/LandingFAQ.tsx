@@ -8,7 +8,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Apa bedanya Free dan Premium?',
-    a: 'Free: 500 MB per file, 10 menit, 15 video/24jam, total storage 500 MB. Premium: 10 GB per file, durasi unlimited, video unlimited, storage unlimited. Premium ngasih kebebasan untuk creator yang butuh upload video panjang atau resolusi tinggi.',
+    a: 'Free: 500 MB per file, 10 menit, 15 video/24jam, total storage 500 MB. Premium: ukuran file unlimited, durasi unlimited, video unlimited, storage unlimited. Premium ngasih kebebasan untuk creator yang butuh upload video panjang atau resolusi tinggi.',
   },
   {
     q: 'Aman tidak?',

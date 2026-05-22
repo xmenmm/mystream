@@ -132,7 +132,7 @@ export default async function LandingPage() {
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-warn/20 text-xl text-warn">⭐</span>
                 <div>
                   <div className="text-sm font-bold">Premium aktif</div>
-                  <div className="text-xs text-muted">10 GB per file · unlimited durasi</div>
+                  <div className="text-xs text-muted">unlimited per file · unlimited durasi</div>
                 </div>
               </div>
             </div>
@@ -281,7 +281,7 @@ export default async function LandingPage() {
           <Feature i="🔗" t="Share Mode Fokus" d="Setiap video punya link nonton immersive — viewer tidak perlu daftar untuk nonton, langsung play." />
           <Feature i="🔐" t="Keamanan Top-tier" d="2FA TOTP via authenticator app (Google Auth/Authy), rate limit anti brute-force, captcha SVG anti-bot." />
           <Feature i="💬" t="DM ke Creator Lain" d="Follow creator favorit, kirim DM, dapat notifikasi real-time tiap ada like/follow/upload baru." />
-          <Feature i="⭐" t="Plan Premium Opsional" d="Upgrade kalau butuh upload sampai 10 GB per file, durasi unlimited, dan unlimited video / hari." />
+          <Feature i="⭐" t="Plan Premium Opsional" d="Upgrade kalau butuh upload ukuran file unlimited, durasi unlimited, dan unlimited video / hari." />
           <Feature i="🎨" t="Player Customizable" d="Speed (0.5x-2x), pilih ukuran (XS sampai Full), resolusi indicator. Player jalan smooth di portrait & landscape." />
           <Feature i="🛡" t="Sponsor Layer Ad" d="Admin bisa set sponsor link yang user klik dulu sebelum video play. Monetisasi sederhana untuk konten kamu." />
           <Feature i="🌙" t="Dark / Light Mode" d="Theme toggle bisa diatur per-user. Auto-detect preferensi sistem, tersimpan di browser." />
@@ -477,7 +477,7 @@ export default async function LandingPage() {
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             <Step n={1} t="Daftar Gratis" d="Bikin akun pakai username + email. Cuma butuh 30 detik dengan captcha anti-bot." extra="Recommended: aktifkan 2FA langsung biar akun terlindungi." />
-            <Step n={2} t="Upload Video" d="Klik tombol +Upload, pilih file, isi judul & deskripsi. Thumbnail otomatis ke-generate." extra="Free 500 MB · Premium 10 GB per file." />
+            <Step n={2} t="Upload Video" d="Klik tombol +Upload, pilih file, isi judul & deskripsi. Thumbnail otomatis ke-generate." extra="Free 500 MB · Premium unlimited per file." />
             <Step n={3} t="Share & Tumbuh" d="Share link nonton ke teman. Pantau views & likes naik di dashboard real-time." extra="Stats update otomatis, bisa download video sendiri kapan saja." />
           </div>
         </div>

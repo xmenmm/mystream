@@ -164,7 +164,7 @@ export const PLAN_LIMITS = {
     label: 'Premium',
     maxDurationSec: Infinity,
     maxVideosPerDay: Infinity,
-    maxFileSize: 10 * 1024 * 1024 * 1024,  // 10 GB per file (beneran 10 GB!)
+    maxFileSize: Infinity,                 // unlimited per file
     maxStorageBytes: Infinity,             // total storage unlimited
   },
 } as const;
