@@ -33,7 +33,7 @@ function Inner({ children }: { children: ReactNode }) {
     <div className="relative min-h-screen w-full">
       <div className="relative z-10">
         <Sidebar />
-        <div className="w-full md:pl-16">
+        <div className="w-full md:pl-60">
           <TopBar />
           <main className="w-full min-w-0 p-3 pb-20 sm:p-4 md:px-6 md:pb-6">
             {loading ? (

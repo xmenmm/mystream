@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useRef } from 'react';
 import { useMe } from './UserContext';
 import { useT } from '@/lib/i18n';
 
@@ -42,98 +41,47 @@ export function Sidebar() {
   const { me } = useMe();
   const t = useT();
   const showAdmin = !!me?.isAdmin;
-  const isAdminRoute = path?.startsWith('/admin');
-
-  // Hover-flyout state for ADMIN section
-  const [adminOpen, setAdminOpen] = useState(false);
-  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  function openAdmin() {
-    if (closeTimerRef.current) {
-      clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-    setAdminOpen(true);
-  }
-  function scheduleClose() {
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = setTimeout(() => setAdminOpen(false), 150);
-  }
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-16 flex-col items-center gap-2 overflow-y-auto overflow-x-visible border-r border-border bg-bg-card backdrop-blur-md py-4 md:flex">
+      {/* Desktop sidebar — gaya SciFi: full-width, section grup, label lengkap */}
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-60 flex-col overflow-y-auto border-r border-border bg-gradient-to-b from-bg-card to-bg md:flex">
+        {/* Logo header */}
         <Link
           href="/dashboard"
-          className="mb-2 grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-grad-accent text-lg font-bold text-white shadow-glow"
-          aria-label="MyStream"
+          className="flex shrink-0 items-center gap-2.5 border-b border-border px-5 py-[18px]"
         >
-          M
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-grad-accent text-lg font-extrabold text-white shadow-glow">M</span>
+          <span className="bg-grad-accent bg-clip-text text-xl font-extrabold text-transparent">MyStream</span>
         </Link>
-        {userItems.map((it) => (
-          <SidebarLink key={it.href} item={it} label={t(it.tKey) || it.fallback} active={isActiveFor(it.href, path)} />
-        ))}
 
-        {showAdmin && (
-          <div
-            className="relative mt-1"
-            onMouseEnter={openAdmin}
-            onMouseLeave={scheduleClose}
-          >
-            <div className="mb-1 h-px w-8 mx-auto bg-warn/40" />
-            {/* Trigger badge — clickable + hoverable */}
-            <Link
-              href="/admin"
-              aria-label="Admin"
-              className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg transition ${
-                isAdminRoute
-                  ? 'bg-gradient-to-br from-warn to-danger text-white shadow-glow'
-                  : 'text-warn hover:bg-warn/15 hover:scale-105'
-              }`}
-            >
-              🛡
-              <span className="absolute -bottom-1 -right-1 rounded-full bg-warn px-1 py-0 text-[7px] font-extrabold leading-none text-white">
-                {adminItems.length}
-              </span>
-            </Link>
-            <div className="mt-0.5 text-center text-[8px] font-bold uppercase tracking-wider text-warn">
-              ADMIN ▸
-            </div>
+        {/* Menu */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3">
+          <p className="mb-2 mt-2 px-3 text-[11px] font-semibold uppercase tracking-[1.5px] text-muted">
+            Menu
+          </p>
+          {userItems.map((it) => (
+            <SidebarLink key={it.href} href={it.href} icon={it.icon} label={t(it.tKey) || it.fallback} active={isActiveFor(it.href, path)} />
+          ))}
 
-            {/* Flyout panel — drop down */}
-            {adminOpen && (
-              <div
-                onMouseEnter={openAdmin}
-                onMouseLeave={scheduleClose}
-                className="absolute left-0 top-full z-50 mt-2 w-56 origin-top-left animate-fade-in-down rounded-2xl border-2 border-warn/40 bg-bg-card p-2 shadow-2xl backdrop-blur"
-              >
-                <div className="mb-2 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-warn">
-                  🛡 Admin Tools ({adminItems.length})
-                </div>
-                <div className="max-h-[60vh] space-y-0.5 overflow-y-auto">
-                  {adminItems.map((it) => {
-                    const active = isActiveFor(it.href, path);
-                    return (
-                      <Link
-                        key={it.href}
-                        href={it.href}
-                        className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition ${
-                          active
-                            ? 'bg-gradient-to-r from-warn to-danger text-white shadow-glow'
-                            : 'text-text hover:bg-warn/15 hover:text-warn'
-                        }`}
-                      >
-                        <span className="text-lg">{it.icon}</span>
-                        <span className="truncate">{t(it.tKey) || it.fallback}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+          {showAdmin && (
+            <>
+              <p className="mb-2 mt-5 px-3 text-[11px] font-semibold uppercase tracking-[1.5px] text-warn">
+                Admin
+              </p>
+              {adminItems.map((it) => (
+                <SidebarLink
+                  key={it.href}
+                  href={it.href}
+                  icon={it.icon}
+                  label={t(it.tKey) || it.fallback}
+                  active={isActiveFor(it.href, path)}
+                  admin
+                />
+              ))}
+            </>
+          )}
+        </nav>
       </aside>
 
       {/* Mobile bottom nav */}
@@ -170,18 +118,22 @@ export function Sidebar() {
   );
 }
 
-function SidebarLink({ item, label, active }: { item: NavItem; label: string; active: boolean; admin?: boolean }) {
+function SidebarLink({
+  href, icon, label, active, admin,
+}: { href: string; icon: string; label: string; active: boolean; admin?: boolean }) {
   return (
     <Link
-      href={item.href}
-      title={label}
-      className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg transition ${
+      href={href}
+      className={`relative mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
         active
-          ? 'bg-grad-accent text-white shadow-glow'
-          : 'text-muted hover:bg-bg-elev hover:text-white'
+          ? admin
+            ? 'bg-gradient-to-r from-warn/25 to-warn/5 text-warn shadow-[inset_3px_0_0_var(--warn,#f59e0b)]'
+            : 'bg-gradient-to-r from-accent/25 to-accent/5 text-text shadow-[inset_3px_0_0_rgb(var(--accent-rgb))]'
+          : 'text-muted hover:bg-bg-elev hover:text-text'
       }`}
     >
-      {item.icon}
+      <span className="grid w-5 shrink-0 place-items-center text-base">{icon}</span>
+      <span className="truncate">{label}</span>
     </Link>
   );
 }
