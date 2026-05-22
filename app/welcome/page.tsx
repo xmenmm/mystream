@@ -45,6 +45,13 @@ function WelcomePage() {
   const [stepIdx, setStepIdx] = useState(0);
   const [quoteIdx] = useState(() => Math.floor(Math.random() * QUOTES.length));
 
+  // Intro split-reveal "Welcome @username" — selesai ~2.2 detik
+  const [introDone, setIntroDone] = useState(false);
+  useEffect(() => {
+    const tm = setTimeout(() => setIntroDone(true), 2200);
+    return () => clearTimeout(tm);
+  }, []);
+
   // Debug: ?freeze=1 disables auto-redirect (untuk inspect/screenshot)
   const freeze = searchParams.get('freeze') === '1';
 
@@ -63,6 +70,20 @@ function WelcomePage() {
 
   return (
     <div className="welcome-bg fixed inset-0 z-[10000] grid place-items-center overflow-hidden p-4">
+      {/* Intro split-reveal — 2 panel hitam membelah, reveal "Welcome @username" */}
+      {!introDone && (
+        <>
+          <div className="split-line" />
+          <div className="split-text">
+            <span>Welcome @{username || 'creator'}</span>
+          </div>
+          <div className="split-overlay">
+            <div className="split-panel split-panel-l" />
+            <div className="split-panel split-panel-r" />
+          </div>
+        </>
+      )}
+
       {/* Glow orbs background */}
       <div className="welcome-orb welcome-orb-1" />
       <div className="welcome-orb welcome-orb-2" />
