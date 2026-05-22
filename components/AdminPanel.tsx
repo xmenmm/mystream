@@ -1341,6 +1341,24 @@ function PaymentsPane() {
     setMethods((m) => m.map((x, i) => (i === idx ? { ...x, ...patch } : x)));
   }
 
+  function addMethod(type: 'ewallet' | 'bank') {
+    const newM: PaymentMethod = {
+      id: 'custom_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+      name: '',
+      type,
+      account: '',
+      accountName: '',
+      icon: type === 'bank' ? '🏦' : '💳',
+      color: 'bg-slate-700',
+      enabled: true,
+    };
+    setMethods((m) => [...m, newM]);
+  }
+
+  function removeMethod(idx: number) {
+    setMethods((m) => m.filter((_, i) => i !== idx));
+  }
+
   async function save() {
     setSaving(true);
     setMsg(null);
@@ -1381,20 +1399,30 @@ function PaymentsPane() {
 
       {/* E-Wallets */}
       <div>
-        <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">{t('admin_panel.ewallet')}</div>
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-xs font-bold uppercase tracking-wider text-muted">{t('admin_panel.ewallet')}</span>
+          <button type="button" onClick={() => addMethod('ewallet')} className="rounded-lg border border-accent/40 bg-accent/10 px-2 py-1 text-xs font-semibold text-accent hover:bg-accent/20">
+            + {t('common.add')} E-Wallet
+          </button>
+        </div>
         <div className="space-y-2">
           {ewallets.map(({ m, i }) => (
-            <PaymentRow key={m.id} m={m} onChange={(p) => update(i, p)} />
+            <PaymentRow key={m.id} m={m} onChange={(p) => update(i, p)} onRemove={() => removeMethod(i)} />
           ))}
         </div>
       </div>
 
       {/* Banks */}
       <div>
-        <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">{t('admin_panel.bank_transfer')}</div>
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-xs font-bold uppercase tracking-wider text-muted">{t('admin_panel.bank_transfer')}</span>
+          <button type="button" onClick={() => addMethod('bank')} className="rounded-lg border border-accent/40 bg-accent/10 px-2 py-1 text-xs font-semibold text-accent hover:bg-accent/20">
+            + {t('common.add')} Bank
+          </button>
+        </div>
         <div className="space-y-2">
           {banks.map(({ m, i }) => (
-            <PaymentRow key={m.id} m={m} onChange={(p) => update(i, p)} />
+            <PaymentRow key={m.id} m={m} onChange={(p) => update(i, p)} onRemove={() => removeMethod(i)} />
           ))}
         </div>
       </div>
@@ -1428,12 +1456,18 @@ function PaymentsPane() {
   );
 }
 
-function PaymentRow({ m, onChange }: { m: PaymentMethod; onChange: (p: Partial<PaymentMethod>) => void }) {
+function PaymentRow({ m, onChange, onRemove }: { m: PaymentMethod; onChange: (p: Partial<PaymentMethod>) => void; onRemove?: () => void }) {
   return (
     <div className={`flex flex-wrap items-center gap-2 rounded-xl border border-border p-2 ${m.enabled ? 'bg-bg' : 'bg-bg/50 opacity-60'}`}>
       <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg text-xl ${m.color}`}>{m.icon}</span>
-      <div className="flex w-24 shrink-0 flex-col">
-        <div className="text-sm font-bold">{m.name}</div>
+      <div className="flex w-28 shrink-0 flex-col gap-1">
+        <input
+          type="text"
+          value={m.name}
+          onChange={(e) => onChange({ name: e.target.value })}
+          placeholder="Nama (DANA/BCA)"
+          className="input h-7 px-1.5 text-sm font-bold"
+        />
         <label className="flex items-center gap-1 text-[10px] text-muted">
           <input
             type="checkbox"
@@ -1458,6 +1492,17 @@ function PaymentRow({ m, onChange }: { m: PaymentMethod; onChange: (p: Partial<P
         placeholder="Atas nama"
         className="input flex-1 min-w-[120px]"
       />
+      {onRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-danger/40 bg-danger/10 text-danger hover:bg-danger/20"
+          aria-label="Hapus rekening"
+          title="Hapus rekening"
+        >
+          🗑
+        </button>
+      )}
     </div>
   );
 }
