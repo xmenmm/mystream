@@ -1,15 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest } from '@/lib/auth';
-import { loadDB, saveDB } from '@/lib/db';
+import { getConfig, setConfig } from '@/lib/config';
 
 export const runtime = 'nodejs';
-// Anti edge-cache: tanpa ini Vercel cache GET-nya & PUT balas 405.
 export const dynamic = 'force-dynamic';
 
-const def = {
+type RunningText = {
+  enabled: boolean;
+  text: string;
+  position: 'above' | 'below';
+  bgColor1: string;
+  bgColor2: string;
+  textColor: string;
+  speed: number;
+  updatedBy?: string;
+  updatedAt?: string;
+};
+
+const KEY = 'runningText';
+const def: RunningText = {
   enabled: false,
   text: '',
-  position: 'above' as 'above' | 'below',
+  position: 'above',
   bgColor1: '#8b5cf6',
   bgColor2: '#d946ef',
   textColor: '#ffffff',
@@ -18,8 +30,8 @@ const def = {
 
 /** Public: read current global running text config */
 export async function GET() {
-  const db = await loadDB();
-  return NextResponse.json({ runningText: { ...def, ...(db.runningText || {}) } });
+  const cfg = await getConfig<RunningText>(KEY, def);
+  return NextResponse.json({ runningText: { ...def, ...cfg } });
 }
 
 /** Admin only: update */
@@ -28,8 +40,7 @@ export async function PUT(req: NextRequest) {
   if (!a) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   if (!a.user.isAdmin) return NextResponse.json({ error: 'admin only' }, { status: 403 });
   const body = await req.json();
-  const db = await loadDB();
-  db.runningText = {
+  const next: RunningText = {
     enabled: !!body.enabled,
     text: String(body.text || '').slice(0, 300),
     position: body.position === 'below' ? 'below' : 'above',
@@ -40,6 +51,6 @@ export async function PUT(req: NextRequest) {
     updatedBy: a.user.username,
     updatedAt: new Date().toISOString(),
   };
-  await saveDB(db);
-  return NextResponse.json({ runningText: db.runningText });
+  await setConfig(KEY, next);
+  return NextResponse.json({ runningText: next });
 }

@@ -1,12 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest } from '@/lib/auth';
-import { loadDB, saveDB } from '@/lib/db';
+import { getConfig, setConfig } from '@/lib/config';
 
 export const runtime = 'nodejs';
-// Anti edge-cache: tanpa ini Vercel cache GET-nya & PUT balas 405.
 export const dynamic = 'force-dynamic';
 
-const def = {
+type Banner = {
+  enabled: boolean;
+  layout: 'promo' | 'text' | 'image';
+  icon: string;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  ctaUrl: string;
+  bgColor1: string;
+  bgColor2: string;
+  textColor: string;
+  imageUrl: string;
+  height: string;
+  objectFit: string;
+  updatedBy?: string;
+  updatedAt?: string;
+};
+
+const KEY = 'banner';
+const def: Banner = {
   enabled: true,
   layout: 'promo',
   icon: '🎬',
@@ -23,8 +41,8 @@ const def = {
 };
 
 export async function GET() {
-  const db = await loadDB();
-  return NextResponse.json({ banner: { ...def, ...(db.banner || {}) } });
+  const cfg = await getConfig<Banner>(KEY, def);
+  return NextResponse.json({ banner: { ...def, ...cfg } });
 }
 
 export async function PUT(req: NextRequest) {
@@ -33,8 +51,7 @@ export async function PUT(req: NextRequest) {
   if (!a.user.isAdmin)
     return NextResponse.json({ error: 'Hanya admin yang bisa edit banner' }, { status: 403 });
   const body = await req.json();
-  const db = await loadDB();
-  db.banner = {
+  const next: Banner = {
     enabled: !!body.enabled,
     layout: ['promo', 'text', 'image'].includes(body.layout) ? body.layout : 'promo',
     icon: (body.icon || '').slice(0, 6),
@@ -51,6 +68,6 @@ export async function PUT(req: NextRequest) {
     updatedBy: a.user.username,
     updatedAt: new Date().toISOString(),
   };
-  await saveDB(db);
-  return NextResponse.json({ banner: db.banner });
+  await setConfig(KEY, next);
+  return NextResponse.json({ banner: next });
 }
