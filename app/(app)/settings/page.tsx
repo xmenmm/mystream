@@ -11,16 +11,14 @@ const THEME_KEY = 'mystream_theme';
 const PANDUAN_KEY = 'mystream_panduan_dismissed';
 const PREF_PREFIX = 'mystream_pref_';
 
-type TabId = 'account' | 'security' | 'plan' | 'notifications' | 'payout' | 'api' | 'embed' | 'dmca';
+type TabId = 'account' | 'security' | 'plan' | 'notifications' | 'api' | 'dmca';
 
 const TABS: { id: TabId; icon: string; label: string }[] = [
   { id: 'account', icon: '👤', label: 'Account' },
   { id: 'security', icon: '🛡', label: 'Security' },
   { id: 'plan', icon: '⭐', label: 'Plan & Storage' },
   { id: 'notifications', icon: '🔔', label: 'Notifications' },
-  { id: 'payout', icon: '💰', label: 'Payout' },
   { id: 'api', icon: '🔑', label: 'API Keys' },
-  { id: 'embed', icon: '📡', label: 'Embed Defaults' },
   { id: 'dmca', icon: '📋', label: 'DMCA' },
 ];
 
@@ -110,9 +108,7 @@ export default function SettingsPage() {
           {tab === 'security' && <SecurityTab me={me} refresh={refresh} />}
           {tab === 'plan' && <PlanTab quota={quota} me={me} />}
           {tab === 'notifications' && <NotificationsTab />}
-          {tab === 'payout' && <PayoutTab quota={quota} />}
           {tab === 'api' && <ApiTab />}
-          {tab === 'embed' && <EmbedTab />}
           {tab === 'dmca' && <DmcaTab />}
         </section>
       </div>
@@ -597,263 +593,6 @@ function NotificationsTab() {
   );
 }
 
-/* ─────────────────────────────────────────────────────── PAYOUT ─── */
-function PayoutTab({ quota }: { quota: any }) {
-  const [method, setMethod] = useState<string>(pref('payout_method', 'bank'));
-  const [accountName, setAccountName] = useState<string>(pref('payout_account_name', ''));
-  const [accountNumber, setAccountNumber] = useState<string>(pref('payout_account_number', ''));
-  const [bank, setBank] = useState<string>(pref('payout_bank', 'BCA'));
-  const [usdtAddr, setUsdtAddr] = useState<string>(pref('payout_usdt_addr', ''));
-  const [saved, setSaved] = useState(false);
-
-  function save() {
-    setPref('payout_method', method);
-    setPref('payout_account_name', accountName);
-    setPref('payout_account_number', accountNumber);
-    setPref('payout_bank', bank);
-    setPref('payout_usdt_addr', usdtAddr);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  }
-
-  return (
-    <>
-      <section className="card">
-        <h2 className="mb-1 text-lg font-bold">💰 Earnings Saldo</h2>
-        <p className="mb-3 text-xs text-muted">Saldo earnings dari views video kamu.</p>
-        <div className="grid gap-2 sm:grid-cols-3">
-          <PlanStat icon="💰" label="Saldo Tersedia" value="Rp 0" bar={null} />
-          <PlanStat icon="⏳" label="Pending" value="Rp 0" bar={null} />
-          <PlanStat icon="✅" label="Total Withdraw" value="Rp 0" bar={null} />
-        </div>
-        <p className="mt-2 text-xs text-muted">Minimum withdraw: Bank/E-wallet Rp 100.000 · USDT Rp 200.000</p>
-      </section>
-
-      <section className="card">
-        <h2 className="mb-3 text-lg font-bold">🏦 Metode Pembayaran</h2>
-        <div className="space-y-3 max-w-xl">
-          <div>
-            <label className="label">Metode</label>
-            <select className="input" value={method} onChange={(e) => setMethod(e.target.value)}>
-              <option value="bank">🏦 Bank Transfer</option>
-              <option value="gopay">💚 GoPay</option>
-              <option value="ovo">💜 OVO</option>
-              <option value="dana">💙 DANA</option>
-              <option value="shopeepay">🧡 ShopeePay</option>
-              <option value="usdt">₿ USDT (TRC20)</option>
-            </select>
-          </div>
-
-          {method === 'bank' && (
-            <div>
-              <label className="label">Pilih Bank</label>
-              <select className="input" value={bank} onChange={(e) => setBank(e.target.value)}>
-                <option>BCA</option><option>Mandiri</option><option>BNI</option>
-                <option>BRI</option><option>CIMB Niaga</option><option>Permata</option>
-                <option>Danamon</option><option>Maybank</option><option>BSI</option>
-              </select>
-            </div>
-          )}
-
-          <div>
-            <label className="label">{method === 'usdt' ? 'Alamat Wallet (TRC20)' : 'Nomor Rekening / HP'}</label>
-            {method === 'usdt'
-              ? <input className="input font-mono text-xs" placeholder="T..." value={usdtAddr} onChange={(e) => setUsdtAddr(e.target.value)} />
-              : <input className="input" placeholder="081234567890" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} />}
-          </div>
-          {method !== 'usdt' && (
-            <div>
-              <label className="label">Nama Pemilik Rekening</label>
-              <input className="input" placeholder="Sesuai KTP" value={accountName} onChange={(e) => setAccountName(e.target.value)} />
-            </div>
-          )}
-          <button className="btn-primary" onClick={save}>💾 Simpan Metode</button>
-          {saved && <div className="text-sm text-success">✓ Tersimpan</div>}
-        </div>
-      </section>
-
-      <section className="card">
-        <h2 className="mb-3 text-lg font-bold">📋 Riwayat Withdraw</h2>
-        <div className="rounded-lg border border-dashed border-border bg-bg p-6 text-center text-sm text-muted">
-          Belum ada withdraw.
-          <div className="mt-1 text-xs">Riwayat penarikan saldo akan muncul di sini.</div>
-        </div>
-      </section>
-    </>
-  );
-}
-
-/* ─────────────────────────────────────────────────────── API ─── */
-function ApiTab() {
-  const [apiKey, setApiKey] = useState<string | null>(pref('api_key', null));
-  const [showKey, setShowKey] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  function generateKey() {
-    const k = 'ms_' + Array.from(crypto.getRandomValues(new Uint8Array(24)))
-      .map((b) => b.toString(16).padStart(2, '0')).join('');
-    setApiKey(k);
-    setPref('api_key', k);
-    setShowKey(true);
-  }
-  function regenerate() {
-    if (!confirm('Regenerate API key? Key lama akan langsung tidak valid.')) return;
-    generateKey();
-  }
-  function revoke() {
-    if (!confirm('Revoke API key? Aplikasi yang pakai key ini akan berhenti jalan.')) return;
-    setApiKey(null);
-    setPref('api_key', null);
-  }
-  async function copy() {
-    if (!apiKey) return;
-    await navigator.clipboard.writeText(apiKey);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }
-
-  return (
-    <>
-      <section className="card">
-        <h2 className="mb-3 text-lg font-bold">🔑 API Key</h2>
-        <p className="mb-3 text-xs text-muted">
-          API key untuk upload via REST API (programmatic). Sertakan di header <code>Authorization: Bearer &lt;key&gt;</code>.
-        </p>
-        {!apiKey ? (
-          <button className="btn-primary" onClick={generateKey}>🔐 Generate API Key</button>
-        ) : (
-          <div className="space-y-3 max-w-xl">
-            <div className="flex items-center gap-2">
-              <input
-                className="input font-mono text-xs"
-                readOnly
-                type={showKey ? 'text' : 'password'}
-                value={apiKey}
-              />
-              <button className="btn-ghost shrink-0" onClick={() => setShowKey((s) => !s)}>
-                {showKey ? '🙈' : '👁'}
-              </button>
-              <button className="btn-ghost shrink-0" onClick={copy}>
-                {copied ? '✓' : '📋'}
-              </button>
-            </div>
-            <div className="flex gap-2">
-              <button className="btn-ghost text-xs" onClick={regenerate}>🔄 Regenerate</button>
-              <button className="btn-danger text-xs" onClick={revoke}>🗑 Revoke</button>
-            </div>
-            <div className="rounded-lg border border-warn/30 bg-warn/5 p-3 text-xs text-warn">
-              ⚠ Simpan key di tempat aman. Anggap key seperti password — jangan share publik atau commit ke Git.
-            </div>
-          </div>
-        )}
-      </section>
-
-      <section className="card">
-        <h2 className="mb-3 text-lg font-bold">📊 Rate Limit</h2>
-        <dl className="grid gap-2 text-sm sm:grid-cols-2 max-w-xl">
-          <Info label="Upload per jam" value="100 request" />
-          <Info label="Read per jam" value="1.000 request" />
-          <Info label="Burst limit" value="20 / detik" />
-          <Info label="Concurrent upload" value="3 file" />
-        </dl>
-      </section>
-
-      <section className="card">
-        <h2 className="mb-3 text-lg font-bold">📖 Dokumentasi API</h2>
-        <ul className="space-y-2 text-sm">
-          <li><b>POST</b> <code>/api/v1/upload</code> — Upload video file</li>
-          <li><b>GET</b> <code>/api/v1/videos</code> — List videos kamu</li>
-          <li><b>GET</b> <code>/api/v1/videos/:id</code> — Detail video</li>
-          <li><b>PATCH</b> <code>/api/v1/videos/:id</code> — Update metadata</li>
-          <li><b>DELETE</b> <code>/api/v1/videos/:id</code> — Hapus video</li>
-          <li><b>GET</b> <code>/api/v1/stats</code> — Statistik akun</li>
-        </ul>
-        <p className="mt-3 text-xs text-muted">📌 Dokumentasi lengkap akan tersedia di /docs/api (Phase 2).</p>
-      </section>
-    </>
-  );
-}
-
-/* ─────────────────────────────────────────────────────── EMBED ─── */
-function EmbedTab() {
-  const [defaultWidth, setDefaultWidth] = useState<number>(pref('embed_width', 640));
-  const [defaultHeight, setDefaultHeight] = useState<number>(pref('embed_height', 360));
-  const [autoplay, setAutoplay] = useState(pref('embed_autoplay', false));
-  const [muted, setMuted] = useState(pref('embed_muted', false));
-  const [showControls, setShowControls] = useState(pref('embed_controls', true));
-  const [showLogo, setShowLogo] = useState(pref('embed_logo', true));
-  const [allowedDomains, setAllowedDomains] = useState<string>(pref('embed_allowed_domains', ''));
-  const [saved, setSaved] = useState(false);
-
-  function save() {
-    setPref('embed_width', defaultWidth);
-    setPref('embed_height', defaultHeight);
-    setPref('embed_autoplay', autoplay);
-    setPref('embed_muted', muted);
-    setPref('embed_controls', showControls);
-    setPref('embed_logo', showLogo);
-    setPref('embed_allowed_domains', allowedDomains);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  }
-
-  return (
-    <>
-      <section className="card">
-        <h2 className="mb-1 text-lg font-bold">📡 Default Embed</h2>
-        <p className="mb-3 text-xs text-muted">Setting default saat orang generate embed code dari video kamu.</p>
-        <div className="grid gap-3 sm:grid-cols-2 max-w-xl">
-          <div>
-            <label className="label">Default Width (px)</label>
-            <input type="number" className="input" value={defaultWidth} onChange={(e) => setDefaultWidth(+e.target.value)} />
-          </div>
-          <div>
-            <label className="label">Default Height (px)</label>
-            <input type="number" className="input" value={defaultHeight} onChange={(e) => setDefaultHeight(+e.target.value)} />
-          </div>
-        </div>
-        <div className="mt-4 space-y-1.5 max-w-xl">
-          <Toggle label="▶ Autoplay saat embed di-load" on={autoplay} onChange={() => setAutoplay((s) => !s)} />
-          <Toggle label="🔇 Muted by default (perlu kalau autoplay)" on={muted} onChange={() => setMuted((s) => !s)} />
-          <Toggle label="🎛 Tampilkan controls player" on={showControls} onChange={() => setShowControls((s) => !s)} />
-          <Toggle label="🏷 Tampilkan logo MyStream di player" on={showLogo} onChange={() => setShowLogo((s) => !s)} />
-        </div>
-      </section>
-
-      <section className="card">
-        <h2 className="mb-1 text-lg font-bold">🛡 Anti-Leech (Hotlink Protection)</h2>
-        <p className="mb-3 text-xs text-muted">
-          Whitelist domain yang boleh embed video kamu. Kosongkan = semua domain boleh.
-          Pisah dengan baris baru atau koma. Contoh: <code>blogku.com</code>, <code>website-saya.id</code>
-        </p>
-        <textarea
-          className="input"
-          rows={5}
-          value={allowedDomains}
-          onChange={(e) => setAllowedDomains(e.target.value)}
-          placeholder="blogku.com&#10;website-saya.id&#10;medium.com"
-        />
-      </section>
-
-      <section className="card">
-        <h2 className="mb-3 text-lg font-bold">👀 Preview Embed Code</h2>
-        <pre className="overflow-x-auto rounded-lg border border-border bg-bg p-3 text-xs">
-{`<iframe
-  src="https://mystream-o2f7.vercel.app/embed/v_xxxxxx"
-  width="${defaultWidth}"
-  height="${defaultHeight}"
-  frameborder="0"${autoplay ? '\n  allow="autoplay"' : ''}
-  allowfullscreen></iframe>`}
-        </pre>
-      </section>
-
-      <div className="flex gap-2">
-        <button className="btn-primary" onClick={save}>💾 Simpan Setting</button>
-        {saved && <div className="self-center text-sm text-success">✓ Tersimpan</div>}
-      </div>
-    </>
-  );
-}
 
 /* ─────────────────────────────────────────────────────── DMCA ─── */
 function DmcaTab() {
