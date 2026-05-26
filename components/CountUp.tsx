@@ -80,7 +80,7 @@ export function CountUp({ to, duration = 1200, delay = 0, decimals = 0, format, 
   const safeVal = Math.max(0, Math.min(safeTo, val));
 
   const display = format
-    ? format(safeVal)
+    ? format(decimals > 0 ? safeVal : Math.round(safeVal))
     : decimals > 0
       ? safeVal.toFixed(decimals)
       : Math.round(safeVal).toLocaleString('id-ID');
