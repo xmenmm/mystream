@@ -72,44 +72,45 @@ export default function SettingsPage() {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between flex-wrap gap-2">
-        <h1 className="text-3xl font-bold">⚙ {t('settings.title')}</h1>
-        <div className="text-xs text-muted">@{me.username} · {me.email}</div>
+        <div>
+          <h1 className="text-3xl font-bold">⚙ {t('settings.title')}</h1>
+          <div className="text-xs text-muted">@{me.username} · {me.email}</div>
+        </div>
+        <button onClick={() => logout()} className="btn-ghost text-xs text-danger">
+          ⎋ Logout dari device ini
+        </button>
       </header>
 
-      <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
-        {/* Tabs nav */}
-        <aside className="card p-2">
-          <nav className="space-y-1">
-            {TABS.map((x) => (
-              <button
-                key={x.id}
-                type="button"
-                onClick={() => selectTab(x.id)}
-                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition ${
-                  tab === x.id ? 'bg-accent/15 text-accent font-bold' : 'hover:bg-bg-elev'
-                }`}
-              >
-                <span className="text-base">{x.icon}</span>
-                <span>{x.label}</span>
-              </button>
-            ))}
-          </nav>
-          <div className="mt-3 border-t border-border pt-3">
-            <button onClick={() => logout()} className="btn-ghost w-full text-xs text-danger">
-              ⎋ Logout dari device ini
-            </button>
-          </div>
-        </aside>
+      {/* Horizontal tabs nav (sticky on scroll) */}
+      <nav className="sticky top-0 z-10 -mx-1 flex gap-1 overflow-x-auto border-b border-border bg-bg/95 px-1 pb-px backdrop-blur scrollbar-thin">
+        {TABS.map((x) => (
+          <button
+            key={x.id}
+            type="button"
+            onClick={() => selectTab(x.id)}
+            className={`relative flex shrink-0 items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm font-medium transition ${
+              tab === x.id
+                ? 'text-accent'
+                : 'text-muted hover:text-text'
+            }`}
+          >
+            <span className="text-base">{x.icon}</span>
+            <span>{x.label}</span>
+            {tab === x.id && (
+              <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-accent" />
+            )}
+          </button>
+        ))}
+      </nav>
 
-        {/* Active tab content */}
-        <section className="space-y-4">
-          {tab === 'account' && <AccountTab me={me} refresh={refresh} />}
-          {tab === 'security' && <SecurityTab me={me} refresh={refresh} />}
-          {tab === 'plan' && <PlanTab quota={quota} me={me} />}
-          {tab === 'notifications' && <NotificationsTab />}
-          {tab === 'dmca' && <DmcaTab />}
-        </section>
-      </div>
+      {/* Active tab content (full-width) */}
+      <section className="space-y-4">
+        {tab === 'account' && <AccountTab me={me} refresh={refresh} />}
+        {tab === 'security' && <SecurityTab me={me} refresh={refresh} />}
+        {tab === 'plan' && <PlanTab quota={quota} me={me} />}
+        {tab === 'notifications' && <NotificationsTab />}
+        {tab === 'dmca' && <DmcaTab />}
+      </section>
     </div>
   );
 }
