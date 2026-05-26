@@ -33,7 +33,20 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
   const [allowComments, setAllowComments] = useState(true);
   const [allowDownload, setAllowDownload] = useState(false);
   const [scheduledAt, setScheduledAt] = useState('');
+  const [folder, setFolder] = useState('');
+  const [folderSuggestions, setFolderSuggestions] = useState<string[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/videos?user=me')
+      .then((r) => r.json())
+      .then((d) => {
+        const set = new Set<string>();
+        (d.videos || []).forEach((v: any) => v.folder && set.add(v.folder));
+        setFolderSuggestions(Array.from(set).sort());
+      })
+      .catch(() => {});
+  }, []);
 
   function addTag(raw: string) {
     const t = raw.trim().replace(/^#/, '').slice(0, 30);
@@ -155,6 +168,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
           allowComments,
           allowDownload,
           scheduledAt: scheduledAt || null,
+          folder: folder.trim(),
         },
       });
       videoId = video.id;
@@ -475,6 +489,25 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Folder */}
+            <div>
+              <label className="label">📁 Folder <span className="text-[10px] text-muted">(opsional)</span></label>
+              <input
+                className="input"
+                value={folder}
+                onChange={(e) => setFolder(e.target.value)}
+                placeholder="Contoh: Tutorial, Vlog, Klien-A"
+                maxLength={80}
+                list="folder-suggestions"
+              />
+              <datalist id="folder-suggestions">
+                {folderSuggestions.map((f) => <option key={f} value={f} />)}
+              </datalist>
+              <p className="mt-1 text-[10px] text-muted">
+                Kelompokkan video dalam folder. Bisa pakai folder yang sudah ada atau bikin baru. Kosong = "Tanpa Folder".
+              </p>
             </div>
 
             {/* Engagement toggles */}

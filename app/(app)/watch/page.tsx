@@ -15,6 +15,10 @@ type V = {
   type: string; mimeType: string; filename: string; hasThumb: boolean;
   duration: number; size: number; views: number; likes: number; uploadedAt: string;
   playerLayers?: Layer[];
+  allowDownload?: boolean;
+  allowComments?: boolean;
+  visibility?: string;
+  folder?: string;
 };
 type GlobalRT = { enabled: boolean; text: string; position: 'above' | 'below'; bgColor1: string; bgColor2: string; textColor: string; speed: number };
 
@@ -336,9 +340,36 @@ export default function WatchPage() {
     setV((vv) => vv ? { ...vv, likes: r.likes } : vv);
     setLiked(r.liked);
   }
+  const [copyToast, setCopyToast] = useState<string>('');
+  function flashToast(msg: string) {
+    setCopyToast(msg);
+    setTimeout(() => setCopyToast(''), 1800);
+  }
+  // Short URL: /v/<8 char> — strip `v_` prefix dari ID
+  function shortIdOf(rawId: string): string {
+    return rawId.replace(/^v_/, '').replace(/_/g, '-');
+  }
+  function directLink(): string {
+    return location.origin + '/v/' + shortIdOf(id || '');
+  }
+  function embedUrl(): string {
+    return location.origin + '/embed/' + shortIdOf(id || '');
+  }
+  function embedCode(): string {
+    return `<iframe src="${embedUrl()}" width="640" height="360" frameborder="0" allowfullscreen allow="autoplay; fullscreen; picture-in-picture"></iframe>`;
+  }
+  function copyDirectLink() {
+    navigator.clipboard.writeText(directLink()).then(() => flashToast('✓ Link tersalin'));
+  }
+  function copyEmbed() {
+    navigator.clipboard.writeText(embedCode()).then(() => flashToast('✓ Embed code tersalin'));
+  }
   function shareLink() {
-    const url = location.origin + '/view?id=' + encodeURIComponent(id || '');
-    navigator.clipboard.writeText(url).then(() => alert('✓ Link nonton tersalin: ' + url));
+    if (navigator.share) {
+      navigator.share({ title: v?.title || 'Video', url: directLink() }).catch(() => copyDirectLink());
+    } else {
+      copyDirectLink();
+    }
   }
   async function downloadVideo() {
     if (!id || !v) return;
@@ -695,11 +726,45 @@ export default function WatchPage() {
           <button onClick={toggleLike} className={liked ? 'btn-primary' : 'btn-ghost'} disabled={!me}>
             👍 {fmtNum(v.likes)}
           </button>
-          <button onClick={shareLink} className="btn-ghost">{t('watch.share')}</button>
-          <button onClick={downloadVideo} className="btn-ghost" disabled={downloadProg !== null}>
-            {downloadProg === null ? t('watch.download') : `⏬ ${Math.round(downloadProg * 100)}%`}
+          <button onClick={copyDirectLink} className="btn-ghost" title={directLink()}>
+            🔗 Copy Link
           </button>
+          <button onClick={copyEmbed} className="btn-ghost" title="Embed code">
+            📋 Copy Embed
+          </button>
+          <button onClick={shareLink} className="btn-ghost">
+            ↗ Share
+          </button>
+          {(v.allowDownload === undefined || v.allowDownload === true || me?.username === v.username) && (
+            <button onClick={downloadVideo} className="btn-ghost" disabled={downloadProg !== null}>
+              {downloadProg === null ? '⬇️ Download' : `⏬ ${Math.round(downloadProg * 100)}%`}
+            </button>
+          )}
         </div>
+
+        {/* Direct Link + Embed code preview (collapsible) */}
+        <details className="card bg-bg-elev/50 text-xs">
+          <summary className="cursor-pointer font-bold">📡 Share & Embed (klik untuk lihat detail)</summary>
+          <div className="mt-3 space-y-3">
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="font-semibold text-muted">🔗 Direct Link</span>
+                <button onClick={copyDirectLink} className="text-accent hover:underline">Copy</button>
+              </div>
+              <input className="input font-mono text-xs" readOnly value={directLink()} onClick={(e) => (e.target as HTMLInputElement).select()} />
+            </div>
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="font-semibold text-muted">📋 Embed Code (HTML iframe)</span>
+                <button onClick={copyEmbed} className="text-accent hover:underline">Copy</button>
+              </div>
+              <textarea className="input font-mono text-[10px] min-h-[60px]" readOnly value={embedCode()} onClick={(e) => (e.target as HTMLTextAreaElement).select()} />
+            </div>
+            <p className="text-[10px] text-muted">
+              Direct link untuk share ke sosmed. Embed code untuk pasang video di blog/website lain.
+            </p>
+          </div>
+        </details>
         {v.description && <p className="card whitespace-pre-wrap text-sm">{v.description}</p>}
       </div>
       <aside className="space-y-3">
@@ -718,6 +783,13 @@ export default function WatchPage() {
         <SideBannerCard />
       </aside>
       </div>
+
+      {/* Copy toast */}
+      {copyToast && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-accent bg-bg-card px-5 py-2.5 text-sm font-bold text-accent shadow-2xl">
+          {copyToast}
+        </div>
+      )}
     </div>
   );
 }

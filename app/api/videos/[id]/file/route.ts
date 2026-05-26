@@ -12,11 +12,35 @@ function fmtSize(b: number) {
   return `${(b / 1024 / 1024).toFixed(0)} MB`;
 }
 
-/** Redirect ke video di Supabase Storage — Supabase handle HTTP Range/seek. */
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+/** Redirect ke video di Supabase Storage — Supabase handle HTTP Range/seek.
+ *  Anti-leech: kalau video punya `allowedDomains`, cek Referer.
+ */
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const db = await loadDB();
   const v = db.videos.find((x) => x.id === params.id);
   if (!v) return new NextResponse(null, { status: 404 });
+
+  // Anti-leech (hotlink protection) — kalau creator set allowedDomains, validate.
+  const allowed: string[] = Array.isArray((v as any).allowedDomains) ? (v as any).allowedDomains : [];
+  if (allowed.length > 0) {
+    const ref = req.headers.get('referer') || '';
+    let refHost = '';
+    try {
+      refHost = ref ? new URL(ref).hostname.toLowerCase() : '';
+    } catch {}
+    const selfHost = new URL(req.url).hostname.toLowerCase();
+    // Selalu allow domain MyStream sendiri + jika tidak ada Referer (direct nav)
+    const isSelf = refHost === selfHost || refHost.endsWith('.' + selfHost) || refHost === '';
+    const inAllowlist = allowed.some((d) => {
+      const dom = d.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+      if (!dom) return false;
+      return refHost === dom || refHost.endsWith('.' + dom);
+    });
+    if (!isSelf && !inAllowlist) {
+      return new NextResponse('Embed not allowed dari domain ini', { status: 403 });
+    }
+  }
+
   return storageRedirect(FILES_DIR, params.id);
 }
 

@@ -34,6 +34,8 @@ export async function POST(req: NextRequest) {
     allowComments = true,
     allowDownload = false,
     scheduledAt = null,
+    folder = '',
+    allowedDomains = [],
   } = body;
   if (!title || !filename || !type)
     return NextResponse.json({ error: 'metadata kurang' }, { status: 400 });
@@ -48,6 +50,10 @@ export async function POST(req: NextRequest) {
     ? tags.filter((t: any) => typeof t === 'string').map((t: string) => t.trim().slice(0, 30)).filter(Boolean).slice(0, 10)
     : [];
   const safeScheduledAt = scheduledAt && !isNaN(Date.parse(scheduledAt)) ? new Date(scheduledAt).toISOString() : null;
+  const safeFolder = String(folder || '').trim().slice(0, 80).replace(/[\\/:*?"<>|]/g, '');
+  const safeAllowedDomains = Array.isArray(allowedDomains)
+    ? allowedDomains.filter((d: any) => typeof d === 'string').map((d: string) => d.trim().slice(0, 80)).filter(Boolean).slice(0, 20)
+    : [];
 
   // Plan-based validation
   const plan = getUserPlan(a.user);
@@ -123,6 +129,8 @@ export async function POST(req: NextRequest) {
     allowComments: !!allowComments,
     allowDownload: !!allowDownload,
     scheduledAt: safeScheduledAt,
+    folder: safeFolder,
+    allowedDomains: safeAllowedDomains,
   };
   const db = await loadDB();
   db.videos.push(video);

@@ -1,0 +1,40 @@
+{
+  "name": "MyStream — Platform Video",
+  "short_name": "MyStream",
+  "description": "Upload, host & share video kreasi kamu. Embed-friendly, multi-bahasa, secure.",
+  "id": "/",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0a14",
+  "theme_color": "#8b5cf6",
+  "lang": "id-ID",
+  "categories": ["video", "social", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Upload Video",
+      "url": "/dashboard?action=upload",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Videos",
+      "url": "/history",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

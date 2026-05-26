@@ -1,9 +1,22 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { PWARegister } from '@/components/PWARegister';
 
 export const metadata: Metadata = {
   title: 'MyStream — Dashboard',
-  description: 'MyStream — share your moments, watch creators, follow friends.',
+  description: 'MyStream — host, share & embed video kamu. Multi-bahasa, secure, embed-friendly.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    title: 'MyStream',
+    statusBarStyle: 'black-translucent',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#8b5cf6',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 // Inline script: apply theme class BEFORE React hydrates, so no flash of wrong theme.
@@ -13,7 +26,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="id" className="dark">
       <head><script dangerouslySetInnerHTML={{ __html: themeBootstrap }} /></head>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen">
+        {children}
+        <PWARegister />
+      </body>
     </html>
   );
 }

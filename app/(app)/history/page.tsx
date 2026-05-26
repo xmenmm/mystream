@@ -24,9 +24,29 @@ export default function HistoryPage() {
     );
   useEffect(() => { if (me) refresh(); }, [me]);
 
+  const [selectedFolder, setSelectedFolder] = useState<string>('all');
+
+  const folders = useMemo(() => {
+    const counts = new Map<string, number>();
+    videos.forEach((v) => {
+      const f = (v as any).folder || '';
+      counts.set(f, (counts.get(f) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([name, count]) => ({ name, count }));
+  }, [videos]);
+
   const filtered = useMemo(
-    () => videos.filter((v) => filter === 'all' || v.type === filter),
-    [videos, filter],
+    () => videos.filter((v) => {
+      if (filter !== 'all' && v.type !== filter) return false;
+      if (selectedFolder !== 'all') {
+        const vf = ((v as any).folder || '') as string;
+        if (selectedFolder === '_none' ? vf !== '' : vf !== selectedFolder) return false;
+      }
+      return true;
+    }),
+    [videos, filter, selectedFolder],
   );
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -70,6 +90,32 @@ export default function HistoryPage() {
           ))}
         </div>
       </header>
+      {/* FOLDER GRID — DoodStream-style file manager */}
+      {folders.length > 0 && (
+        <section className="card">
+          <h3 className="mb-3 text-sm font-bold text-muted">📁 Folder</h3>
+          <div className="grid gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            <FolderChip
+              icon="📚"
+              label="Semua"
+              count={videos.length}
+              active={selectedFolder === 'all'}
+              onClick={() => { setSelectedFolder('all'); setPage(1); }}
+            />
+            {folders.map((f) => (
+              <FolderChip
+                key={f.name || '_none'}
+                icon={f.name ? '📁' : '📭'}
+                label={f.name || 'Tanpa Folder'}
+                count={f.count}
+                active={selectedFolder === (f.name || '_none')}
+                onClick={() => { setSelectedFolder(f.name || '_none'); setPage(1); }}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {items.length === 0 ? (
         <div className="card text-center text-muted">{t('history.empty')}</div>
       ) : (
@@ -109,5 +155,23 @@ export default function HistoryPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function FolderChip({ icon, label, count, active, onClick }: { icon: string; label: string; count: number; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center gap-2 rounded-xl border p-3 text-left text-xs transition ${
+        active ? 'border-accent bg-accent/15 font-bold' : 'border-border bg-bg hover:border-accent/50'
+      }`}
+    >
+      <span className="text-xl">{icon}</span>
+      <div className="min-w-0 flex-1">
+        <div className="truncate font-semibold">{label}</div>
+        <div className="text-[10px] text-muted">{count} {count === 1 ? 'item' : 'item'}</div>
+      </div>
+    </button>
   );
 }
