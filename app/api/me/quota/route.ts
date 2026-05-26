@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest, getUserPlan, getDailyVideoCount, getUserStorageBytes, getPremiumDaysRemaining } from '@/lib/auth';
 import { loadDB } from '@/lib/db';
+import { fmtBytes } from '@/lib/utils';
 
 export const runtime = 'nodejs';
 
+// Pakai fmtBytes dari utils.ts supaya KONSISTEN dengan Dashboard/Profile.
+// Sebelumnya: quota pakai toFixed(0) → "6 MB", Dashboard/Profile pakai toFixed(1) → "5.7 MB". Bug.
 function fmtSize(b: number) {
   if (!isFinite(b)) return 'unlimited';
-  if (b >= 1024 ** 3) return `${(b / 1024 ** 3).toFixed(b >= 10 * 1024 ** 3 ? 0 : 1)} GB`;
-  return `${(b / 1024 / 1024).toFixed(0)} MB`;
+  return fmtBytes(b);
 }
 function fmtDur(s: number) {
   if (!isFinite(s)) return 'unlimited';

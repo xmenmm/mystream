@@ -9,7 +9,7 @@ type NavItem = { href: string; icon: string; tKey: string; fallback: string };
 const userItems: NavItem[] = [
   { href: '/dashboard', icon: '⊞', tKey: 'nav.dashboard',     fallback: 'Dashboard' },
   { href: '/history',   icon: '🖼', tKey: 'nav.history',       fallback: 'History' },
-  { href: '/friends',   icon: '👥', tKey: 'common.followers',  fallback: 'Friends' },
+  { href: '/friends',   icon: '👥', tKey: 'nav.friends',       fallback: 'Pengikut' },
   { href: '/messages',  icon: '💬', tKey: 'nav.messages',      fallback: 'Messages' },
   { href: '/profile',   icon: '👤', tKey: 'nav.profile',       fallback: 'Profile' },
   { href: '/settings',  icon: '⚙', tKey: 'nav.settings',      fallback: 'Settings' },

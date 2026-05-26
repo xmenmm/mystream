@@ -2,9 +2,19 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiGetBanner } from '@/lib/api-client';
+import { useMe } from '@/components/UserContext';
+
+// Heuristik: kalau banner CTA arahkan ke /signup atau /login → target guest only.
+// Jangan tampilkan ke user yang sudah login (CTA salah audience).
+function isGuestCta(b: any): boolean {
+  const url = String(b?.ctaUrl || '').toLowerCase();
+  const label = String(b?.ctaLabel || b?.title || '').toLowerCase();
+  return /\/(signup|register|login|daftar)/.test(url) || /daftar\s+gratis|sign up|register/.test(label);
+}
 
 export function BannerStrip() {
   const [b, setB] = useState<any>(null);
+  const { me } = useMe();
 
   useEffect(() => {
     let cancel = false;
@@ -15,6 +25,8 @@ export function BannerStrip() {
   }, []);
 
   if (!b || !b.enabled) return null;
+  // Sembunyikan banner CTA "Daftar Gratis" untuk user yang sudah login
+  if (me && isGuestCta(b)) return null;
 
   const bgStyle = {
     background: `linear-gradient(135deg, ${b.bgColor1}, ${b.bgColor2})`,
