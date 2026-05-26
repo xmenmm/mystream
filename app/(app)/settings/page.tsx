@@ -11,14 +11,13 @@ const THEME_KEY = 'mystream_theme';
 const PANDUAN_KEY = 'mystream_panduan_dismissed';
 const PREF_PREFIX = 'mystream_pref_';
 
-type TabId = 'account' | 'security' | 'plan' | 'notifications' | 'api' | 'dmca';
+type TabId = 'account' | 'security' | 'plan' | 'notifications' | 'dmca';
 
 const TABS: { id: TabId; icon: string; label: string }[] = [
   { id: 'account', icon: '👤', label: 'Account' },
   { id: 'security', icon: '🛡', label: 'Security' },
   { id: 'plan', icon: '⭐', label: 'Plan & Storage' },
   { id: 'notifications', icon: '🔔', label: 'Notifications' },
-  { id: 'api', icon: '🔑', label: 'API Keys' },
   { id: 'dmca', icon: '📋', label: 'DMCA' },
 ];
 
@@ -108,7 +107,6 @@ export default function SettingsPage() {
           {tab === 'security' && <SecurityTab me={me} refresh={refresh} />}
           {tab === 'plan' && <PlanTab quota={quota} me={me} />}
           {tab === 'notifications' && <NotificationsTab />}
-          {tab === 'api' && <ApiTab />}
           {tab === 'dmca' && <DmcaTab />}
         </section>
       </div>
@@ -593,97 +591,6 @@ function NotificationsTab() {
   );
 }
 
-
-/* ─────────────────────────────────────────────────────── API ─── */
-function ApiTab() {
-  const [apiKey, setApiKey] = useState<string | null>(pref('api_key', null));
-  const [showKey, setShowKey] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  function generateKey() {
-    const k = 'ms_' + Array.from(crypto.getRandomValues(new Uint8Array(24)))
-      .map((b) => b.toString(16).padStart(2, '0')).join('');
-    setApiKey(k);
-    setPref('api_key', k);
-    setShowKey(true);
-  }
-  function regenerate() {
-    if (!confirm('Regenerate API key? Key lama akan langsung tidak valid.')) return;
-    generateKey();
-  }
-  function revoke() {
-    if (!confirm('Revoke API key? Aplikasi yang pakai key ini akan berhenti jalan.')) return;
-    setApiKey(null);
-    setPref('api_key', null);
-  }
-  async function copy() {
-    if (!apiKey) return;
-    await navigator.clipboard.writeText(apiKey);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }
-
-  return (
-    <>
-      <section className="card">
-        <h2 className="mb-3 text-lg font-bold">🔑 API Key</h2>
-        <p className="mb-3 text-xs text-muted">
-          API key untuk upload via REST API (programmatic). Sertakan di header <code>Authorization: Bearer &lt;key&gt;</code>.
-        </p>
-        {!apiKey ? (
-          <button className="btn-primary" onClick={generateKey}>🔐 Generate API Key</button>
-        ) : (
-          <div className="space-y-3 max-w-xl">
-            <div className="flex items-center gap-2">
-              <input
-                className="input font-mono text-xs"
-                readOnly
-                type={showKey ? 'text' : 'password'}
-                value={apiKey}
-              />
-              <button className="btn-ghost shrink-0" onClick={() => setShowKey((s) => !s)}>
-                {showKey ? '🙈' : '👁'}
-              </button>
-              <button className="btn-ghost shrink-0" onClick={copy}>
-                {copied ? '✓' : '📋'}
-              </button>
-            </div>
-            <div className="flex gap-2">
-              <button className="btn-ghost text-xs" onClick={regenerate}>🔄 Regenerate</button>
-              <button className="btn-danger text-xs" onClick={revoke}>🗑 Revoke</button>
-            </div>
-            <div className="rounded-lg border border-warn/30 bg-warn/5 p-3 text-xs text-warn">
-              ⚠ Simpan key di tempat aman. Anggap key seperti password — jangan share publik atau commit ke Git.
-            </div>
-          </div>
-        )}
-      </section>
-
-      <section className="card">
-        <h2 className="mb-3 text-lg font-bold">📊 Rate Limit</h2>
-        <dl className="grid gap-2 text-sm sm:grid-cols-2 max-w-xl">
-          <Info label="Upload per jam" value="100 request" />
-          <Info label="Read per jam" value="1.000 request" />
-          <Info label="Burst limit" value="20 / detik" />
-          <Info label="Concurrent upload" value="3 file" />
-        </dl>
-      </section>
-
-      <section className="card">
-        <h2 className="mb-3 text-lg font-bold">📖 Dokumentasi API</h2>
-        <ul className="space-y-2 text-sm">
-          <li><b>POST</b> <code>/api/v1/upload</code> — Upload video file</li>
-          <li><b>GET</b> <code>/api/v1/videos</code> — List videos kamu</li>
-          <li><b>GET</b> <code>/api/v1/videos/:id</code> — Detail video</li>
-          <li><b>PATCH</b> <code>/api/v1/videos/:id</code> — Update metadata</li>
-          <li><b>DELETE</b> <code>/api/v1/videos/:id</code> — Hapus video</li>
-          <li><b>GET</b> <code>/api/v1/stats</code> — Statistik akun</li>
-        </ul>
-        <p className="mt-3 text-xs text-muted">📌 Dokumentasi lengkap akan tersedia di /docs/api (Phase 2).</p>
-      </section>
-    </>
-  );
-}
 
 /* ─────────────────────────────────────────────────────── DMCA ─── */
 function DmcaTab() {
