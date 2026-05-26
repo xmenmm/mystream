@@ -5,22 +5,279 @@ import { useRouter } from 'next/navigation';
 import { api, api2faSetup, api2faEnable, api2faDisable, apiGetMyQuota } from '@/lib/api-client';
 import { useMe } from '@/components/UserContext';
 import { CountUp } from '@/components/CountUp';
-import { fmtBytes } from '@/lib/utils';
 import { useT } from '@/lib/i18n';
 
 const THEME_KEY = 'mystream_theme';
 const PANDUAN_KEY = 'mystream_panduan_dismissed';
+const PREF_PREFIX = 'mystream_pref_';
+
+type TabId = 'account' | 'security' | 'plan' | 'notifications' | 'payout' | 'api' | 'embed' | 'dmca';
+
+const TABS: { id: TabId; icon: string; label: string }[] = [
+  { id: 'account', icon: '👤', label: 'Account' },
+  { id: 'security', icon: '🛡', label: 'Security' },
+  { id: 'plan', icon: '⭐', label: 'Plan & Storage' },
+  { id: 'notifications', icon: '🔔', label: 'Notifications' },
+  { id: 'payout', icon: '💰', label: 'Payout' },
+  { id: 'api', icon: '🔑', label: 'API Keys' },
+  { id: 'embed', icon: '📡', label: 'Embed Defaults' },
+  { id: 'dmca', icon: '📋', label: 'DMCA' },
+];
+
+function pref<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const v = localStorage.getItem(PREF_PREFIX + key);
+    if (v === null) return fallback;
+    return JSON.parse(v) as T;
+  } catch {
+    return fallback;
+  }
+}
+function setPref<T>(key: string, val: T) {
+  try {
+    localStorage.setItem(PREF_PREFIX + key, JSON.stringify(val));
+  } catch {}
+}
 
 export default function SettingsPage() {
   const router = useRouter();
   const { me, refresh, logout } = useMe();
   const t = useT();
+  const [tab, setTab] = useState<TabId>('account');
+  const [quota, setQuota] = useState<any>(null);
+
+  useEffect(() => {
+    if (me) apiGetMyQuota().then(setQuota).catch(() => {});
+  }, [me]);
+
+  // Hash routing — supaya bisa share link /settings#security
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onHash = () => {
+      const h = window.location.hash.replace('#', '') as TabId;
+      if (TABS.some((x) => x.id === h)) setTab(h);
+    };
+    onHash();
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  function selectTab(id: TabId) {
+    setTab(id);
+    if (typeof window !== 'undefined') {
+      history.replaceState(null, '', '#' + id);
+    }
+  }
+
+  if (!me) return null;
+
+  return (
+    <div className="space-y-4">
+      <header className="flex items-center justify-between flex-wrap gap-2">
+        <h1 className="text-3xl font-bold">⚙ {t('settings.title')}</h1>
+        <div className="text-xs text-muted">@{me.username} · {me.email}</div>
+      </header>
+
+      <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
+        {/* Tabs nav */}
+        <aside className="card p-2">
+          <nav className="space-y-1">
+            {TABS.map((x) => (
+              <button
+                key={x.id}
+                type="button"
+                onClick={() => selectTab(x.id)}
+                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition ${
+                  tab === x.id ? 'bg-accent/15 text-accent font-bold' : 'hover:bg-bg-elev'
+                }`}
+              >
+                <span className="text-base">{x.icon}</span>
+                <span>{x.label}</span>
+              </button>
+            ))}
+          </nav>
+          <div className="mt-3 border-t border-border pt-3">
+            <button onClick={() => logout()} className="btn-ghost w-full text-xs text-danger">
+              ⎋ Logout dari device ini
+            </button>
+          </div>
+        </aside>
+
+        {/* Active tab content */}
+        <section className="space-y-4">
+          {tab === 'account' && <AccountTab me={me} refresh={refresh} />}
+          {tab === 'security' && <SecurityTab me={me} refresh={refresh} />}
+          {tab === 'plan' && <PlanTab quota={quota} me={me} />}
+          {tab === 'notifications' && <NotificationsTab />}
+          {tab === 'payout' && <PayoutTab quota={quota} />}
+          {tab === 'api' && <ApiTab />}
+          {tab === 'embed' && <EmbedTab />}
+          {tab === 'dmca' && <DmcaTab />}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────── ACCOUNT ─── */
+function AccountTab({ me, refresh }: { me: any; refresh: () => Promise<void> }) {
+  const router = useRouter();
+  const { logout } = useMe();
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [tz, setTz] = useState<string>('Asia/Jakarta');
+  const [lang, setLang] = useState<string>('id');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setTheme((localStorage.getItem(THEME_KEY) as any) || 'dark');
+      setTz(pref('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Jakarta'));
+      setLang(pref('lang', (document.documentElement.lang as string) || 'id'));
+    }
+  }, []);
+
+  function setThemeMode(t: 'dark' | 'light') {
+    setTheme(t);
+    localStorage.setItem(THEME_KEY, t);
+    document.documentElement.classList.toggle('dark', t === 'dark');
+    document.documentElement.classList.toggle('light', t === 'light');
+    document.documentElement.style.colorScheme = t;
+  }
+  function showPanduanAgain() {
+    localStorage.removeItem(PANDUAN_KEY);
+    window.dispatchEvent(new Event('mystream:show-panduan'));
+  }
+  async function clearVideos() {
+    if (!confirm('Hapus semua video kamu?')) return;
+    await api('/api/me/videos', { method: 'DELETE' });
+    router.refresh();
+  }
+  async function deleteAccount() {
+    if (!confirm('Hapus akun permanen?') || !confirm('Yakin? Semua data hilang permanen!')) return;
+    await api('/api/me', { method: 'DELETE' });
+    logout();
+  }
+
+  return (
+    <>
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">👤 Account Info</h2>
+        <dl className="grid gap-2 text-sm sm:grid-cols-2">
+          <Info label="Username" value={'@' + me.username} />
+          <Info label="Email" value={me.email || '—'} />
+          <Info
+            label="Member sejak"
+            value={me.createdAt ? new Date(me.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}
+          />
+          <Info label="Status" value={me.banned ? '🚫 Banned' : '● Active'} />
+        </dl>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">🎨 Tampilan</h2>
+        <div className="grid grid-cols-2 gap-2 max-w-xs">
+          <button
+            onClick={() => setThemeMode('dark')}
+            className={`rounded-xl border p-3 text-center text-xs transition ${
+              theme === 'dark' ? 'border-accent bg-accent/10' : 'border-border bg-bg hover:border-accent'
+            }`}
+          >
+            <div className="text-2xl">🌙</div>
+            <div className="mt-1 font-bold">Dark</div>
+          </button>
+          <button
+            onClick={() => setThemeMode('light')}
+            className={`rounded-xl border p-3 text-center text-xs transition ${
+              theme === 'light' ? 'border-accent bg-accent/10' : 'border-border bg-bg hover:border-accent'
+            }`}
+          >
+            <div className="text-2xl">☀️</div>
+            <div className="mt-1 font-bold">Light</div>
+          </button>
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">🌍 Bahasa & Zona Waktu</h2>
+        <div className="grid gap-3 sm:grid-cols-2 max-w-2xl">
+          <div>
+            <label className="label">Bahasa</label>
+            <select
+              className="input"
+              value={lang}
+              onChange={(e) => {
+                setLang(e.target.value);
+                setPref('lang', e.target.value);
+                document.cookie = `lang=${e.target.value}; path=/; max-age=31536000`;
+                location.reload();
+              }}
+            >
+              <option value="id">🇮🇩 Bahasa Indonesia</option>
+              <option value="en">🇺🇸 English</option>
+              <option value="jp">🇯🇵 日本語</option>
+              <option value="ar">🇸🇦 العربية</option>
+            </select>
+          </div>
+          <div>
+            <label className="label">Zona Waktu</label>
+            <select
+              className="input"
+              value={tz}
+              onChange={(e) => {
+                setTz(e.target.value);
+                setPref('timezone', e.target.value);
+              }}
+            >
+              <option value="Asia/Jakarta">WIB · Jakarta (UTC+7)</option>
+              <option value="Asia/Makassar">WITA · Makassar (UTC+8)</option>
+              <option value="Asia/Jayapura">WIT · Jayapura (UTC+9)</option>
+              <option value="Asia/Singapore">Singapore (UTC+8)</option>
+              <option value="Asia/Tokyo">Tokyo (UTC+9)</option>
+              <option value="Asia/Dubai">Dubai (UTC+4)</option>
+              <option value="UTC">UTC</option>
+              <option value="America/New_York">New York (UTC-5)</option>
+              <option value="Europe/London">London (UTC+0)</option>
+            </select>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-muted">Zona waktu dipakai untuk tampilan jam upload, statistik, dan jadwal publish.</p>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">📖 Bantuan</h2>
+        <button onClick={showPanduanAgain} className="btn-ghost">📖 Tampilkan Panduan Lagi</button>
+      </section>
+
+      <section className="card border-danger/30">
+        <h2 className="mb-3 text-lg font-bold text-danger">⚠ Zona Berbahaya</h2>
+        <div className="space-y-2">
+          <DangerRow
+            title="Hapus Semua Video"
+            desc="Hapus semua video & thumbnail yang kamu upload. Akun tetap aktif."
+            btnLabel="🗑 Hapus Video"
+            onClick={clearVideos}
+            variant="ghost"
+          />
+          <DangerRow
+            title="Hapus Akun"
+            desc="Hapus akun permanen. Username, email, semua video, follower & data hilang. Tidak bisa dibatalkan."
+            btnLabel="⚠ Hapus Akun"
+            onClick={deleteAccount}
+            variant="danger"
+          />
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────── SECURITY ─── */
+function SecurityTab({ me, refresh }: { me: any; refresh: () => Promise<void> }) {
   const [oldPw, setOldPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
   const [pwMsg, setPwMsg] = useState('');
 
-  // 2FA state
   const [tfaSecret, setTfaSecret] = useState('');
   const [tfaOtpauth, setTfaOtpauth] = useState('');
   const [tfaCode, setTfaCode] = useState('');
@@ -28,16 +285,6 @@ export default function SettingsPage() {
   const [tfaDisableOpen, setTfaDisableOpen] = useState(false);
   const [tfaPwInput, setTfaPwInput] = useState('');
   const [tfaMsg, setTfaMsg] = useState('');
-
-  const [quota, setQuota] = useState<any>(null);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-
-  useEffect(() => {
-    if (me) apiGetMyQuota().then(setQuota).catch(() => {});
-    if (typeof window !== 'undefined') {
-      setTheme((localStorage.getItem(THEME_KEY) as any) || 'dark');
-    }
-  }, [me]);
 
   async function changePw() {
     setPwMsg('');
@@ -50,7 +297,6 @@ export default function SettingsPage() {
       setTimeout(() => setPwMsg(''), 3000);
     } catch (e: any) { setPwMsg(e.message); }
   }
-
   async function startTfa() {
     try {
       const r = await api2faSetup() as any;
@@ -79,32 +325,6 @@ export default function SettingsPage() {
     } catch (e: any) { setTfaMsg(e.message); }
   }
 
-  async function clearVideos() {
-    if (!confirm('Hapus semua video kamu?')) return;
-    await api('/api/me/videos', { method: 'DELETE' });
-    router.refresh();
-  }
-  async function deleteAccount() {
-    if (!confirm('Hapus akun permanen?') || !confirm('Yakin? Semua data hilang permanen!')) return;
-    await api('/api/me', { method: 'DELETE' });
-    logout();
-  }
-
-  function setThemeMode(t: 'dark' | 'light') {
-    setTheme(t);
-    localStorage.setItem(THEME_KEY, t);
-    document.documentElement.classList.toggle('dark', t === 'dark');
-    document.documentElement.classList.toggle('light', t === 'light');
-    document.documentElement.style.colorScheme = t;
-  }
-  function showPanduanAgain() {
-    localStorage.removeItem(PANDUAN_KEY);
-    window.dispatchEvent(new Event('mystream:show-panduan'));
-  }
-
-  if (!me) return null;
-
-  // Password strength estimator
   const pwStrength = (() => {
     if (!newPw) return { score: 0, label: '', color: 'text-muted' };
     let s = 0;
@@ -118,9 +338,8 @@ export default function SettingsPage() {
     return { score: s, label: labels[s], color: colors[s] };
   })();
 
-  // Security score (rough)
   const security = {
-    pw: !!me.email, // assume password set since logged in
+    pw: !!me.email,
     twofa: !!me.totpEnabled,
     email: !!me.email,
     avatar: !!me.hasAvatar,
@@ -132,271 +351,615 @@ export default function SettingsPage() {
   const secPct = Math.round((secScore / secMax) * 100);
 
   return (
-    <div className="space-y-4">
-      <header className="enter enter-1 flex items-center justify-between flex-wrap gap-2">
-        <h1 className="text-3xl font-bold">⚙ {t('settings.title')}</h1>
-        <div className="text-xs text-muted">@{me.username} · {me.email}</div>
-      </header>
+    <>
+      <section className="card">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-bold">🛡 Skor Keamanan</h2>
+          <span className={`rounded-full px-3 py-0.5 text-sm font-extrabold ${
+            secPct >= 80 ? 'bg-success/20 text-success' : secPct >= 50 ? 'bg-warn/20 text-warn' : 'bg-danger/20 text-danger'
+          }`}>
+            <CountUp to={secPct} delay={150} />%
+          </span>
+        </div>
+        <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-bg-elev">
+          <div
+            className="h-full rounded-full transition-all duration-700"
+            style={{
+              width: `${secPct}%`,
+              background: secPct >= 80 ? '#22c55e' : secPct >= 50 ? '#f59e0b' : '#ef4444',
+            }}
+          />
+        </div>
+        <ul className="grid gap-1.5 text-xs sm:grid-cols-2">
+          <SecRow ok={security.email} label="Email terdaftar" />
+          <SecRow ok={security.pw} label="Password ada" />
+          <SecRow ok={security.twofa} label="2FA aktif" warn="Aktifkan 2FA biar lebih aman!" />
+          <SecRow ok={security.avatar} label="Foto profile" warn="Upload foto biar profile lebih trust" />
+          <SecRow ok={security.bio} label="Bio diisi" warn="Bio bantu orang kenal kamu" />
+          <SecRow ok={security.country} label="Country diisi" />
+        </ul>
+      </section>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* LEFT: account + security */}
-        <div className="space-y-4 lg:col-span-2">
-
-          {/* SECURITY SCORE */}
-          <section className="card enter enter-2">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold">{t('settings.security_score')}</h2>
-              <span className={`rounded-full px-3 py-0.5 text-sm font-extrabold ${secPct >= 80 ? 'bg-success/20 text-success' : secPct >= 50 ? 'bg-warn/20 text-warn' : 'bg-danger/20 text-danger'}`}>
-                <CountUp to={secPct} delay={150} />%
-              </span>
-            </div>
-            <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-bg-elev">
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{
-                  width: `${secPct}%`,
-                  background: secPct >= 80 ? '#22c55e' : secPct >= 50 ? '#f59e0b' : '#ef4444',
-                }}
-              />
-            </div>
-            <ul className="grid gap-1.5 text-xs sm:grid-cols-2">
-              <SecRow ok={security.email}  label="Email terdaftar" />
-              <SecRow ok={security.pw}     label="Password ada" />
-              <SecRow ok={security.twofa}  label="2FA aktif" warn="Aktifkan 2FA biar lebih aman!" />
-              <SecRow ok={security.avatar} label="Foto profile" warn="Upload foto biar profile lebih trust" />
-              <SecRow ok={security.bio}    label="Bio diisi" warn="Bio bantu orang kenal kamu" />
-              <SecRow ok={security.country} label="Country diisi" />
-            </ul>
-          </section>
-
-          {/* PLAN INFO */}
-          {quota && (
-            <section className="card enter enter-3 relative overflow-hidden">
-              {quota.isPremium && <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-gradient-to-br from-warn/30 to-accent-2/30 blur-2xl" />}
-              <div className="relative">
-                <div className="mb-2 flex items-center justify-between">
-                  <h2 className="text-lg font-bold">{quota.isPremium ? '⭐ Premium Plan' : '✨ Free Plan'}</h2>
-                  {!quota.isPremium && (
-                    <Link href="/dashboard" className="rounded-lg bg-gradient-to-r from-warn to-accent-2 px-3 py-1 text-xs font-bold text-white">Upgrade</Link>
-                  )}
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">🔑 Ganti Password</h2>
+        <div className="space-y-3 max-w-md">
+          <div>
+            <label className="label">Password lama</label>
+            <input className="input" type="password" value={oldPw} onChange={(e) => setOldPw(e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Password baru <span className="text-[10px] text-muted">(min 6 karakter)</span></label>
+            <input className="input" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} />
+            {newPw && (
+              <div className="mt-1.5 flex items-center gap-2">
+                <div className="h-1 flex-1 overflow-hidden rounded-full bg-bg-elev">
+                  <div className="h-full rounded-full transition-all" style={{
+                    width: `${(pwStrength.score / 5) * 100}%`,
+                    background: pwStrength.score >= 4 ? '#22c55e' : pwStrength.score >= 3 ? '#f59e0b' : '#ef4444',
+                  }} />
                 </div>
-                {quota.isPremium && quota.expiresAt && (
-                  <p className="text-sm text-muted">
-                    Aktif sampai <b className="text-text">{new Date(quota.expiresAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</b>
-                    {quota.daysRemaining != null && <span> · <CountUp to={quota.daysRemaining} delay={200} /> hari lagi</span>}
-                  </p>
-                )}
-                {quota.lifetime && <p className="text-sm text-warn">⭐ Lifetime — tanpa expire</p>}
-
-                {/* QUOTA GRID */}
-                <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                  <PlanStat icon="📦" label="Upload (24 jam)"
-                    value={quota.daily?.unlimited ? 'unlimited' : `${quota.daily?.used ?? 0}/${quota.daily?.limit ?? '—'}`}
-                    bar={quota.daily && !quota.daily.unlimited ? Math.min(100, (quota.daily.used / quota.daily.limit) * 100) : null}
-                  />
-                  <PlanStat icon="💾" label="Storage"
-                    value={`${quota.storage?.usedLabel || '—'}${quota.storage && !quota.storage.unlimited ? ' / ' + quota.storage.limitLabel : ''}`}
-                    bar={quota.storage && !quota.storage.unlimited ? quota.storage.percent : null}
-                  />
-                  <PlanStat icon="🎬" label="Max durasi"
-                    value={quota.limits.maxDurationLabel}
-                    bar={null}
-                  />
-                </div>
-                <div className="mt-2 text-xs text-muted">
-                  Max file: <b className="text-text">{quota.limits.maxFileSizeLabel}</b>
-                  {quota.daily && !quota.daily.unlimited && <> · Reset 24 jam (rolling)</>}
-                </div>
+                <span className={`text-[10px] font-semibold ${pwStrength.color}`}>{pwStrength.label}</span>
               </div>
-            </section>
+            )}
+            <div className="mt-1 text-[10px] text-muted">Kuatkan dengan: huruf besar (A-Z), angka (0-9), simbol (!@#$).</div>
+          </div>
+          <div>
+            <label className="label">Konfirmasi password baru</label>
+            <input className="input" type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} />
+            {confirmPw && (
+              <div className={`mt-1 text-[10px] ${newPw === confirmPw ? 'text-success' : 'text-danger'}`}>
+                {newPw === confirmPw ? '✓ Cocok' : '✗ Tidak cocok'}
+              </div>
+            )}
+          </div>
+          {pwMsg && <div className={`text-sm ${pwMsg.startsWith('✓') ? 'text-success' : 'text-danger'}`}>{pwMsg}</div>}
+          <button className="btn-primary" onClick={changePw} disabled={!oldPw || newPw.length < 6 || newPw !== confirmPw}>
+            💾 Ubah Password
+          </button>
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">🔐 Autentikasi Dua Faktor (2FA)</h2>
+        {!tfaWizardOpen && !tfaDisableOpen && (me.totpEnabled
+          ? (
+            <>
+              <p className="rounded-lg bg-success/15 border border-success/30 p-3 text-sm text-success">
+                ✓ 2FA sedang aktif. Login berikutnya akan minta kode 6-digit.
+              </p>
+              <button className="btn-ghost mt-3" onClick={() => { setTfaDisableOpen(true); setTfaMsg(''); }}>
+                Matikan 2FA
+              </button>
+            </>
+          )
+          : (
+            <>
+              <p className="rounded-lg bg-warn/15 border border-warn/30 p-3 text-sm text-warn">
+                ⚠ 2FA belum aktif — proteksi password saja.
+              </p>
+              <ul className="mt-3 space-y-1 text-xs text-muted">
+                <li>✓ Lapisan kedua keamanan setelah password</li>
+                <li>✓ Pakai Google Authenticator / Authy / Microsoft Authenticator</li>
+                <li>✓ Kode berubah tiap 30 detik</li>
+                <li>✓ Setup sekali, aktif selamanya (sampai dimatikan)</li>
+              </ul>
+              <button className="btn-primary mt-3" onClick={startTfa}>🔐 Aktifkan 2FA</button>
+            </>
+          ))}
+
+        {tfaWizardOpen && (
+          <div className="space-y-3 rounded-xl border border-border bg-bg-elev p-4">
+            <p className="text-sm">Step 1: Buka authenticator app (Google Auth/Authy) → Add account → Manual entry → paste secret:</p>
+            <input className="input font-mono text-xs tracking-wider" readOnly value={tfaSecret.replace(/(.{4})/g, '$1 ').trim()} />
+            <a href={tfaOtpauth} className="text-xs text-accent">📱 Atau buka di authenticator app (HP yang sama)</a>
+            <p className="text-sm">Step 2: Masukkan kode 6-digit dari authenticator:</p>
+            <input
+              className="input text-center font-mono text-xl tracking-[8px]"
+              value={tfaCode}
+              onChange={(e) => setTfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000" maxLength={6} inputMode="numeric"
+            />
+            <div className="flex gap-2">
+              <button className="btn-ghost flex-1" onClick={() => setTfaWizardOpen(false)}>Batal</button>
+              <button className="btn-primary flex-1" onClick={confirmTfa}>✓ Konfirmasi</button>
+            </div>
+          </div>
+        )}
+
+        {tfaDisableOpen && (
+          <div className="space-y-3 rounded-xl border border-danger/30 bg-danger/5 p-4">
+            <p className="text-sm text-danger">⚠ Konfirmasi password untuk matikan 2FA</p>
+            <input className="input" type="password" placeholder="Password" value={tfaPwInput} onChange={(e) => setTfaPwInput(e.target.value)} />
+            <div className="flex gap-2">
+              <button className="btn-ghost flex-1" onClick={() => { setTfaDisableOpen(false); setTfaPwInput(''); }}>Batal</button>
+              <button className="btn-danger flex-1" onClick={disableTfa}>Matikan 2FA</button>
+            </div>
+          </div>
+        )}
+
+        {tfaMsg && <div className="mt-2 text-sm">{tfaMsg}</div>}
+      </section>
+
+      <section className="card bg-grad-card">
+        <h2 className="mb-3 font-bold">💡 Tips Keamanan</h2>
+        <ul className="space-y-2 text-xs">
+          <li className="flex gap-2"><span>🔐</span><span>Aktifkan <b>2FA</b> — proteksi #1 dari hijack akun.</span></li>
+          <li className="flex gap-2"><span>🔑</span><span>Pakai password <b>unik</b> per situs — jangan recycle.</span></li>
+          <li className="flex gap-2"><span>📧</span><span>Email aktif — kalau lupa password, kirim reset ke email.</span></li>
+          <li className="flex gap-2"><span>🚪</span><span>Logout dari device asing setelah selesai.</span></li>
+          <li className="flex gap-2"><span>🤐</span><span>Jangan share kode 2FA — admin gak akan minta.</span></li>
+        </ul>
+      </section>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────── PLAN ─── */
+function PlanTab({ quota, me }: { quota: any; me: any }) {
+  if (!quota) return <div className="card">⏳ Memuat info plan…</div>;
+  return (
+    <>
+      <section className="card relative overflow-hidden">
+        {quota.isPremium && <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-gradient-to-br from-warn/30 to-accent-2/30 blur-2xl" />}
+        <div className="relative">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-lg font-bold">{quota.isPremium ? '⭐ Premium Plan' : '✨ Free Plan'}</h2>
+            {!quota.isPremium && (
+              <Link href="/dashboard" className="rounded-lg bg-gradient-to-r from-warn to-accent-2 px-3 py-1 text-xs font-bold text-white">Upgrade</Link>
+            )}
+          </div>
+          {quota.isPremium && quota.expiresAt && (
+            <p className="text-sm text-muted">
+              Aktif sampai <b className="text-text">{new Date(quota.expiresAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</b>
+              {quota.daysRemaining != null && <span> · <CountUp to={quota.daysRemaining} delay={200} /> hari lagi</span>}
+            </p>
+          )}
+          {quota.lifetime && <p className="text-sm text-warn">⭐ Lifetime — tanpa expire</p>}
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            <PlanStat icon="📦" label="Upload (24 jam)"
+              value={quota.daily?.unlimited ? 'unlimited' : `${quota.daily?.used ?? 0}/${quota.daily?.limit ?? '—'}`}
+              bar={quota.daily && !quota.daily.unlimited ? Math.min(100, (quota.daily.used / quota.daily.limit) * 100) : null}
+            />
+            <PlanStat icon="💾" label="Storage"
+              value={`${quota.storage?.usedLabel || '—'}${quota.storage && !quota.storage.unlimited ? ' / ' + quota.storage.limitLabel : ''}`}
+              bar={quota.storage && !quota.storage.unlimited ? quota.storage.percent : null}
+            />
+            <PlanStat icon="🎬" label="Max durasi" value={quota.limits.maxDurationLabel} bar={null} />
+          </div>
+          <div className="mt-2 text-xs text-muted">
+            Max file: <b className="text-text">{quota.limits.maxFileSizeLabel}</b>
+            {quota.daily && !quota.daily.unlimited && <> · Reset 24 jam (rolling)</>}
+          </div>
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">💳 Riwayat Pembayaran</h2>
+        <div className="rounded-lg border border-dashed border-border bg-bg p-6 text-center text-sm text-muted">
+          Belum ada transaksi.
+          <div className="mt-1 text-xs">Riwayat pembayaran Premium akan muncul di sini setelah kamu upgrade.</div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────── NOTIFICATIONS ─── */
+function NotificationsTab() {
+  const [toggles, setToggles] = useState({
+    emailLike: pref('notif_email_like', true),
+    emailFollow: pref('notif_email_follow', true),
+    emailUpload: pref('notif_email_upload', true),
+    emailDM: pref('notif_email_dm', true),
+    emailBroadcast: pref('notif_email_broadcast', false),
+    emailEarnings: pref('notif_email_earnings', true),
+    emailTakedown: pref('notif_email_takedown', true),
+    inappLike: pref('notif_inapp_like', true),
+    inappFollow: pref('notif_inapp_follow', true),
+    inappUpload: pref('notif_inapp_upload', true),
+    inappDM: pref('notif_inapp_dm', true),
+  });
+  function toggle(k: keyof typeof toggles) {
+    const next = { ...toggles, [k]: !toggles[k] };
+    setToggles(next);
+    setPref('notif_' + k.replace(/^email/, 'email_').replace(/^inapp/, 'inapp_').toLowerCase(), next[k]);
+  }
+  return (
+    <>
+      <section className="card">
+        <h2 className="mb-1 text-lg font-bold">🔔 Notifikasi In-App</h2>
+        <p className="mb-3 text-xs text-muted">Notifikasi yang muncul di bell icon.</p>
+        <div className="space-y-1.5">
+          <Toggle label="❤️ Like di video saya" on={toggles.inappLike} onChange={() => toggle('inappLike')} />
+          <Toggle label="👥 Follower baru" on={toggles.inappFollow} onChange={() => toggle('inappFollow')} />
+          <Toggle label="🎬 Upload baru dari yang di-follow" on={toggles.inappUpload} onChange={() => toggle('inappUpload')} />
+          <Toggle label="💬 DM masuk" on={toggles.inappDM} onChange={() => toggle('inappDM')} />
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-1 text-lg font-bold">📧 Email Alert</h2>
+        <p className="mb-3 text-xs text-muted">Kirim email saat ada activity penting.</p>
+        <div className="space-y-1.5">
+          <Toggle label="❤️ Like di video saya" on={toggles.emailLike} onChange={() => toggle('emailLike')} />
+          <Toggle label="👥 Follower baru" on={toggles.emailFollow} onChange={() => toggle('emailFollow')} />
+          <Toggle label="🎬 Upload baru dari yang di-follow" on={toggles.emailUpload} onChange={() => toggle('emailUpload')} />
+          <Toggle label="💬 DM masuk" on={toggles.emailDM} onChange={() => toggle('emailDM')} />
+          <Toggle label="📢 Broadcast admin" on={toggles.emailBroadcast} onChange={() => toggle('emailBroadcast')} />
+          <Toggle label="💰 Earnings update (saat ada views)" on={toggles.emailEarnings} onChange={() => toggle('emailEarnings')} />
+          <Toggle label="⚠ Video di-takedown" on={toggles.emailTakedown} onChange={() => toggle('emailTakedown')} />
+        </div>
+      </section>
+
+      <p className="text-xs text-muted">Preferensi disimpan di browser kamu. Sinkron ke akun akan aktif setelah integrasi email service (Phase 2).</p>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────── PAYOUT ─── */
+function PayoutTab({ quota }: { quota: any }) {
+  const [method, setMethod] = useState<string>(pref('payout_method', 'bank'));
+  const [accountName, setAccountName] = useState<string>(pref('payout_account_name', ''));
+  const [accountNumber, setAccountNumber] = useState<string>(pref('payout_account_number', ''));
+  const [bank, setBank] = useState<string>(pref('payout_bank', 'BCA'));
+  const [usdtAddr, setUsdtAddr] = useState<string>(pref('payout_usdt_addr', ''));
+  const [saved, setSaved] = useState(false);
+
+  function save() {
+    setPref('payout_method', method);
+    setPref('payout_account_name', accountName);
+    setPref('payout_account_number', accountNumber);
+    setPref('payout_bank', bank);
+    setPref('payout_usdt_addr', usdtAddr);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+
+  return (
+    <>
+      <section className="card">
+        <h2 className="mb-1 text-lg font-bold">💰 Earnings Saldo</h2>
+        <p className="mb-3 text-xs text-muted">Saldo earnings dari views video kamu.</p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          <PlanStat icon="💰" label="Saldo Tersedia" value="Rp 0" bar={null} />
+          <PlanStat icon="⏳" label="Pending" value="Rp 0" bar={null} />
+          <PlanStat icon="✅" label="Total Withdraw" value="Rp 0" bar={null} />
+        </div>
+        <p className="mt-2 text-xs text-muted">Minimum withdraw: Bank/E-wallet Rp 100.000 · USDT Rp 200.000</p>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">🏦 Metode Pembayaran</h2>
+        <div className="space-y-3 max-w-xl">
+          <div>
+            <label className="label">Metode</label>
+            <select className="input" value={method} onChange={(e) => setMethod(e.target.value)}>
+              <option value="bank">🏦 Bank Transfer</option>
+              <option value="gopay">💚 GoPay</option>
+              <option value="ovo">💜 OVO</option>
+              <option value="dana">💙 DANA</option>
+              <option value="shopeepay">🧡 ShopeePay</option>
+              <option value="usdt">₿ USDT (TRC20)</option>
+            </select>
+          </div>
+
+          {method === 'bank' && (
+            <div>
+              <label className="label">Pilih Bank</label>
+              <select className="input" value={bank} onChange={(e) => setBank(e.target.value)}>
+                <option>BCA</option><option>Mandiri</option><option>BNI</option>
+                <option>BRI</option><option>CIMB Niaga</option><option>Permata</option>
+                <option>Danamon</option><option>Maybank</option><option>BSI</option>
+              </select>
+            </div>
           )}
 
-          {/* PASSWORD */}
-          <section className="card enter enter-4">
-            <h2 className="mb-3 text-lg font-bold">🔑 {t('settings.change_password')}</h2>
-            <div className="space-y-3">
-              <div>
-                <label className="label">{t('settings.old_password')}</label>
-                <input className="input" type="password" value={oldPw} onChange={(e) => setOldPw(e.target.value)} />
-              </div>
-              <div>
-                <label className="label">{t('settings.new_password')} <span className="text-[10px] text-muted">{t('settings.new_password_hint')}</span></label>
-                <input className="input" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} />
-                {newPw && (
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-bg-elev">
-                      <div className="h-full rounded-full transition-all" style={{
-                        width: `${(pwStrength.score / 5) * 100}%`,
-                        background: pwStrength.score >= 4 ? '#22c55e' : pwStrength.score >= 3 ? '#f59e0b' : '#ef4444',
-                      }} />
-                    </div>
-                    <span className={`text-[10px] font-semibold ${pwStrength.color}`}>{pwStrength.label}</span>
-                  </div>
-                )}
-                <div className="mt-1 text-[10px] text-muted">
-                  Kuatkan dengan: huruf besar (A-Z), angka (0-9), simbol (!@#$).
-                </div>
-              </div>
-              <div>
-                <label className="label">{t('settings.confirm_new_password')}</label>
-                <input className="input" type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} />
-                {confirmPw && (
-                  <div className={`mt-1 text-[10px] ${newPw === confirmPw ? 'text-success' : 'text-danger'}`}>
-                    {newPw === confirmPw ? t('settings.match') : t('settings.not_match')}
-                  </div>
-                )}
-              </div>
-              {pwMsg && <div className={`text-sm ${pwMsg.startsWith('✓') ? 'text-success' : 'text-danger'}`}>{pwMsg}</div>}
-              <button className="btn-primary" onClick={changePw} disabled={!oldPw || newPw.length < 6 || newPw !== confirmPw}>
-                {t('settings.btn_change_pw')}
-              </button>
+          <div>
+            <label className="label">{method === 'usdt' ? 'Alamat Wallet (TRC20)' : 'Nomor Rekening / HP'}</label>
+            {method === 'usdt'
+              ? <input className="input font-mono text-xs" placeholder="T..." value={usdtAddr} onChange={(e) => setUsdtAddr(e.target.value)} />
+              : <input className="input" placeholder="081234567890" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} />}
+          </div>
+          {method !== 'usdt' && (
+            <div>
+              <label className="label">Nama Pemilik Rekening</label>
+              <input className="input" placeholder="Sesuai KTP" value={accountName} onChange={(e) => setAccountName(e.target.value)} />
             </div>
-          </section>
-
-          {/* 2FA */}
-          <section className="card enter enter-5">
-            <h2 className="mb-3 text-lg font-bold">{t('settings.two_factor_auth')}</h2>
-            {!tfaWizardOpen && !tfaDisableOpen && (me.totpEnabled
-              ? (
-                <>
-                  <p className="rounded-lg bg-success/15 border border-success/30 p-3 text-sm text-success">
-                    {t('settings.tfa_on')}
-                  </p>
-                  <button className="btn-ghost mt-3" onClick={() => { setTfaDisableOpen(true); setTfaMsg(''); }}>
-                    {t('settings.btn_disable_2fa')}
-                  </button>
-                </>
-              )
-              : (
-                <>
-                  <p className="rounded-lg bg-warn/15 border border-warn/30 p-3 text-sm text-warn">
-                    {t('settings.tfa_off')}
-                  </p>
-                  <ul className="mt-3 space-y-1 text-xs text-muted">
-                    <li>✓ Lapisan kedua keamanan setelah password</li>
-                    <li>✓ Pakai Google Authenticator / Authy / Microsoft Authenticator</li>
-                    <li>✓ Kode berubah tiap 30 detik</li>
-                    <li>✓ Setup sekali, aktif selamanya (sampai dimatikan)</li>
-                  </ul>
-                  <button className="btn-primary mt-3" onClick={startTfa}>🔐 Aktifkan 2FA</button>
-                </>
-              ))}
-
-            {tfaWizardOpen && (
-              <div className="space-y-3 rounded-xl border border-border bg-bg-elev p-4">
-                <p className="text-sm">Step 1: Buka authenticator app (Google Auth/Authy) → Add account → Manual entry → paste secret:</p>
-                <input className="input font-mono text-xs tracking-wider" readOnly value={tfaSecret.replace(/(.{4})/g, '$1 ').trim()} />
-                <a href={tfaOtpauth} className="text-xs text-accent">📱 Atau buka di authenticator app (HP yang sama)</a>
-                <p className="text-sm">Step 2: Masukkan kode 6-digit dari authenticator:</p>
-                <input
-                  className="input text-center font-mono text-xl tracking-[8px]"
-                  value={tfaCode}
-                  onChange={(e) => setTfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="000000" maxLength={6} inputMode="numeric"
-                />
-                <div className="flex gap-2">
-                  <button className="btn-ghost flex-1" onClick={() => setTfaWizardOpen(false)}>Batal</button>
-                  <button className="btn-primary flex-1" onClick={confirmTfa}>✓ Konfirmasi</button>
-                </div>
-              </div>
-            )}
-
-            {tfaDisableOpen && (
-              <div className="space-y-3 rounded-xl border border-danger/30 bg-danger/5 p-4">
-                <p className="text-sm text-danger">⚠ Konfirmasi password untuk matikan 2FA</p>
-                <input className="input" type="password" placeholder="Password" value={tfaPwInput} onChange={(e) => setTfaPwInput(e.target.value)} />
-                <div className="flex gap-2">
-                  <button className="btn-ghost flex-1" onClick={() => { setTfaDisableOpen(false); setTfaPwInput(''); }}>Batal</button>
-                  <button className="btn-danger flex-1" onClick={disableTfa}>Matikan 2FA</button>
-                </div>
-              </div>
-            )}
-
-            {tfaMsg && <div className="mt-2 text-sm">{tfaMsg}</div>}
-          </section>
-
-          {/* DANGER ZONE */}
-          <section className="card enter enter-6 border-danger/30">
-            <h2 className="mb-3 text-lg font-bold text-danger">⚠ {t('settings.danger')}</h2>
-            <div className="space-y-2">
-              <DangerRow
-                title="Hapus Semua Video"
-                desc="Hapus semua video & thumbnail yang kamu upload. Akun tetap aktif."
-                btnLabel="🗑 Hapus Video"
-                onClick={clearVideos}
-                variant="ghost"
-              />
-              <DangerRow
-                title="Hapus Akun"
-                desc="Hapus akun permanen. Username, email, semua video, follower & data hilang. Tidak bisa dibatalkan."
-                btnLabel="⚠ Hapus Akun"
-                onClick={deleteAccount}
-                variant="danger"
-              />
-            </div>
-          </section>
+          )}
+          <button className="btn-primary" onClick={save}>💾 Simpan Metode</button>
+          {saved && <div className="text-sm text-success">✓ Tersimpan</div>}
         </div>
+      </section>
 
-        {/* RIGHT SIDEBAR */}
-        <aside className="space-y-4">
-          {/* APPEARANCE */}
-          <section className="card enter enter-2">
-            <h2 className="mb-3 font-bold">{t('settings.appearance')}</h2>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setThemeMode('dark')}
-                className={`rounded-xl border p-3 text-center text-xs transition ${theme === 'dark' ? 'border-accent bg-accent/10' : 'border-border bg-bg hover:border-accent'}`}
-              >
-                <div className="text-2xl">🌙</div>
-                <div className="mt-1 font-bold">Dark</div>
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">📋 Riwayat Withdraw</h2>
+        <div className="rounded-lg border border-dashed border-border bg-bg p-6 text-center text-sm text-muted">
+          Belum ada withdraw.
+          <div className="mt-1 text-xs">Riwayat penarikan saldo akan muncul di sini.</div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────── API ─── */
+function ApiTab() {
+  const [apiKey, setApiKey] = useState<string | null>(pref('api_key', null));
+  const [showKey, setShowKey] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  function generateKey() {
+    const k = 'ms_' + Array.from(crypto.getRandomValues(new Uint8Array(24)))
+      .map((b) => b.toString(16).padStart(2, '0')).join('');
+    setApiKey(k);
+    setPref('api_key', k);
+    setShowKey(true);
+  }
+  function regenerate() {
+    if (!confirm('Regenerate API key? Key lama akan langsung tidak valid.')) return;
+    generateKey();
+  }
+  function revoke() {
+    if (!confirm('Revoke API key? Aplikasi yang pakai key ini akan berhenti jalan.')) return;
+    setApiKey(null);
+    setPref('api_key', null);
+  }
+  async function copy() {
+    if (!apiKey) return;
+    await navigator.clipboard.writeText(apiKey);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
+  return (
+    <>
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">🔑 API Key</h2>
+        <p className="mb-3 text-xs text-muted">
+          API key untuk upload via REST API (programmatic). Sertakan di header <code>Authorization: Bearer &lt;key&gt;</code>.
+        </p>
+        {!apiKey ? (
+          <button className="btn-primary" onClick={generateKey}>🔐 Generate API Key</button>
+        ) : (
+          <div className="space-y-3 max-w-xl">
+            <div className="flex items-center gap-2">
+              <input
+                className="input font-mono text-xs"
+                readOnly
+                type={showKey ? 'text' : 'password'}
+                value={apiKey}
+              />
+              <button className="btn-ghost shrink-0" onClick={() => setShowKey((s) => !s)}>
+                {showKey ? '🙈' : '👁'}
               </button>
-              <button
-                onClick={() => setThemeMode('light')}
-                className={`rounded-xl border p-3 text-center text-xs transition ${theme === 'light' ? 'border-accent bg-accent/10' : 'border-border bg-bg hover:border-accent'}`}
-              >
-                <div className="text-2xl">☀️</div>
-                <div className="mt-1 font-bold">Light</div>
+              <button className="btn-ghost shrink-0" onClick={copy}>
+                {copied ? '✓' : '📋'}
               </button>
             </div>
-          </section>
-
-          {/* QUICK LINKS */}
-          <section className="card enter enter-3">
-            <h2 className="mb-3 font-bold">{t('settings.quick_links')}</h2>
-            <div className="space-y-1.5">
-              <QuickLink href="/profile" icon="👤" label="Edit Profile" />
-              <QuickLink href="/history" icon="🖼" label="My Uploads" />
-              <QuickLink href="/messages" icon="💬" label="Messages" />
-              <QuickLink href="/notifications" icon="🔔" label="Notifications" />
-              <QuickLink href="/friends" icon="👥" label="Friends" />
-              <button onClick={showPanduanAgain} className="flex w-full items-center gap-2 rounded-lg border border-border bg-bg p-2 text-left text-xs transition hover:border-accent">
-                <span className="text-base">📖</span>
-                <span className="font-semibold">Tampilkan Panduan</span>
-              </button>
+            <div className="flex gap-2">
+              <button className="btn-ghost text-xs" onClick={regenerate}>🔄 Regenerate</button>
+              <button className="btn-danger text-xs" onClick={revoke}>🗑 Revoke</button>
             </div>
-          </section>
+            <div className="rounded-lg border border-warn/30 bg-warn/5 p-3 text-xs text-warn">
+              ⚠ Simpan key di tempat aman. Anggap key seperti password — jangan share publik atau commit ke Git.
+            </div>
+          </div>
+        )}
+      </section>
 
-          {/* TIPS */}
-          <section className="card enter enter-4 bg-grad-card">
-            <h2 className="mb-3 font-bold">{t('settings.security_tips')}</h2>
-            <ul className="space-y-2 text-xs">
-              <li className="flex gap-2"><span>🔐</span><span>Aktifkan <b>2FA</b> — proteksi #1 dari hijack akun.</span></li>
-              <li className="flex gap-2"><span>🔑</span><span>Pakai password <b>unik</b> per situs — jangan recycle.</span></li>
-              <li className="flex gap-2"><span>📧</span><span>Email aktif — kalau lupa password, kirim reset ke email.</span></li>
-              <li className="flex gap-2"><span>🚪</span><span>Logout dari device asing setelah selesai.</span></li>
-              <li className="flex gap-2"><span>🤐</span><span>Jangan share kode 2FA — admin gak akan minta.</span></li>
-            </ul>
-          </section>
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">📊 Rate Limit</h2>
+        <dl className="grid gap-2 text-sm sm:grid-cols-2 max-w-xl">
+          <Info label="Upload per jam" value="100 request" />
+          <Info label="Read per jam" value="1.000 request" />
+          <Info label="Burst limit" value="20 / detik" />
+          <Info label="Concurrent upload" value="3 file" />
+        </dl>
+      </section>
 
-          {/* LOGOUT */}
-          <section className="card enter enter-5">
-            <button onClick={() => logout()} className="btn-ghost w-full text-danger">
-              ⎋ Logout dari device ini
-            </button>
-          </section>
-        </aside>
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">📖 Dokumentasi API</h2>
+        <ul className="space-y-2 text-sm">
+          <li><b>POST</b> <code>/api/v1/upload</code> — Upload video file</li>
+          <li><b>GET</b> <code>/api/v1/videos</code> — List videos kamu</li>
+          <li><b>GET</b> <code>/api/v1/videos/:id</code> — Detail video</li>
+          <li><b>PATCH</b> <code>/api/v1/videos/:id</code> — Update metadata</li>
+          <li><b>DELETE</b> <code>/api/v1/videos/:id</code> — Hapus video</li>
+          <li><b>GET</b> <code>/api/v1/stats</code> — Statistik akun</li>
+        </ul>
+        <p className="mt-3 text-xs text-muted">📌 Dokumentasi lengkap akan tersedia di /docs/api (Phase 2).</p>
+      </section>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────── EMBED ─── */
+function EmbedTab() {
+  const [defaultWidth, setDefaultWidth] = useState<number>(pref('embed_width', 640));
+  const [defaultHeight, setDefaultHeight] = useState<number>(pref('embed_height', 360));
+  const [autoplay, setAutoplay] = useState(pref('embed_autoplay', false));
+  const [muted, setMuted] = useState(pref('embed_muted', false));
+  const [showControls, setShowControls] = useState(pref('embed_controls', true));
+  const [showLogo, setShowLogo] = useState(pref('embed_logo', true));
+  const [allowedDomains, setAllowedDomains] = useState<string>(pref('embed_allowed_domains', ''));
+  const [saved, setSaved] = useState(false);
+
+  function save() {
+    setPref('embed_width', defaultWidth);
+    setPref('embed_height', defaultHeight);
+    setPref('embed_autoplay', autoplay);
+    setPref('embed_muted', muted);
+    setPref('embed_controls', showControls);
+    setPref('embed_logo', showLogo);
+    setPref('embed_allowed_domains', allowedDomains);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+
+  return (
+    <>
+      <section className="card">
+        <h2 className="mb-1 text-lg font-bold">📡 Default Embed</h2>
+        <p className="mb-3 text-xs text-muted">Setting default saat orang generate embed code dari video kamu.</p>
+        <div className="grid gap-3 sm:grid-cols-2 max-w-xl">
+          <div>
+            <label className="label">Default Width (px)</label>
+            <input type="number" className="input" value={defaultWidth} onChange={(e) => setDefaultWidth(+e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Default Height (px)</label>
+            <input type="number" className="input" value={defaultHeight} onChange={(e) => setDefaultHeight(+e.target.value)} />
+          </div>
+        </div>
+        <div className="mt-4 space-y-1.5 max-w-xl">
+          <Toggle label="▶ Autoplay saat embed di-load" on={autoplay} onChange={() => setAutoplay((s) => !s)} />
+          <Toggle label="🔇 Muted by default (perlu kalau autoplay)" on={muted} onChange={() => setMuted((s) => !s)} />
+          <Toggle label="🎛 Tampilkan controls player" on={showControls} onChange={() => setShowControls((s) => !s)} />
+          <Toggle label="🏷 Tampilkan logo MyStream di player" on={showLogo} onChange={() => setShowLogo((s) => !s)} />
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-1 text-lg font-bold">🛡 Anti-Leech (Hotlink Protection)</h2>
+        <p className="mb-3 text-xs text-muted">
+          Whitelist domain yang boleh embed video kamu. Kosongkan = semua domain boleh.
+          Pisah dengan baris baru atau koma. Contoh: <code>blogku.com</code>, <code>website-saya.id</code>
+        </p>
+        <textarea
+          className="input"
+          rows={5}
+          value={allowedDomains}
+          onChange={(e) => setAllowedDomains(e.target.value)}
+          placeholder="blogku.com&#10;website-saya.id&#10;medium.com"
+        />
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">👀 Preview Embed Code</h2>
+        <pre className="overflow-x-auto rounded-lg border border-border bg-bg p-3 text-xs">
+{`<iframe
+  src="https://mystream-o2f7.vercel.app/embed/v_xxxxxx"
+  width="${defaultWidth}"
+  height="${defaultHeight}"
+  frameborder="0"${autoplay ? '\n  allow="autoplay"' : ''}
+  allowfullscreen></iframe>`}
+        </pre>
+      </section>
+
+      <div className="flex gap-2">
+        <button className="btn-primary" onClick={save}>💾 Simpan Setting</button>
+        {saved && <div className="self-center text-sm text-success">✓ Tersimpan</div>}
       </div>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────── DMCA ─── */
+function DmcaTab() {
+  const [reportText, setReportText] = useState('');
+  const [reportUrl, setReportUrl] = useState('');
+  const [sent, setSent] = useState(false);
+
+  function submit() {
+    if (!reportText.trim() || !reportUrl.trim()) return;
+    // Stub: kirim ke /api/dmca nanti
+    setSent(true);
+    setReportText('');
+    setReportUrl('');
+    setTimeout(() => setSent(false), 3000);
+  }
+
+  return (
+    <>
+      <section className="card">
+        <h2 className="mb-1 text-lg font-bold">📋 DMCA / Hak Cipta</h2>
+        <p className="mb-3 text-xs text-muted">
+          Lapor pelanggaran hak cipta atau ajukan banding kalau video kamu di-takedown.
+        </p>
+        <div className="rounded-lg bg-bg-elev p-3 text-xs">
+          📧 <b>Email DMCA agent:</b> dmca@mystream.app<br />
+          📞 <b>Response time:</b> 24-72 jam kerja
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">📨 Lapor Pelanggaran Hak Cipta</h2>
+        <div className="space-y-3 max-w-xl">
+          <div>
+            <label className="label">URL Video yang Dilaporkan</label>
+            <input
+              className="input"
+              placeholder="https://mystream-o2f7.vercel.app/watch?id=..."
+              value={reportUrl}
+              onChange={(e) => setReportUrl(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="label">Penjelasan / Bukti Kepemilikan</label>
+            <textarea
+              className="input"
+              rows={6}
+              value={reportText}
+              onChange={(e) => setReportText(e.target.value)}
+              placeholder="Sertakan: bukti kepemilikan, hubungan kamu dengan konten asli, lokasi konten asli (URL), kontak kamu yang bisa dihubungi."
+            />
+          </div>
+          {sent && <div className="text-sm text-success">✓ Laporan terkirim. Tim akan review dalam 24-72 jam.</div>}
+          <button className="btn-primary" onClick={submit} disabled={!reportText.trim() || !reportUrl.trim()}>
+            📤 Kirim Laporan DMCA
+          </button>
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">📜 Riwayat Laporan</h2>
+        <div className="rounded-lg border border-dashed border-border bg-bg p-6 text-center text-sm text-muted">
+          Belum ada laporan.
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-lg font-bold">⚠ Takedown Diterima</h2>
+        <div className="rounded-lg border border-dashed border-border bg-bg p-6 text-center text-sm text-muted">
+          Tidak ada video kamu yang ditakedown.
+          <div className="mt-1 text-xs">Kalau ada, history akan muncul di sini dengan opsi banding.</div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────── Helpers ─── */
+function Info({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-bg p-2">
+      <div className="text-[10px] uppercase tracking-wide text-muted">{label}</div>
+      <div className="mt-0.5 font-bold">{value}</div>
     </div>
+  );
+}
+
+function Toggle({ label, on, onChange }: { label: string; on: boolean; onChange: () => void }) {
+  return (
+    <label className="flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-border bg-bg p-2.5 transition hover:border-accent">
+      <span className="text-sm">{label}</span>
+      <button
+        type="button"
+        onClick={onChange}
+        role="switch"
+        aria-checked={on}
+        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition ${
+          on ? 'bg-accent' : 'bg-bg-elev'
+        }`}
+      >
+        <span
+          className={`h-4 w-4 rounded-full bg-white shadow transition-transform ${
+            on ? 'translate-x-6' : 'translate-x-1'
+          }`}
+        />
+      </button>
+    </label>
   );
 }
 
@@ -437,15 +1000,5 @@ function DangerRow({ title, desc, btnLabel, onClick, variant }: { title: string;
         {btnLabel}
       </button>
     </div>
-  );
-}
-
-function QuickLink({ href, icon, label }: { href: string; icon: string; label: string }) {
-  return (
-    <Link href={href} className="flex items-center gap-2 rounded-lg border border-border bg-bg p-2 text-xs transition hover:border-accent hover:bg-accent/5">
-      <span className="text-base">{icon}</span>
-      <span className="font-semibold flex-1">{label}</span>
-      <span className="text-muted">→</span>
-    </Link>
   );
 }

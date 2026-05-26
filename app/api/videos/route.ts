@@ -25,9 +25,29 @@ export async function POST(req: NextRequest) {
   const a = await getAuthFromRequest(req);
   if (!a) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const body = await req.json();
-  const { title, description = '', filename, size, mimeType, type, duration = 0, thumbDataURL } = body;
+  const {
+    title, description = '', filename, size, mimeType, type, duration = 0, thumbDataURL,
+    visibility = 'public',
+    audience = 'all',
+    category = '',
+    tags = [],
+    allowComments = true,
+    allowDownload = false,
+    scheduledAt = null,
+  } = body;
   if (!title || !filename || !type)
     return NextResponse.json({ error: 'metadata kurang' }, { status: 400 });
+
+  // Sanitize new fields
+  const allowedVisibility = ['public', 'unlisted', 'private', 'draft'];
+  const allowedAudience = ['all', '13plus', '18plus', 'subscriber'];
+  const safeVisibility = allowedVisibility.includes(visibility) ? visibility : 'public';
+  const safeAudience = allowedAudience.includes(audience) ? audience : 'all';
+  const safeCategory = String(category).slice(0, 50);
+  const safeTags = Array.isArray(tags)
+    ? tags.filter((t: any) => typeof t === 'string').map((t: string) => t.trim().slice(0, 30)).filter(Boolean).slice(0, 10)
+    : [];
+  const safeScheduledAt = scheduledAt && !isNaN(Date.parse(scheduledAt)) ? new Date(scheduledAt).toISOString() : null;
 
   // Plan-based validation
   const plan = getUserPlan(a.user);
@@ -96,6 +116,13 @@ export async function POST(req: NextRequest) {
     likes: 0,
     likedBy: [] as string[],
     fileReady: false,
+    visibility: safeVisibility,
+    audience: safeAudience,
+    category: safeCategory,
+    tags: safeTags,
+    allowComments: !!allowComments,
+    allowDownload: !!allowDownload,
+    scheduledAt: safeScheduledAt,
   };
   const db = await loadDB();
   db.videos.push(video);

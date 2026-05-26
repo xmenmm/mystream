@@ -24,6 +24,29 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
   const [showAiThumb, setShowAiThumb] = useState(false);
   const thumbInputRef = useRef<HTMLInputElement>(null);
 
+  // Advanced settings
+  const [visibility, setVisibility] = useState<'public' | 'unlisted' | 'private' | 'draft'>('public');
+  const [audience, setAudience] = useState<'all' | '13plus' | '18plus' | 'subscriber'>('all');
+  const [category, setCategory] = useState('');
+  const [tagInput, setTagInput] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [allowComments, setAllowComments] = useState(true);
+  const [allowDownload, setAllowDownload] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  function addTag(raw: string) {
+    const t = raw.trim().replace(/^#/, '').slice(0, 30);
+    if (!t) return;
+    if (tags.includes(t)) return;
+    if (tags.length >= 10) return;
+    setTags([...tags, t]);
+    setTagInput('');
+  }
+  function removeTag(t: string) {
+    setTags(tags.filter((x) => x !== t));
+  }
+
   useEffect(() => { apiGetMyQuota().then(setQuota).catch(() => {}); }, []);
 
   async function pick(f: File) {
@@ -125,6 +148,13 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
           type: isVideo ? 'video' : 'image',
           duration,
           thumbDataURL: thumb,
+          visibility,
+          audience,
+          category: category.trim(),
+          tags,
+          allowComments,
+          allowDownload,
+          scheduledAt: scheduledAt || null,
         },
       });
       videoId = video.id;
@@ -309,6 +339,179 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
           />
         </div>
 
+        {/* Advanced toggler */}
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={() => setShowAdvanced((s) => !s)}
+            className="flex w-full items-center justify-between rounded-xl border border-border bg-bg-elev px-3 py-2 text-sm font-semibold hover:border-accent"
+          >
+            <span>⚙ Pengaturan Lanjutan {tags.length > 0 && <span className="ml-1 text-xs text-accent">· {tags.length} tag</span>}</span>
+            <span>{showAdvanced ? '▴' : '▾'}</span>
+          </button>
+        </div>
+
+        {showAdvanced && (
+          <div className="mt-3 space-y-3 rounded-xl border border-border bg-bg-elev/50 p-3">
+            {/* Visibility */}
+            <div>
+              <label className="label">👁 Visibilitas</label>
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+                {[
+                  { v: 'public', icon: '🌐', label: 'Publik' },
+                  { v: 'unlisted', icon: '🔗', label: 'Unlisted' },
+                  { v: 'private', icon: '🔒', label: 'Pribadi' },
+                  { v: 'draft', icon: '📝', label: 'Draf' },
+                ].map((x) => (
+                  <button
+                    key={x.v}
+                    type="button"
+                    onClick={() => setVisibility(x.v as any)}
+                    className={`rounded-lg border p-2 text-xs transition ${
+                      visibility === x.v ? 'border-accent bg-accent/10 font-bold' : 'border-border bg-bg hover:border-accent/50'
+                    }`}
+                  >
+                    <div className="text-base">{x.icon}</div>
+                    <div className="mt-0.5">{x.label}</div>
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1 text-[10px] text-muted">
+                {visibility === 'public' && 'Semua orang bisa nonton & muncul di Discover.'}
+                {visibility === 'unlisted' && 'Hanya yang punya link bisa nonton. Tidak muncul di feed/search.'}
+                {visibility === 'private' && 'Cuma kamu yang bisa lihat.'}
+                {visibility === 'draft' && 'Disimpan tapi tidak dipublish — bisa publish nanti.'}
+              </p>
+            </div>
+
+            {/* Audience */}
+            <div>
+              <label className="label">👥 Audiens</label>
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+                {[
+                  { v: 'all', icon: '🌟', label: 'Semua usia' },
+                  { v: '13plus', icon: '🧒', label: '13+' },
+                  { v: '18plus', icon: '🔞', label: '18+' },
+                  { v: 'subscriber', icon: '⭐', label: 'Subscriber' },
+                ].map((x) => (
+                  <button
+                    key={x.v}
+                    type="button"
+                    onClick={() => setAudience(x.v as any)}
+                    className={`rounded-lg border p-2 text-xs transition ${
+                      audience === x.v ? 'border-accent bg-accent/10 font-bold' : 'border-border bg-bg hover:border-accent/50'
+                    }`}
+                  >
+                    <div className="text-base">{x.icon}</div>
+                    <div className="mt-0.5">{x.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="label">🏷 Kategori</label>
+              <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
+                <option value="">— Pilih kategori —</option>
+                <option value="vlog">📹 Vlog & Daily</option>
+                <option value="gaming">🎮 Gaming</option>
+                <option value="music">🎵 Musik & Cover</option>
+                <option value="tutorial">📚 Tutorial</option>
+                <option value="comedy">😂 Komedi</option>
+                <option value="art">🎨 Seni & Kreatif</option>
+                <option value="tech">💻 Tech & Review</option>
+                <option value="lifestyle">✨ Lifestyle</option>
+                <option value="other">🗂 Lainnya</option>
+              </select>
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="label">
+                #️⃣ Tag <span className="text-[10px] text-muted">({tags.length}/10)</span>
+              </label>
+              <div className="flex gap-1.5">
+                <input
+                  className="input flex-1"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                      e.preventDefault();
+                      addTag(tagInput);
+                    }
+                  }}
+                  placeholder="Tekan Enter untuk tambah"
+                  maxLength={30}
+                  disabled={tags.length >= 10}
+                />
+                <button
+                  type="button"
+                  className="btn-ghost shrink-0"
+                  onClick={() => addTag(tagInput)}
+                  disabled={!tagInput.trim() || tags.length >= 10}
+                >
+                  + Tambah
+                </button>
+              </div>
+              {tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {tags.map((t) => (
+                    <span
+                      key={t}
+                      className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-xs text-accent"
+                    >
+                      #{t}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(t)}
+                        className="hover:text-danger"
+                        aria-label={`Remove ${t}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Engagement toggles */}
+            <div>
+              <label className="label">💬 Engagement</label>
+              <div className="space-y-1.5">
+                <ToggleRow label="Izinkan komentar" desc="User bisa komen di watch page" on={allowComments} onChange={() => setAllowComments((s) => !s)} />
+                <ToggleRow label="Izinkan download" desc="Tampilkan tombol download di watch page" on={allowDownload} onChange={() => setAllowDownload((s) => !s)} />
+              </div>
+            </div>
+
+            {/* Schedule */}
+            <div>
+              <label className="label">⏰ Jadwalkan Publish (opsional)</label>
+              <input
+                type="datetime-local"
+                className="input"
+                value={scheduledAt}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+              />
+              {scheduledAt && (
+                <button
+                  type="button"
+                  onClick={() => setScheduledAt('')}
+                  className="mt-1 text-[10px] text-muted hover:text-text"
+                >
+                  ✕ Hapus jadwal
+                </button>
+              )}
+              <p className="mt-1 text-[10px] text-muted">
+                Kosong = publish langsung. Diisi = video tersimpan sebagai draft sampai jam yang ditentukan.
+              </p>
+            </div>
+          </div>
+        )}
+
         {err && <div className="mt-3 rounded-lg bg-danger/20 p-2 text-sm text-danger">{err}</div>}
         {busy && progress > 0 && (
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-bg-elev">
@@ -333,5 +536,31 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function ToggleRow({ label, desc, on, onChange }: { label: string; desc?: string; on: boolean; onChange: () => void }) {
+  return (
+    <label className="flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-border bg-bg p-2 transition hover:border-accent">
+      <div className="min-w-0">
+        <div className="text-xs font-semibold">{label}</div>
+        {desc && <div className="text-[10px] text-muted">{desc}</div>}
+      </div>
+      <button
+        type="button"
+        onClick={onChange}
+        role="switch"
+        aria-checked={on}
+        className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition ${
+          on ? 'bg-accent' : 'bg-bg-elev'
+        }`}
+      >
+        <span
+          className={`h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${
+            on ? 'translate-x-5' : 'translate-x-0.5'
+          }`}
+        />
+      </button>
+    </label>
   );
 }
