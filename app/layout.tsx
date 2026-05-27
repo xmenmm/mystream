@@ -34,7 +34,10 @@ const themeBootstrap = `(function(){try{var t=localStorage.getItem('mystream_the
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className="dark">
-      <head><script dangerouslySetInnerHTML={{ __html: themeBootstrap }} /></head>
+      <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
       <body className="min-h-screen">
         {children}
         <PWARegister />

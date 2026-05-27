@@ -54,8 +54,10 @@ export default function DashboardPage() {
         <header className="enter enter-1 flex items-center justify-between flex-wrap gap-2">
           <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
           <div className="flex gap-2">
-            <span className="chip" data-count>VIEWS <b className="text-success"><CountUp to={summary?.totalViews ?? 0} format={fmtNum} /></b></span>
-            <span className="chip" data-count>LIKES <b className="text-success"><CountUp to={summary?.totalLikes ?? 0} format={fmtNum} /></b></span>
+            {/* Raw value — TANPA CountUp untuk hindari race "73 → 82" saat first load.
+                Counter visual flair akan reactivated kalau summary udah ready. */}
+            <span className="chip">VIEWS <b className="text-success">{summary ? fmtNum(summary.totalViews) : '—'}</b></span>
+            <span className="chip">LIKES <b className="text-success">{summary ? fmtNum(summary.totalLikes) : '—'}</b></span>
           </div>
         </header>
 
@@ -309,16 +311,18 @@ export default function DashboardPage() {
         {/* STORAGE USED */}
         <section className="card enter enter-5">
           <h2 className="mb-3 font-bold">💾 Storage</h2>
-          {summary ? (
+          {summary && videos ? (
             <>
               <div className="flex items-baseline justify-between">
                 <span className="text-2xl font-extrabold">
-                  <CountUp to={summary.storageBytes} format={fmtBytes} delay={500} />
+                  {/* Raw fmtBytes — TANPA CountUp animation supaya tidak mismatch
+                      dengan "Rata-rata/file" yg pakai nilai final. */}
+                  {fmtBytes(summary.storageBytes)}
                 </span>
                 <span className="text-xs text-muted">terpakai</span>
               </div>
               <div className="mt-2 text-xs text-muted">
-                Dari <b className="text-text"><CountUp to={videos.length} delay={550} /></b> file media kamu.
+                Dari <b className="text-text">{videos.length}</b> file media kamu.
               </div>
               {videos.length > 0 && (
                 <div className="mt-3 space-y-1.5 text-xs">
@@ -328,7 +332,10 @@ export default function DashboardPage() {
               )}
             </>
           ) : (
-            <div className="text-sm text-muted">Loading…</div>
+            <div className="space-y-2">
+              <div className="h-8 w-20 animate-pulse rounded bg-bg-elev" />
+              <div className="h-3 w-32 animate-pulse rounded bg-bg-elev" />
+            </div>
           )}
         </section>
 

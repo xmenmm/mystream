@@ -16,6 +16,13 @@ export function PWARegister() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // Skip PWA UI sepenuhnya untuk halaman embed-mode (iframe di blog) & guest view.
+    // Banner Install di sana mengganggu — user bukan visitor MyStream, dia visitor
+    // website lain yang kebetulan embed video kita.
+    const path = window.location.pathname;
+    const isMinimal = path.startsWith('/embed/') || path.startsWith('/view');
+    if (isMinimal) return;
+
     // Register service worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
