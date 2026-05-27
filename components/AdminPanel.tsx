@@ -126,14 +126,13 @@ export function AdminPanel({ section, hideHeader }: { section?: AdminTab; hideHe
 
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-bg">
-          <Stat label="Users"        num={stats.totalUsers} />
-          <Stat label="Online"       num={stats.onlineNow}    color="text-success" />
-          <Stat label="Videos"       num={stats.totalVideos} />
-          <Stat label="Views"        num={stats.totalViews}   format={fmtNum} color="text-warn" />
-          <Stat label="Likes"        num={stats.totalLikes}   format={fmtNum} />
-          <Stat label="Comments"     num={stats.totalComments} />
-          <Stat label="Suspended"    num={stats.suspended}    color="text-danger" />
-          <Stat label="Baru hari ini" num={stats.newToday}    color="text-success" />
+          <Stat label="Users"         num={stats.totalUsers} />
+          <Stat label="Online"        num={stats.onlineNow}  color="text-success" />
+          <Stat label="Videos"        num={stats.totalVideos} />
+          <Stat label="Views"         num={stats.totalViews} format={fmtNum} color="text-warn" />
+          <Stat label="Likes"         num={stats.totalLikes} format={fmtNum} />
+          <Stat label="Suspended"     num={stats.suspended}  color="text-danger" />
+          <Stat label="Baru hari ini" num={stats.newToday}   color="text-success" />
         </div>
       )}
 
