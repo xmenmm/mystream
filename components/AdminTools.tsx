@@ -1,14 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { apiDiscordSend, apiDailyReport, apiGenerateImage, apiGetGlobalLayers, apiSetGlobalLayers } from '@/lib/api-client';
+import { apiGenerateImage, apiGetGlobalLayers, apiSetGlobalLayers } from '@/lib/api-client';
 import { useT } from '@/lib/i18n';
 
 type Layer = { url: string; label?: string };
 
 export function AdminTools() {
   const tr = useT();
-  const [tool, setTool] = useState<null | 'gen' | 'discord' | 'daily' | 'layers'>(null);
+  const [tool, setTool] = useState<null | 'gen' | 'layers'>(null);
 
   const TOOLS: { key: any; icon: string; title: string; desc: string; onClick: () => void }[] = [
     {
@@ -20,16 +20,6 @@ export function AdminTools() {
       key: 'layers', icon: '🔗', title: tr('admin_tools.layers_title'),
       desc: tr('admin_tools.layers_desc'),
       onClick: () => setTool('layers'),
-    },
-    {
-      key: 'discord', icon: '💬', title: tr('admin_tools.discord_title'),
-      desc: tr('admin_tools.discord_desc'),
-      onClick: () => setTool('discord'),
-    },
-    {
-      key: 'daily', icon: '📊', title: tr('admin_tools.daily_title'),
-      desc: tr('admin_tools.daily_desc'),
-      onClick: () => setTool('daily'),
     },
   ];
 
@@ -68,8 +58,6 @@ export function AdminTools() {
       </div>
 
       {tool === 'gen' && <GenerateImageModal onClose={() => setTool(null)} />}
-      {tool === 'discord' && <SendDiscordModal onClose={() => setTool(null)} />}
-      {tool === 'daily' && <DailyReportModal onClose={() => setTool(null)} />}
       {tool === 'layers' && <GlobalLayersModal onClose={() => setTool(null)} />}
     </section>
   );
@@ -162,66 +150,6 @@ function GenerateImageModal({ onClose }: { onClose: () => void }) {
           <p className="text-[10px] text-muted">Gunakan URL ini di Banner admin → Image URL untuk pakai sebagai banner.</p>
         </div>
       )}
-    </ModalShell>
-  );
-}
-
-function SendDiscordModal({ onClose }: { onClose: () => void }) {
-  const [text, setText] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState('');
-
-  async function send() {
-    if (!text.trim()) return;
-    setBusy(true); setMsg('');
-    try {
-      await apiDiscordSend(text.trim());
-      setMsg('✓ Terkirim ke Discord');
-      setText('');
-    } catch (e: any) { setMsg('Gagal: ' + e.message); }
-    finally { setBusy(false); }
-  }
-
-  return (
-    <ModalShell title="💬 Send to Discord" onClose={onClose}>
-      <label className="text-xs text-muted">Pesan (max 2000 char)</label>
-      <textarea
-        className="input min-h-[120px]"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        maxLength={2000}
-        placeholder="Tulis notif/anouncement untuk #hasil-claude..."
-      />
-      {msg && <div className="mt-3 text-xs">{msg}</div>}
-      <button onClick={send} disabled={busy || !text.trim()} className="btn-primary mt-4 w-full">
-        {busy ? 'Mengirim…' : '📤 Kirim'}
-      </button>
-    </ModalShell>
-  );
-}
-
-function DailyReportModal({ onClose }: { onClose: () => void }) {
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState('');
-
-  async function trigger() {
-    setBusy(true); setMsg('');
-    try {
-      await apiDailyReport();
-      setMsg('✓ Daily report terkirim ke Discord');
-    } catch (e: any) { setMsg('Gagal: ' + e.message); }
-    finally { setBusy(false); }
-  }
-
-  return (
-    <ModalShell title="📊 Daily Report" onClose={onClose}>
-      <p className="text-sm text-muted">
-        Kirim laporan harian (stats 24 jam, top video, total views) ke Discord channel #hasil-claude.
-      </p>
-      {msg && <div className="mt-3 text-xs">{msg}</div>}
-      <button onClick={trigger} disabled={busy} className="btn-primary mt-4 w-full">
-        {busy ? 'Mengirim…' : '🚀 Trigger Report'}
-      </button>
     </ModalShell>
   );
 }
