@@ -206,7 +206,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
       className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="max-h-[90vh] w-full max-w-lg animate-slide-up overflow-y-auto rounded-2xl border border-border bg-bg-card p-6 shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-2xl animate-slide-up overflow-y-auto rounded-2xl border border-border bg-bg-card p-6 shadow-xl">
         <div className="mb-1 flex items-start justify-between">
           <h3 className="text-xl font-bold">{t('upload.title')}</h3>
           <button className="text-2xl text-muted hover:text-white" onClick={onClose} aria-label="Close">
