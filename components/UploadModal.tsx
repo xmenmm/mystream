@@ -203,10 +203,14 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="max-h-[90vh] w-full max-w-2xl animate-slide-up overflow-y-auto rounded-2xl border border-border bg-bg-card p-6 shadow-xl">
+      <div
+        className="flex min-h-full items-start justify-center p-4 sm:items-center"
+        onClick={(e) => e.target === e.currentTarget && onClose()}
+      >
+        <div className="w-full max-w-2xl animate-slide-up rounded-2xl border border-border bg-bg-card p-6 shadow-xl my-4">
         <div className="mb-1 flex items-start justify-between">
           <h3 className="text-xl font-bold">{t('upload.title')}</h3>
           <button className="text-2xl text-muted hover:text-white" onClick={onClose} aria-label="Close">
@@ -566,6 +570,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
           >
             {busy ? t('upload.uploading') : t('upload.upload')}
           </button>
+        </div>
         </div>
       </div>
     </div>
