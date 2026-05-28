@@ -164,50 +164,14 @@ export default function DashboardPage() {
           }
         </section>
 
-        {/* QUICK ACTIONS + ACHIEVEMENTS side-by-side */}
-        <div className="grid gap-4 md:grid-cols-2 enter enter-5">
-          <section className="card">
-            <h2 className="mb-3 font-bold">{t('dashboard.quick_actions')}</h2>
-            <div className="grid grid-cols-2 gap-2">
-              <QuickAction href="/history" icon="🖼" label={t('dashboard.qa_uploads')} desc={t('dashboard.qa_uploads_desc')} />
-              <QuickAction href="/friends" icon="👥" label={t('dashboard.qa_friends')} desc={t('dashboard.qa_friends_desc')} />
-              <QuickAction href="/messages" icon="💬" label={t('dashboard.qa_messages')} desc={t('dashboard.qa_messages_desc')} />
-              <QuickAction href="/settings" icon="⚙" label={t('dashboard.qa_settings')} desc={t('dashboard.qa_settings_desc')} />
-            </div>
-          </section>
-
-          <section className="card">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold">{t('dashboard.achievements')}</h2>
-              <span className="rounded-full bg-bg px-2 py-0.5 text-[10px] font-bold text-warn">
-                {[
-                  videos.length >= 1, videos.length >= 5,
-                  (summary?.totalViews ?? 0) >= 100, (summary?.totalLikes ?? 0) >= 10,
-                  !!me.totpEnabled, !!me.isPremium,
-                ].filter(Boolean).length}/6
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <Badge unlocked={videos.length >= 1} icon="🎬" label={t('dashboard.ach_first')} desc={t('dashboard.ach_first_desc')} />
-              <Badge unlocked={videos.length >= 5} icon="📹" label={t('dashboard.ach_5vids')} desc={t('dashboard.ach_5vids_desc')} />
-              <Badge unlocked={(summary?.totalViews ?? 0) >= 100} icon="👁" label={t('dashboard.ach_100views')} desc={t('dashboard.ach_100views_desc')} />
-              <Badge unlocked={(summary?.totalLikes ?? 0) >= 10} icon="👍" label={t('dashboard.ach_liked')} desc={t('dashboard.ach_liked_desc')} />
-              <Badge unlocked={!!me.totpEnabled} icon="🔐" label={t('dashboard.ach_secure')} desc={t('dashboard.ach_secure_desc')} />
-              <Badge unlocked={!!me.isPremium} icon="⭐" label={t('dashboard.ach_premium')} desc={t('dashboard.ach_premium_desc')} />
-            </div>
-          </section>
-        </div>
-
-        {/* TIPS & TRICKS */}
-        <section className="card bg-grad-card enter enter-6">
-          <h2 className="mb-3 font-bold">{t('dashboard.tips')}</h2>
-          <div className="grid gap-2 text-sm md:grid-cols-2">
-            <Tip icon="📌" text={t('dashboard.tip_thumbnail')} />
-            <Tip icon="🔗" text={t('dashboard.tip_share')} />
-            <Tip icon="👥" text={t('dashboard.tip_follow')} />
-            <Tip icon="🔥" text={t('dashboard.tip_short_video')} />
-            <Tip icon="🔐" text={t('dashboard.tip_2fa')} />
-            <Tip icon="🎬" text={t('dashboard.tip_consistent')} />
+        {/* QUICK ACTIONS */}
+        <section className="card enter enter-5">
+          <h2 className="mb-3 font-bold">{t('dashboard.quick_actions')}</h2>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <QuickAction href="/history" icon="🖼" label={t('dashboard.qa_uploads')} desc={t('dashboard.qa_uploads_desc')} />
+            <QuickAction href="/notifications" icon="🔔" label="Notifikasi" desc="Aktivitas terbaru" />
+            <QuickAction href="/messages" icon="💬" label={t('dashboard.qa_messages')} desc={t('dashboard.qa_messages_desc')} />
+            <QuickAction href="/settings" icon="⚙" label={t('dashboard.qa_settings')} desc={t('dashboard.qa_settings_desc')} />
           </div>
         </section>
 
@@ -289,24 +253,6 @@ export default function DashboardPage() {
             </div>
           </section>
         )}
-
-        {/* NETWORK */}
-        <section className="card enter enter-4">
-          <h2 className="mb-3 font-bold">🌐 Network</h2>
-          <div className="grid grid-cols-2 gap-2">
-            <Link href="/friends?tab=followers" className="rounded-xl border border-border bg-bg p-3 text-center transition hover:border-accent">
-              <div className="text-xl">👥</div>
-              <div className="mt-1 text-2xl font-extrabold"><CountUp to={followers.length} delay={400} /></div>
-              <div className="text-[10px] uppercase tracking-wider text-muted">Followers</div>
-            </Link>
-            <Link href="/friends?tab=following" className="rounded-xl border border-border bg-bg p-3 text-center transition hover:border-accent">
-              <div className="text-xl">➕</div>
-              <div className="mt-1 text-2xl font-extrabold"><CountUp to={following.length} delay={450} /></div>
-              <div className="text-[10px] uppercase tracking-wider text-muted">Following</div>
-            </Link>
-          </div>
-          <Link href="/friends" className="btn-ghost mt-3 block w-full text-center text-xs">🔍 Cari Teman Baru</Link>
-        </section>
 
         {/* STORAGE USED */}
         <section className="card enter enter-5">
