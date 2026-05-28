@@ -217,14 +217,14 @@ export function PremiumUpgradeModal({ open, onClose }: { open: boolean; onClose:
                 onClick={() => { setTier(t); setStep('payment'); }}
                 className={`relative flex flex-col rounded-2xl border p-4 text-left transition hover:-translate-y-1 hover:border-accent/60 ${
                   t.bestValue
-                    ? 'border-accent bg-accent/10 shadow-glow'
+                    ? 'border-accent bg-accent/10'
                     : t.popular
                     ? 'border-warn/50 bg-warn/5'
                     : 'border-border bg-bg-elev/40'
                 }`}
               >
                 {t.bestValue && (
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-grad-accent px-2 py-0.5 text-[10px] font-bold text-white">
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-white">
                     🏆 Hemat Terbanyak
                   </div>
                 )}
@@ -253,7 +253,7 @@ export function PremiumUpgradeModal({ open, onClose }: { open: boolean; onClose:
                 </ul>
                 <div className={`mt-4 block rounded-xl py-2 text-center text-xs font-bold ${
                   t.bestValue || t.popular
-                    ? 'bg-grad-accent text-white shadow-glow'
+                    ? 'bg-accent text-white'
                     : 'border border-border bg-bg-card'
                 }`}>
                   Pilih →
@@ -423,8 +423,8 @@ export function LandingPricing() {
           </Link>
         </div>
 
-        <div className="card relative flex flex-col border-2 border-accent shadow-glow">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-grad-accent px-3 py-1 text-xs font-bold text-white">
+        <div className="card relative flex flex-col border-2 border-accent">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-1 text-xs font-bold text-white">
             ⭐ Best Value
           </div>
           <div className="text-center">
@@ -470,7 +470,7 @@ function PaymentTile({ pm, onClick, active }: { pm: PaymentMethod; onClick: () =
       type="button"
       onClick={onClick}
       className={`flex items-center gap-2 rounded-xl border p-3 text-left transition hover:-translate-y-0.5 ${
-        active ? 'border-accent bg-accent/15 shadow-glow' : 'border-border bg-bg-elev/40 hover:border-accent/50'
+        active ? 'border-accent bg-accent/15' : 'border-border bg-bg-elev/40 hover:border-accent/50'
       }`}
     >
       <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg text-lg ${pm.color}`}>{pm.icon}</span>

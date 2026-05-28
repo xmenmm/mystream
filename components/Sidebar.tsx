@@ -107,8 +107,8 @@ export function Sidebar() {
           href="/dashboard"
           className="flex shrink-0 items-center gap-2.5 border-b border-border px-5 py-[18px]"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-grad-accent text-lg font-extrabold text-white shadow-glow">M</span>
-          <span className="bg-grad-accent bg-clip-text text-xl font-extrabold text-transparent">MyStream</span>
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-accent text-lg font-extrabold text-white">M</span>
+          <span className="text-xl font-extrabold">MyStream</span>
         </Link>
 
         {/* Upload CTA */}
@@ -116,7 +116,7 @@ export function Sidebar() {
           <button
             type="button"
             onClick={() => window.dispatchEvent(new Event('mystream:open-upload'))}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-grad-accent px-3 py-2.5 text-sm font-bold text-white shadow-glow transition hover:opacity-90"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-3 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
           >
             <span>⬆</span>
             <span>Upload Video</span>
@@ -150,7 +150,7 @@ export function Sidebar() {
         </nav>
 
         {/* Bottom: Storage + User card */}
-        <div className="shrink-0 border-t border-border bg-bg/80 backdrop-blur p-3 space-y-2.5">
+        <div className="shrink-0 border-t border-border bg-bg p-3 space-y-2.5">
           {/* Storage meter */}
           <div>
             <div className="mb-1 flex items-center justify-between text-[10px]">
@@ -161,7 +161,7 @@ export function Sidebar() {
               <div className="h-1 overflow-hidden rounded-full bg-bg-elev">
                 <div
                   className={`h-full rounded-full transition-all ${
-                    storagePct > 80 ? 'bg-danger' : storagePct > 50 ? 'bg-warn' : 'bg-grad-accent'
+                    storagePct > 80 ? 'bg-danger' : storagePct > 50 ? 'bg-warn' : 'bg-accent'
                   }`}
                   style={{ width: `${Math.min(100, storagePct)}%` }}
                 />
@@ -199,7 +199,7 @@ export function Sidebar() {
             aria-label={t(it.tKey) || it.fallback}
             className={`relative grid h-10 flex-1 min-w-[40px] place-items-center rounded-xl text-lg transition ${
               isActiveFor(it.href, path)
-                ? 'bg-grad-accent text-white shadow-glow'
+                ? 'bg-accent text-white'
                 : 'text-muted'
             }`}
           >
@@ -217,7 +217,7 @@ export function Sidebar() {
             aria-label="Admin"
             className={`grid h-10 flex-1 min-w-[40px] place-items-center rounded-xl text-lg transition ${
               path?.startsWith('/admin')
-                ? 'bg-gradient-to-r from-warn to-danger text-white shadow-glow'
+                ? 'bg-gradient-to-r from-warn to-danger text-white'
                 : 'text-warn'
             }`}
           >

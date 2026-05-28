@@ -79,7 +79,7 @@ export function OnboardingPanduan() {
     >
       <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-bg-card shadow-2xl animate-slide-up">
         {/* Header */}
-        <div className="flex items-start gap-3 border-b border-border bg-grad-accent p-5 text-white">
+        <div className="flex items-start gap-3 border-b border-border bg-accent p-5 text-white">
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/20 text-xl">📖</div>
           <div className="flex-1">
             <h2 className="text-xl font-extrabold">Panduan singkat dashboard</h2>
@@ -104,7 +104,7 @@ export function OnboardingPanduan() {
               onClick={() => setActive(i)}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                 active === i
-                  ? 'bg-grad-accent text-white shadow-glow'
+                  ? 'bg-accent text-white'
                   : 'border border-border bg-bg-card text-muted hover:text-text hover:border-accent'
               }`}
             >
@@ -117,7 +117,7 @@ export function OnboardingPanduan() {
         {/* Content */}
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-grad-accent text-3xl shadow-glow">
+            <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-accent text-3xl">
               {SECTIONS[active].icon}
             </div>
             <div className="flex-1">
@@ -142,7 +142,7 @@ export function OnboardingPanduan() {
                   onClick={() => setActive(i)}
                   aria-label={`Step ${i + 1}`}
                   className={`h-1.5 rounded-full transition-all ${
-                    active === i ? 'w-6 bg-grad-accent' : 'w-1.5 bg-border'
+                    active === i ? 'w-6 bg-accent' : 'w-1.5 bg-border'
                   }`}
                 />
               ))}

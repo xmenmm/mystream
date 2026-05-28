@@ -20,7 +20,8 @@
   --accent-2-rgb: 56 189 248;
   --grad-accent: linear-gradient(135deg, #3b82f6, #2563eb);
   --accent-fg: #ffffff;
-  --glow: 0 6px 22px rgba(59, 130, 246, 0.28);
+  /* Glow lebih subtle — tone down dari aesthetic-flexing ke trust-focused */
+  --glow: 0 4px 12px rgba(59, 130, 246, 0.14);
 }
 
 .light {
@@ -41,7 +42,7 @@
   --accent-2-rgb: 14 165 233;
   --grad-accent: linear-gradient(135deg, #3b82f6, #2563eb);
   --accent-fg: #ffffff;
-  --glow: 0 6px 20px rgba(37, 99, 235, 0.16);
+  --glow: 0 4px 10px rgba(37, 99, 235, 0.08);
 }
 
 html {
@@ -82,9 +83,10 @@ a { color: inherit; }
 
 @layer components {
   .card {
-    /* Semi-transparent + backdrop-blur supaya space bg keliatan di belakang */
-    @apply rounded-2xl border border-border p-3 shadow-md backdrop-blur-md sm:p-4 md:p-5;
-    background-color: color-mix(in srgb, var(--bg-card) 80%, transparent);
+    /* Solid card — utility-first, gak ada backdrop-blur/transparency.
+       Hosting platform butuh trust > aesthetic-flexing.
+       Versi blur lama → .card-glass (opt-in untuk hero element). */
+    @apply rounded-xl border border-border bg-bg-card p-3 sm:p-4 md:p-5;
   }
   .card-glass {
     @apply rounded-2xl border border-border p-3 shadow-md backdrop-blur-md sm:p-4 md:p-5;

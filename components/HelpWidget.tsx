@@ -28,7 +28,7 @@ export function HelpWidget() {
         {!open && !tipDismissed && (
           <div
             onClick={() => setOpen(true)}
-            className="cursor-pointer rounded-xl bg-grad-accent px-3 py-2 text-xs font-bold text-white shadow-lg animate-pulse"
+            className="cursor-pointer rounded-xl bg-accent px-3 py-2 text-xs font-bold text-white shadow-lg animate-pulse"
             style={{ maxWidth: 220 }}
           >
             Klik di sini jika butuh bantuan
@@ -44,7 +44,7 @@ export function HelpWidget() {
         <button
           onClick={() => { setOpen(!open); setTipDismissed(true); }}
           aria-label="Bantuan"
-          className="grid h-14 w-14 place-items-center rounded-full bg-grad-accent text-white shadow-2xl transition hover:scale-110"
+          className="grid h-14 w-14 place-items-center rounded-full bg-accent text-white shadow-2xl transition hover:scale-110"
         >
           <div className="flex flex-col gap-1">
             <span className="block h-0.5 w-6 bg-white rounded" style={{ transform: open ? 'translateY(6px) rotate(45deg)' : '' }} />
@@ -58,7 +58,7 @@ export function HelpWidget() {
         <>
           <div className="fixed inset-0 z-[8999] bg-black/55 backdrop-blur-sm" onClick={() => setOpen(false)} />
           <div className="fixed bottom-24 right-5 z-[9001] flex w-[420px] max-w-[calc(100vw-2.5rem)] max-h-[78vh] flex-col overflow-hidden rounded-2xl border border-border bg-bg-card shadow-2xl">
-            <div className="flex items-center gap-3 bg-grad-accent p-4 text-white">
+            <div className="flex items-center gap-3 bg-accent p-4 text-white">
               <span className="text-xl">❓</span>
               <div className="flex-1">
                 <h3 className="font-bold">Pusat Bantuan MyStream</h3>

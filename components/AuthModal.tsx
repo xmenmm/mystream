@@ -140,14 +140,14 @@ export function AuthModal() {
             <button
               type="button"
               onClick={() => switchMode('login')}
-              className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${mode === 'login' ? 'bg-grad-accent text-white shadow' : 'text-muted hover:text-white'}`}
+              className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${mode === 'login' ? 'bg-accent text-white shadow' : 'text-muted hover:text-white'}`}
             >
               {t('auth.btn_login')}
             </button>
             <button
               type="button"
               onClick={() => switchMode('signup')}
-              className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${mode === 'signup' ? 'bg-grad-accent text-white shadow' : 'text-muted hover:text-white'}`}
+              className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${mode === 'signup' ? 'bg-accent text-white shadow' : 'text-muted hover:text-white'}`}
             >
               {t('auth.signup_title')}
             </button>

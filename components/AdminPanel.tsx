@@ -318,7 +318,7 @@ function GrantPremiumModal({ user, onClose, onSaved }: { user: any; onClose: () 
               key={t}
               onClick={() => setTab(t)}
               className={`flex-1 rounded-md px-2 py-1.5 text-xs font-bold transition ${
-                tab === t ? 'bg-grad-accent text-white' : 'text-muted hover:text-text'
+                tab === t ? 'bg-accent text-white' : 'text-muted hover:text-text'
               }`}
             >
               {t === 'preset' ? '⏱ Preset' : t === 'custom' ? '🔢 Custom' : '📅 Tanggal'}
@@ -441,7 +441,7 @@ function UserRow({ u }: { u: any }) {
   const isOnline = u.lastActiveAt && Date.now() - u.lastActiveAt < 5 * 60 * 1000;
   return (
     <div className="flex items-center gap-2 py-2 border-b border-border text-sm">
-      <span className="grid h-8 w-8 place-items-center rounded-full bg-grad-accent text-white text-xs font-bold">{u.username[0].toUpperCase()}</span>
+      <span className="grid h-8 w-8 place-items-center rounded-full bg-accent text-white text-xs font-bold">{u.username[0].toUpperCase()}</span>
       <div className="flex-1 min-w-0">
         <div className="font-semibold truncate">
           {u.username}
@@ -1035,7 +1035,7 @@ function ImageUrlField({ label, value, onChange, placeholder }: { label: string;
       {/* Progress bar saat upload */}
       {busy && (
         <div className="h-1 overflow-hidden rounded-full bg-bg-elev">
-          <div className="h-full bg-grad-accent transition-all" style={{ width: `${progress}%` }} />
+          <div className="h-full bg-accent transition-all" style={{ width: `${progress}%` }} />
         </div>
       )}
 
@@ -1216,7 +1216,7 @@ function PremiumCodesPane({ onApproved }: { onApproved: () => void }) {
             onClick={() => setFilter(f)}
             className={`rounded-lg px-3 py-1 text-xs font-semibold ${
               filter === f
-                ? 'bg-grad-accent text-white'
+                ? 'bg-accent text-white'
                 : 'border border-border bg-bg text-muted hover:text-text'
             }`}
           >

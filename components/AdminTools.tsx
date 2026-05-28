@@ -25,7 +25,7 @@ export function AdminTools() {
 
   return (
     <section className="card overflow-hidden p-0 border-warn/30">
-      <header className="flex items-center justify-between bg-grad-accent p-3">
+      <header className="flex items-center justify-between bg-accent p-3">
         <h2 className="font-bold flex items-center gap-2">{tr('admin_tools.header')}</h2>
         <span className="text-xs opacity-85">{tr('admin_tools.quick_actions')}</span>
       </header>

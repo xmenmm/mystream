@@ -28,7 +28,7 @@ export function TopBar() {
     <>
       <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-bg/80 px-4 backdrop-blur">
         <Link href="/dashboard" className="flex items-center gap-2 font-bold md:hidden">
-          <span className="grid h-8 w-8 place-items-center rounded-xl bg-grad-accent text-white">M</span>
+          <span className="grid h-8 w-8 place-items-center rounded-xl bg-accent text-white">M</span>
           <span className="hidden sm:inline">MyStream</span>
         </Link>
         {me && <span className="hidden text-sm text-muted md:inline">{t('topbar.greeting')} {me.username} 👋</span>}

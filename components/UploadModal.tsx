@@ -318,7 +318,7 @@ export function UploadModal({ onClose }: { onClose: () => void }) {
         {busy && progress > 0 && (
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-bg-elev">
             <div
-              className="h-full bg-grad-accent transition-all"
+              className="h-full bg-accent transition-all"
               style={{ width: `${Math.round(progress * 100)}%` }}
             />
           </div>

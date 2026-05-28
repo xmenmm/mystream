@@ -37,7 +37,7 @@ export function BannerStrip() {
   // Layout: text → running marquee. promo → icon+title+CTA. image → image only.
   if (b.layout === 'text') {
     return (
-      <div className="banner-strip overflow-hidden rounded-2xl shadow-glow" style={bgStyle}>
+      <div className="banner-strip overflow-hidden rounded-2xl" style={bgStyle}>
         <div className="banner-marquee whitespace-nowrap py-2 text-sm font-semibold">
           <span className="px-6">{b.icon} {b.title}</span>
           <span className="px-6">{b.icon} {b.title}</span>
@@ -52,7 +52,7 @@ export function BannerStrip() {
     const fitHeight = (b.height && b.height !== 'auto') ? b.height : '200px';
     const fit = (['cover', 'contain', 'fill', 'scale-down', 'none'].includes(b.objectFit) ? b.objectFit : 'cover') as any;
     return (
-      <div className="banner-strip overflow-hidden rounded-2xl shadow-glow" style={bgStyle}>
+      <div className="banner-strip overflow-hidden rounded-2xl" style={bgStyle}>
         <Link href={b.ctaUrl || '#'} className="block">
           <img
             src={b.imageUrl}
@@ -67,7 +67,7 @@ export function BannerStrip() {
 
   // promo (default)
   return (
-    <div className="banner-strip flex items-center gap-4 rounded-2xl p-4 shadow-glow" style={bgStyle}>
+    <div className="banner-strip flex items-center gap-4 rounded-2xl p-4" style={bgStyle}>
       {b.icon && <div className="text-3xl shrink-0">{b.icon}</div>}
       <div className="min-w-0 flex-1">
         <div className="font-extrabold leading-tight">{b.title}</div>
