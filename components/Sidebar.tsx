@@ -113,13 +113,14 @@ export function Sidebar() {
 
         {/* Upload CTA */}
         <div className="px-3 pt-3">
-          <Link
-            href="/dashboard?action=upload"
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event('mystream:open-upload'))}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-grad-accent px-3 py-2.5 text-sm font-bold text-white shadow-glow transition hover:opacity-90"
           >
             <span>⬆</span>
             <span>Upload Video</span>
-          </Link>
+          </button>
         </div>
 
         {/* Menu groups */}

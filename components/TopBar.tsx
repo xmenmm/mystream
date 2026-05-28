@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useMe } from './UserContext';
 import { Avatar } from './Avatar';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UploadModal } from './UploadModal';
 import { ThemeToggle } from './ThemeToggle';
 import { SearchBar } from './SearchBar';
@@ -15,6 +15,14 @@ export function TopBar() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const t = useT();
+
+  // Listen global event `mystream:open-upload` — bisa di-trigger dari Sidebar
+  // atau komponen lain tanpa prop drilling.
+  useEffect(() => {
+    function handler() { setUploadOpen(true); }
+    window.addEventListener('mystream:open-upload', handler);
+    return () => window.removeEventListener('mystream:open-upload', handler);
+  }, []);
 
   return (
     <>
