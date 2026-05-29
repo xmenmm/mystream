@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest } from '@/lib/auth';
 import { supa } from '@/lib/supabase';
+import { setConfig, getConfig } from '@/lib/config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -80,6 +81,24 @@ export async function GET(req: NextRequest) {
   result.bannerReadbackValue = readbackBanner.data?.value;
   result.bannerReadbackUpdatedAt = readbackBanner.data?.updated_at;
   result.updatePersisted = JSON.stringify(readbackBanner.data?.value) === JSON.stringify(updateTestValue);
+
+  // Step 7: Test setConfig wrapper langsung (untuk isolasi bug — apakah wrapper bermasalah?)
+  const wrapperTestValue = { _wrapper_test: Date.now(), title: 'wrapper test' };
+  try {
+    await setConfig('banner', wrapperTestValue);
+    result.wrapperError = null;
+  } catch (e: any) {
+    result.wrapperError = e.message;
+  }
+  // Read back via getConfig
+  const viaGetConfig = await getConfig('banner', null);
+  result.wrapperReadbackValue = viaGetConfig;
+  result.wrapperPersisted = JSON.stringify(viaGetConfig) === JSON.stringify(wrapperTestValue);
+
+  // Read back via direct SQL
+  const directRead = await sb.from('app_config').select('value, updated_at').eq('key', 'banner').maybeSingle();
+  result.directReadValue = directRead.data?.value;
+  result.directReadUpdatedAt = directRead.data?.updated_at;
 
   return NextResponse.json(result);
 }
