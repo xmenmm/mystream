@@ -739,11 +739,30 @@ function BannerPane() {
           <ColorField label="Teks" v={b.textColor} onChange={(v) => setB({ ...b, textColor: v })} />
         </div>
         <ImageUrlField
-          label="Image URL (untuk layout=image)"
+          label="Image URL (auto-pilih layout = Image)"
           value={b.imageUrl}
-          onChange={(v) => setB({ ...b, imageUrl: v })}
+          onChange={(v) => setB({
+            ...b,
+            imageUrl: v,
+            // Auto-switch layout ke 'image' kalau user upload/paste URL baru
+            // & layout masih default 'promo'. Kalau user emang udah pilih layout
+            // lain (text/image), respect pilihannya.
+            layout: v && b.layout === 'promo' ? 'image' : b.layout,
+          })}
           placeholder="https://... atau upload file →"
         />
+        {b.imageUrl && b.layout !== 'image' && (
+          <div className="rounded-lg border border-warn/30 bg-warn/10 p-2 text-xs text-warn">
+            ⚠ Image URL diisi tapi Layout = <b>{b.layout}</b>. Gambar tidak akan tampil.
+            <button
+              type="button"
+              onClick={() => setB({ ...b, layout: 'image' })}
+              className="ml-2 underline hover:text-text"
+            >
+              Ganti ke layout Image →
+            </button>
+          </div>
+        )}
 
         {/* PREVIEW — replicate sama persis dengan render production */}
         <div className="rounded-xl border border-border p-2">
