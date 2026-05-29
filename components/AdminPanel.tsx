@@ -622,12 +622,15 @@ function BannerPane() {
   const [b, setB] = useState<any>(null);
   const [sb, setSb] = useState<any>(null);
   const [rt, setRt] = useState<any>(null);
+  const [rtTopbar, setRtTopbar] = useState<any>(null);
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
     apiGetBanner().then(setB).catch(() => {});
     apiGetSideBanner().then(setSb).catch(() => {});
     apiGetRunningText().then(setRt).catch(() => {});
+    fetch('/api/running-text-topbar', { cache: 'no-store' })
+      .then((r) => r.json()).then((d) => setRtTopbar(d.runningText)).catch(() => {});
   }, []);
 
   async function saveMain() {
@@ -639,11 +642,22 @@ function BannerPane() {
     catch (e: any) { setMsg('Gagal: ' + e.message); }
   }
   async function saveRt() {
-    try { await apiSetRunningText(rt); setMsg('✓ Running text tersimpan'); setTimeout(() => setMsg(''), 2500); }
+    try { await apiSetRunningText(rt); setMsg('✓ Running text watch page tersimpan'); setTimeout(() => setMsg(''), 2500); }
     catch (e: any) { setMsg('Gagal: ' + e.message); }
   }
+  async function saveRtTopbar() {
+    try {
+      await fetch('/api/running-text-topbar', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rtTopbar),
+      });
+      setMsg('✓ Running text topbar tersimpan');
+      setTimeout(() => setMsg(''), 2500);
+    } catch (e: any) { setMsg('Gagal: ' + e.message); }
+  }
 
-  if (!b || !sb || !rt) return <p className="text-sm text-muted">Loading…</p>;
+  if (!b || !sb || !rt || !rtTopbar) return <p className="text-sm text-muted">Loading…</p>;
 
   return (
     <div className="space-y-6">
@@ -966,6 +980,61 @@ function BannerPane() {
         </div>
 
         <button className="btn-primary" onClick={saveRt}>💾 Simpan Running Text</button>
+      </div>
+
+      {/* RUNNING TEXT TOPBAR — separate, tampil transparan di topbar dashboard */}
+      <div className="space-y-3 border-t border-border pt-4">
+        <h3 className="text-sm font-bold">📢 Running Text Topbar (Dashboard & semua halaman dalam app)</h3>
+        <p className="text-xs text-muted">
+          Beda dari running text watch page di atas. Yang ini tampil <b>transparan</b> di topbar dashboard,
+          history, profile, settings, dst. Cocok untuk pengumuman halus yang gak ganggu konten utama.
+        </p>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={rtTopbar.enabled}
+            onChange={(e) => setRtTopbar({ ...rtTopbar, enabled: e.target.checked })}
+          />
+          <span>Aktifkan running text topbar</span>
+        </label>
+        <div>
+          <label className="text-[10px] uppercase text-muted">Teks</label>
+          <input
+            className="input"
+            maxLength={300}
+            value={rtTopbar.text}
+            onChange={(e) => setRtTopbar({ ...rtTopbar, text: e.target.value })}
+            placeholder="Contoh: Update terbaru — fitur embed code sekarang aktif!"
+          />
+        </div>
+        <div className="grid gap-2 sm:grid-cols-3">
+          <ColorField label="Warna teks" v={rtTopbar.textColor} onChange={(v) => setRtTopbar({ ...rtTopbar, textColor: v })} />
+          <div className="sm:col-span-2">
+            <label className="text-[10px] uppercase text-muted">Kecepatan ({rtTopbar.speed}s/loop)</label>
+            <input
+              type="range"
+              min={5}
+              max={120}
+              value={rtTopbar.speed}
+              onChange={(e) => setRtTopbar({ ...rtTopbar, speed: Number(e.target.value) })}
+              className="w-full"
+            />
+          </div>
+        </div>
+
+        {/* Preview */}
+        {rtTopbar.enabled && rtTopbar.text && (
+          <div className="rounded-lg border border-border bg-bg p-2">
+            <div className="text-[10px] uppercase text-muted mb-1">Preview</div>
+            <div className="overflow-hidden" style={{ color: rtTopbar.textColor }}>
+              <div className="whitespace-nowrap text-xs font-medium opacity-70">
+                📢 {rtTopbar.text}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button className="btn-primary" onClick={saveRtTopbar}>💾 Simpan Running Text Topbar</button>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { UploadModal } from './UploadModal';
 import { ThemeToggle } from './ThemeToggle';
 import { SearchBar } from './SearchBar';
 import { NotificationBell } from './NotificationBell';
+import { TopbarRunningText } from './TopbarRunningText';
 import { useT } from '@/lib/i18n';
 
 export function TopBar() {
@@ -30,8 +31,9 @@ export function TopBar() {
           <span className="grid h-8 w-8 place-items-center rounded-xl bg-accent text-white">M</span>
           <span className="hidden sm:inline">MyStream</span>
         </Link>
-        {me && <span className="hidden text-sm text-muted md:inline">{t('topbar.greeting')} {me.username} 👋</span>}
-        <div className="ml-2 flex-1">
+        {me && <span className="hidden shrink-0 text-sm text-muted md:inline">{t('topbar.greeting')} {me.username} 👋</span>}
+        <TopbarRunningText />
+        <div className="ml-2 max-w-md flex-1">
           <SearchBar />
         </div>
         <ThemeToggle />
