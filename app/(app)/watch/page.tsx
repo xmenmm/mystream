@@ -206,6 +206,71 @@ export default function WatchPage() {
     };
   }, [v?.id]);
 
+  // Keyboard shortcuts (standard player controls)
+  // → / L: +5s · ← / J: -5s · Space / K: play-pause · M: mute · F: fullscreen
+  // Skip kalau user lagi ketik di input/textarea/contentEditable.
+  useEffect(() => {
+    function isTypingTarget(target: EventTarget | null): boolean {
+      if (!(target instanceof HTMLElement)) return false;
+      const tag = target.tagName;
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable;
+    }
+    function onKey(e: KeyboardEvent) {
+      if (isTypingTarget(e.target)) return;
+      const el = videoRef.current;
+      if (!el) return;
+      // Skip kalau modifier key dipencet (Ctrl+R refresh dst.)
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'l':
+        case 'L': {
+          e.preventDefault();
+          const newTime = Math.min((el.duration || 0), el.currentTime + 5);
+          el.currentTime = newTime;
+          flashSeek('R', 5);
+          break;
+        }
+        case 'ArrowLeft':
+        case 'j':
+        case 'J': {
+          e.preventDefault();
+          const newTime = Math.max(0, el.currentTime - 5);
+          el.currentTime = newTime;
+          flashSeek('L', 5);
+          break;
+        }
+        case ' ':
+        case 'k':
+        case 'K': {
+          e.preventDefault();
+          if (el.paused) el.play().catch(() => {});
+          else el.pause();
+          break;
+        }
+        case 'm':
+        case 'M': {
+          e.preventDefault();
+          el.muted = !el.muted;
+          setMuted(el.muted);
+          break;
+        }
+        case 'f':
+        case 'F': {
+          e.preventDefault();
+          const container = playerContainerRef.current;
+          if (!container) return;
+          if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+          else container.requestFullscreen().catch(() => {});
+          break;
+        }
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [v?.id]);
+
   function fmtTime(s: number): string {
     if (!isFinite(s) || s < 0) return '0:00';
     const totalSec = Math.floor(s);
