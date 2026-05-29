@@ -31,8 +31,27 @@ export async function getConfig<T = any>(key: string, def: T): Promise<T> {
 
 export async function setConfig(key: string, value: any): Promise<void> {
   const sb = supa();
-  const { error } = await sb
+  // Explicit onConflict: 'key' supaya upsert pakai key sebagai conflict target
+  // (default infer kadang gak jalan di beberapa versi supabase-js).
+  const { error, data } = await sb
     .from(T)
-    .upsert({ key, value, updated_at: new Date().toISOString() });
-  if (error) throw new Error('setConfig(' + key + '): ' + error.message);
+    .upsert(
+      { key, value, updated_at: new Date().toISOString() },
+      { onConflict: 'key' },
+    )
+    .select();
+  if (error) {
+    // Kemungkinan paling besar: tabel `app_config` belum dibuat di Supabase.
+    // Lihat SUPABASE-SESSIONS-TABLE.sql untuk SQL yg perlu di-run.
+    throw new Error(
+      'setConfig(' + key + '): ' + error.message +
+      ' — pastikan tabel app_config sudah dibuat di Supabase (jalankan SQL di SUPABASE-SESSIONS-TABLE.sql)',
+    );
+  }
+  if (!data || data.length === 0) {
+    throw new Error(
+      'setConfig(' + key + '): write balas OK tapi tidak ada row yg ter-upsert. ' +
+      'Kemungkinan tabel app_config belum dibuat atau RLS policy block insert.',
+    );
+  }
 }
