@@ -25,6 +25,13 @@ export function supa(): SupabaseClient {
   }
   _client = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
+    // CRITICAL: Next.js 14 auto-cache semua fetch GET → bikin read Supabase
+    // return STALE data, write balas success tapi gak benar2 persist.
+    // Override fetch dengan cache: 'no-store' supaya tiap request fresh.
+    global: {
+      fetch: (input: any, init: any) =>
+        fetch(input, { ...init, cache: 'no-store', next: { revalidate: 0 } as any }),
+    },
   });
   return _client;
 }
