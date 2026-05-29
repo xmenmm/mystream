@@ -65,5 +65,21 @@ export async function GET(req: NextRequest) {
   // Step 4: Cleanup
   await sb.from('app_config').delete().eq('key', testKey);
 
+  // Step 5: Test UPDATE existing row (banner key)
+  const updateTestValue = { _debug_update_test: Date.now() };
+  const updateRes = await sb
+    .from('app_config')
+    .upsert({ key: 'banner', value: updateTestValue, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+    .select();
+  result.updateError = updateRes.error?.message || null;
+  result.updateReturnedRows = updateRes.data?.length || 0;
+  result.updateReturnedValue = updateRes.data?.[0]?.value;
+
+  // Step 6: Read back the banner row to see if UPDATE persisted
+  const readbackBanner = await sb.from('app_config').select('value, updated_at').eq('key', 'banner').maybeSingle();
+  result.bannerReadbackValue = readbackBanner.data?.value;
+  result.bannerReadbackUpdatedAt = readbackBanner.data?.updated_at;
+  result.updatePersisted = JSON.stringify(readbackBanner.data?.value) === JSON.stringify(updateTestValue);
+
   return NextResponse.json(result);
 }
