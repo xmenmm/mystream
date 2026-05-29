@@ -53,9 +53,11 @@ export default function DashboardPage() {
       <div className="space-y-3 sm:space-y-4 lg:col-span-2 xl:col-span-1">
         <header className="enter enter-1 flex flex-wrap items-center gap-3">
           <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
-          {/* Raw value — TANPA CountUp untuk hindari race "73 → 82" saat first load. */}
-          <span className="chip">VIEWS <b className="text-success">{summary ? fmtNum(summary.totalViews) : '—'}</b></span>
-          <span className="chip">LIKES <b className="text-success">{summary ? fmtNum(summary.totalLikes) : '—'}</b></span>
+          {/* ml-auto push chips ke ujung kanan, tetap stay-in-row dgn judul */}
+          <div className="ml-auto flex gap-2">
+            <span className="chip">VIEWS <b className="text-success">{summary ? fmtNum(summary.totalViews) : '—'}</b></span>
+            <span className="chip">LIKES <b className="text-success">{summary ? fmtNum(summary.totalLikes) : '—'}</b></span>
+          </div>
         </header>
 
         {/* Top 1·2·3 */}
