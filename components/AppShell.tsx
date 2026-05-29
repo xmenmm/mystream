@@ -5,7 +5,6 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { UserProvider, useMe } from './UserContext';
 import { GlobalEffects } from './GlobalEffects';
-import { GlobalRunningText } from './GlobalRunningText';
 import { HelpWidget } from './HelpWidget';
 import { OnboardingPanduan } from './OnboardingPanduan';
 
@@ -35,7 +34,6 @@ function Inner({ children }: { children: ReactNode }) {
       <div className="relative z-10">
         <Sidebar />
         <div className="w-full md:pl-60">
-          <GlobalRunningText />
           <TopBar />
           <main className="w-full min-w-0 p-3 pb-20 sm:p-4 md:px-6 md:pb-6">
             {loading ? (
