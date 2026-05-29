@@ -7,7 +7,6 @@ import { UploadModal } from './UploadModal';
 import { ThemeToggle } from './ThemeToggle';
 import { SearchBar } from './SearchBar';
 import { NotificationBell } from './NotificationBell';
-import { LanguageSwitcher } from './LanguageSwitcher';
 import { useT } from '@/lib/i18n';
 
 export function TopBar() {
@@ -36,7 +35,6 @@ export function TopBar() {
           <SearchBar />
         </div>
         <ThemeToggle />
-        {me && <LanguageSwitcher />}
         {me && <NotificationBell />}
         {me ? (
           <>
