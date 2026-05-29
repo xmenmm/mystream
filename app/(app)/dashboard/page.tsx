@@ -51,14 +51,11 @@ export default function DashboardPage() {
     <div className="space-y-3 sm:space-y-4">
     <div className="grid gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-[2fr_1fr]">
       <div className="space-y-3 sm:space-y-4 lg:col-span-2 xl:col-span-1">
-        <header className="enter enter-1 flex items-center justify-between flex-wrap gap-2">
+        <header className="enter enter-1 flex flex-wrap items-center gap-3">
           <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
-          <div className="flex gap-2">
-            {/* Raw value — TANPA CountUp untuk hindari race "73 → 82" saat first load.
-                Counter visual flair akan reactivated kalau summary udah ready. */}
-            <span className="chip">VIEWS <b className="text-success">{summary ? fmtNum(summary.totalViews) : '—'}</b></span>
-            <span className="chip">LIKES <b className="text-success">{summary ? fmtNum(summary.totalLikes) : '—'}</b></span>
-          </div>
+          {/* Raw value — TANPA CountUp untuk hindari race "73 → 82" saat first load. */}
+          <span className="chip">VIEWS <b className="text-success">{summary ? fmtNum(summary.totalViews) : '—'}</b></span>
+          <span className="chip">LIKES <b className="text-success">{summary ? fmtNum(summary.totalLikes) : '—'}</b></span>
         </header>
 
         {/* Top 1·2·3 */}
