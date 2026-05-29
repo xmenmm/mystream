@@ -6,14 +6,23 @@ import {
 } from '@/lib/auth';
 import { loadDB, saveDB, AVATARS_DIR } from '@/lib/db';
 import { createSession } from '@/lib/sessions';
+import { verifyCaptcha } from '@/lib/captcha';
 import { notifyDiscord } from '@/lib/discord';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
-  const { id, password } = await req.json();
+  const { id, password, captchaId, captchaCode } = await req.json();
   const idL = String(id || '').toLowerCase();
   const rlKey = idL;
+
+  // Captcha gate (anti-bot) — block sebelum cek password biar gak boros DB lookup
+  if (!captchaId || !captchaCode) {
+    return NextResponse.json({ error: 'Captcha wajib diisi', captchaFailed: true }, { status: 400 });
+  }
+  if (!verifyCaptcha(captchaId, captchaCode)) {
+    return NextResponse.json({ error: 'Captcha salah atau kadaluarsa — minta gambar baru', captchaFailed: true }, { status: 400 });
+  }
 
   // Rate-limit gate
   const rl = rateLimitCheck(rlKey);

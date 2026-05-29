@@ -56,10 +56,11 @@ export function AuthModal() {
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
-  // Load captcha when signup tab active
+  // Load captcha saat signup tab active ATAU login tab active (anti-bot di kedua flow)
   useEffect(() => {
-    if (open && mode === 'signup' && !captcha) loadCaptcha();
-  }, [open, mode, captcha, loadCaptcha]);
+    if (!open || tempToken) return; // skip kalau lagi 2FA verification
+    if ((mode === 'signup' || mode === 'login') && !captcha) loadCaptcha();
+  }, [open, mode, captcha, loadCaptcha, tempToken]);
 
   if (!open) return null;
 
@@ -80,7 +81,11 @@ export function AuthModal() {
         const u = r?.user?.username || '';
         router.push(`/welcome?next=${encodeURIComponent('/dashboard')}${u ? '&user=' + encodeURIComponent(u) : ''}`);
       } else {
-        const r = await api<any>('/api/login', { method: 'POST', body: { id, password: loginPw } });
+        if (!captcha) throw new Error('Captcha belum ke-load — refresh halaman');
+        const r = await api<any>('/api/login', {
+          method: 'POST',
+          body: { id, password: loginPw, captchaId: captcha.id, captchaCode },
+        });
         if (r.requires2FA) {
           setTempToken(r.tempToken);
           setCode('');
@@ -92,6 +97,8 @@ export function AuthModal() {
     } catch (e: any) {
       setErr(e.message || 'Login gagal');
       if (tempToken) setCode('');
+      // Refresh captcha kalau login gagal — protection against brute-force
+      if (!tempToken) loadCaptcha();
     } finally {
       setBusy(false);
     }
@@ -167,6 +174,26 @@ export function AuthModal() {
                 <div className="mt-3">
                   <label className="label">{t('auth.password')}</label>
                   <input className="input" type="password" value={loginPw} onChange={(e) => setLoginPw(e.target.value)} />
+                </div>
+                <div className="mt-3">
+                  <label className="label">{t('auth.captcha_label')}</label>
+                  <div className="flex items-stretch gap-2">
+                    <div className="grid min-h-[64px] min-w-0 flex-1 place-items-center rounded-xl border border-border bg-bg-elev p-1">
+                      {captcha
+                        ? <img src={captcha.image} alt="captcha" className="h-auto w-full rounded-lg" />
+                        : <span className="text-xs text-muted">Loading…</span>}
+                    </div>
+                    <button type="button" onClick={loadCaptcha} className="btn-ghost px-3 text-lg" title="Ganti gambar">↻</button>
+                  </div>
+                  <input
+                    className="input mt-2 text-center font-mono uppercase tracking-[6px]"
+                    value={captchaCode}
+                    onChange={(e) => setCC(e.target.value)}
+                    maxLength={8}
+                    placeholder="ABCDE"
+                    required
+                    autoComplete="off"
+                  />
                 </div>
               </>
             ) : (
